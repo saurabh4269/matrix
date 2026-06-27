@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    background: theme('colors.canvas');
+    color: theme('colors.ink.DEFAULT');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  ::selection {
+    background: rgba(184, 132, 59, 0.18);
+  }
+}
+
+@layer components {
+  .reading {
+    @apply max-w-reading mx-auto;
+  }
+  .hairline {
+    @apply border-hairline;
+  }
+}
