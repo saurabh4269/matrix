@@ -1,0 +1,57 @@
+# Redrob Hackathon — Submission Metadata
+# Fill in the TODO fields before submitting.
+
+team_name: "TODO"
+
+primary_contact:
+  name: "TODO"
+  email: "TODO@example.com"
+  phone: "+91-XXXXXXXXXX"
+
+team_members:
+  - name: "TODO"
+    email: "TODO@example.com"
+    role: "Team Lead / ML Engineer"
+
+github_repo: "https://github.com/TODO/redrob-ranker"
+sandbox_link: "https://huggingface.co/spaces/TODO/redrob-ranker"
+reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+
+compute:
+  platform: "TODO (e.g. MacBook Pro M2, AWS EC2 c5.4xlarge)"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.11"
+  os: "TODO"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+ai_tools_used:
+  - "Claude"
+
+ai_usage_summary: |
+  Used Claude for design discussion, code review, and refining the SNR
+  architecture and the six-act sandbox journey. No candidate data was fed to
+  any LLM during ranking; reasoning generation is pure deterministic
+  templating from structured probe evidence (no LLM in the runtime path).
+
+methodology_summary: |
+  Treats the JD as the algorithm: each JD requirement maps to a probe over
+  the candidate schema. Probes are tagged High-SNR / Medium-SNR / Low-SNR /
+  Anti-SNR and weighted by class; behavioural signals are a multiplicative
+  modifier. Six deterministic structural-impossibility rules quarantine
+  honeypots. Top 20 are refined via pairwise comparison against JD-priority
+  tiebreakers because NDCG@10 (50% of the composite score) is a pairwise
+  problem. Reasoning is composed from the top contributing probes per
+  candidate using six templates per rank band with deterministic seeding —
+  no LLM at runtime, so Stage-4 hallucination is impossible by construction.
+  Runs in ~230s on CPU.
+
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
