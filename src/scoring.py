@@ -25,7 +25,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from src.honeypot import detect as honeypot_detect
-from src.probes import anti_snr, behavioural, location, must_have, substance
+from src.probes import anti_snr, behavioural, location, must_have, retrieval, substance
 from src.schema import Candidate
 
 
@@ -81,10 +81,18 @@ ANTI_SNR_WEIGHTS = {
 # Component-wise product: effectively_available × notice_curve × trust × engagement.
 # Engagement has lighter weight via a clipped contribution.
 
+# Hybrid retrieval — bm25 + dense embedding (read from precomputed artefacts).
+# Loaded lazily; gracefully zero-out if data/ is missing (Phase 3 not run yet).
+RETRIEVAL_WEIGHTS = {
+    "bm25_jd_match": 0.40,
+    "dense_cosine_jd_match": 0.60,
+}
+
 # Category-level multipliers in the final composition
 CATEGORY_WEIGHTS = {
     "must_have": 1.0,
     "substance": 0.6,
+    "retrieval": 0.2,
     "location": 0.1,
 }
 
@@ -105,10 +113,12 @@ class CandidateScore:
     behavioural: list[tuple[str, float, str]] = field(default_factory=list)
     anti_snr: list[tuple[str, float, str]] = field(default_factory=list)
     location_probes: list[tuple[str, float, str]] = field(default_factory=list)
+    retrieval: list[tuple[str, float, str]] = field(default_factory=list)
 
     must_have_sum: float = 0.0
     substance_sum: float = 0.0
     location_sum: float = 0.0
+    retrieval_sum: float = 0.0
     anti_snr_penalty: float = 1.0
     behavioural_modifier: float = 1.0
 
@@ -146,6 +156,12 @@ def score_candidate(cand: Candidate) -> CandidateScore:
     for name, score, _ in loc:
         result.location_sum += LOCATION_WEIGHTS.get(name, 0.0) * score
 
+    # ----- Hybrid retrieval (no-op if precomputed artefacts missing) -----
+    retr = retrieval.run_all(cand)
+    result.retrieval = retr
+    for name, score, _ in retr:
+        result.retrieval_sum += RETRIEVAL_WEIGHTS.get(name, 0.0) * score
+
     # ----- Anti-SNR penalty (multiplicative) -----
     anti = anti_snr.run_all(cand)
     result.anti_snr = anti
@@ -176,6 +192,7 @@ def score_candidate(cand: Candidate) -> CandidateScore:
     base = (
         CATEGORY_WEIGHTS["must_have"] * result.must_have_sum
         + CATEGORY_WEIGHTS["substance"] * result.substance_sum
+        + CATEGORY_WEIGHTS["retrieval"] * result.retrieval_sum
         + CATEGORY_WEIGHTS["location"] * result.location_sum
     )
     result.score = base * penalty * behav_modifier
