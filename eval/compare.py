@@ -77,7 +77,7 @@ def main():
     print(f"Largest rank moves (positive = ranked lower in B):")
     for cid, ra, rb, delta in deltas[:15]:
         sign = "+" if delta > 0 else ""
-        print(f"  {cid}  rank {ra:>3} → {rb:>3}  ({sign}{delta})")
+        print(f"  {cid}  rank {ra:>3} -> {rb:>3}  ({sign}{delta})")
 
     # Top-N comparison side by side
     print()
@@ -88,7 +88,7 @@ def main():
     for i in range(args.top):
         ca = sorted_a[i][0] if i < len(sorted_a) else "–"
         cb = sorted_b[i][0] if i < len(sorted_b) else "–"
-        same = "  " if ca == cb else "≠ "
+        same = "  " if ca == cb else "* "
         print(f"  {i+1:<4}  {ca:<14}  {cb:<14}  {same}")
 
 
