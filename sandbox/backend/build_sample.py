@@ -1,4 +1,4 @@
-"""Build sandbox/backend/sample_candidates.json — the curated demo set.
+"""Build sandbox/backend/sample_candidates.json, the curated demo set.
 
 Picks: top 12 of the real ranking, 6 keyword-stuffers (to demonstrate trap
 defense), 2 honeypots (will be quarantined), 5 plain-language tier-5s

@@ -1,7 +1,7 @@
 """Cheap heuristics for stratified sampling and pre-fired structural flags.
 
 These run in a single pass per candidate, ~1ms each. They are intentionally
-crude — calibration ground truth comes from hand-labelling, not these.
+crude, calibration ground truth comes from hand-labelling, not these.
 """
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import re
 from src.schema import Candidate
 
 
-# Title regexes — coarse but sufficient for stratification heuristics
+# Title regexes, coarse but sufficient for stratification heuristics
 _ML_TITLE_RE = re.compile(
     r"\b("
     r"ml|machine[\s\-]?learning|ai|artificial[\s\-]?intelligence|"
@@ -50,7 +50,7 @@ CONSULTING_FIRMS = {
     "deloitte", "kpmg", "ey", "pwc",
 }
 
-# Product companies — broad list including FAANG, Indian unicorns, global ML/IR
+# Product companies, broad list including FAANG, Indian unicorns, global ML/IR
 # This is intentionally generous. Used as a soft positive signal.
 PRODUCT_COMPANIES = {
     # FAANG / big tech (these also trigger bigcorp_only at scale)
@@ -138,7 +138,7 @@ def count_jd_keyword_skills(cand: Candidate) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Honeypot-suspect heuristics (used for bucket E in sampling — NOT the final
+# Honeypot-suspect heuristics (used for bucket E in sampling, NOT the final
 # honeypot detector; that lives in src/honeypot.py with stricter rules).
 # ---------------------------------------------------------------------------
 
@@ -174,7 +174,7 @@ def fires_any_structural_paradox(cand: Candidate) -> list[str]:
     """Returns a list of paradox names that fire. Used for honeypot bucket sampling
     and as pre-fired flags on the labelling cards.
 
-    NOTE: salary_paradox (min > max) is excluded — empirical check shows
+    NOTE: salary_paradox (min > max) is excluded, empirical check shows
     18.9% of the synthesized dataset has min > max, so it's a data-generation
     artifact, not a honeypot signal. The function `salary_paradox()` is kept
     around for diagnostics but not used here.
@@ -192,7 +192,7 @@ def fires_any_structural_paradox(cand: Candidate) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Bucket assignment — single pass, mutually exclusive priority order
+# Bucket assignment, single pass, mutually exclusive priority order
 # ---------------------------------------------------------------------------
 
 def assign_bucket(cand: Candidate) -> str:
@@ -212,7 +212,7 @@ def assign_bucket(cand: Candidate) -> str:
     jd_kw_count = count_jd_keyword_skills(cand)
 
     # Likely tier-5: ML title (now) + product co + retrieval substance.
-    # Tier-5 wins even if a paradox also fires — that's a labelling discovery
+    # Tier-5 wins even if a paradox also fires, that's a labelling discovery
     # worth surfacing (real candidate flagged as honeypot would be a false-positive
     # honeypot rule we want to find).
     if has_ml_now and has_product_co and retrieval_mentions >= 2:
@@ -236,6 +236,6 @@ def assign_bucket(cand: Candidate) -> str:
     if has_ml_ever or retrieval_mentions >= 1 or jd_kw_count >= 2:
         return "adjacent_mid"
 
-    # Random control: no signal in any direction. Boring negatives — necessary
+    # Random control: no signal in any direction. Boring negatives, necessary
     # to anchor the bottom of the relevance scale during weight tuning.
     return "random_control"

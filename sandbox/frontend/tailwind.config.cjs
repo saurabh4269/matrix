@@ -25,9 +25,18 @@ module.exports = {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
+      // Six-tier scale. Use ONLY these in the app:
+      //   display  — candidate name, JD title (Fraunces 400)
+      //   title    — verdict reasoning, summary headings (Fraunces 400, 22px)
+      //   body     — UI text, evidence, status (Inter 400, 16px)
+      //   small    — captions, labels (Inter 500, 13px)
+      //   micro    — section labels (Inter 500, 11px uppercase tracked)
       fontSize: {
         display: ['clamp(2.5rem, 5vw + 1rem, 4.5rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
-        heading: ['clamp(1.5rem, 2vw + 0.5rem, 2rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        title:   ['1.375rem', { lineHeight: '1.6', letterSpacing: '-0.005em' }], // 22px
+        body:    ['1rem',     { lineHeight: '1.6' }],                              // 16px
+        small:   ['0.8125rem', { lineHeight: '1.5' }],                             // 13px
+        micro:   ['0.6875rem', { lineHeight: '1.4', letterSpacing: '0.18em' }],    // 11px tracked
       },
       maxWidth: {
         reading: '64ch',

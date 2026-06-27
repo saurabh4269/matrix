@@ -1,4 +1,4 @@
-"""Ranking metrics — NDCG@k, MAP, P@k — for evaluating against the labelled set.
+"""Ranking metrics, NDCG@k, MAP, P@k, for evaluating against the labelled set.
 
 All four metrics match those in the hackathon's composite score:
     Final = 0.50·NDCG@10 + 0.30·NDCG@50 + 0.15·MAP + 0.05·P@10
@@ -90,7 +90,7 @@ def evaluate(
     returns the four metrics plus composite plus honeypot rate.
 
     Candidates in `ranked_candidate_ids` not present in `label_by_id` are
-    treated as relevance 0 (tier 0) — they were neither labelled positive nor
+    treated as relevance 0 (tier 0), they were neither labelled positive nor
     labelled honeypot, so they don't help or hurt.
     """
     relevances = []

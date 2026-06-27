@@ -1,4 +1,4 @@
-# Redrob Hackathon — Submission Metadata
+# Redrob Hackathon, Submission Metadata
 # Fill in the TODO fields before submitting.
 
 team_name: "TODO"
@@ -45,7 +45,7 @@ methodology_summary: |
   honeypots. Top 20 are refined via pairwise comparison against JD-priority
   tiebreakers because NDCG@10 (50% of the composite score) is a pairwise
   problem. Reasoning is composed from the top contributing probes per
-  candidate using six templates per rank band with deterministic seeding —
+  candidate using six templates per rank band with deterministic seeding,
   no LLM at runtime, so Stage-4 hallucination is impossible by construction.
   Runs in ~230s on CPU.
 

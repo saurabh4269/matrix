@@ -26,7 +26,7 @@ export default function ConcernCallout({ concerns }: Props) {
   if (!top) return null
   return (
     <p className="mt-4 font-serif text-base text-signal-concern italic">
-      {friendlyConcern(top.name)} — {top.evidence}.
+      {friendlyConcern(top.name)}, {top.evidence}.
     </p>
   )
 }

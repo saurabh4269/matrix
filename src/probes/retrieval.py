@@ -1,8 +1,8 @@
-"""Hybrid retrieval probes — BM25 and dense-embedding cosine against the JD.
+"""Hybrid retrieval probes, BM25 and dense-embedding cosine against the JD.
 
 Both scores are read from pre-computed artefacts (data/bm25_scores.npy +
 data/dense_scores.npy). At ranking time we only do an O(1) dict lookup
-per candidate — no embedding model loaded, no compute on the hot path.
+per candidate, no embedding model loaded, no compute on the hot path.
 
 This module returns a (score, evidence) per probe per candidate; the
 scorer composes them as one additive feature group with weight α·bm25 +
@@ -29,6 +29,11 @@ _dense_max: float = 1.0
 
 
 def _load_artefacts() -> bool:
+    """Load BM25 + (optional) dense artefacts. Returns True if at least BM25 is usable.
+
+    Dense embeddings are an optional second channel; if dense_scores.npy is
+    missing (e.g. embedding precompute didn't finish), we run with BM25 only.
+    """
     global _bm25_by_id, _dense_by_id, _bm25_max, _dense_max
 
     if _bm25_by_id is not None:
@@ -38,18 +43,22 @@ def _load_artefacts() -> bool:
     bm25_path = _DATA_DIR / "bm25_scores.npy"
     dense_path = _DATA_DIR / "dense_scores.npy"
 
-    if not ids_path.exists() or not bm25_path.exists() or not dense_path.exists():
+    if not ids_path.exists() or not bm25_path.exists():
         return False
 
     with open(ids_path, "r", encoding="utf-8") as fp:
         ids = json.load(fp)
     bm25 = np.load(bm25_path)
-    dense = np.load(dense_path)
-
     _bm25_by_id = dict(zip(ids, bm25.tolist()))
-    _dense_by_id = dict(zip(ids, dense.tolist()))
     _bm25_max = max(_bm25_by_id.values()) if _bm25_by_id else 1.0
-    _dense_max = max(_dense_by_id.values()) if _dense_by_id else 1.0
+
+    if dense_path.exists():
+        dense = np.load(dense_path)
+        _dense_by_id = dict(zip(ids, dense.tolist()))
+        _dense_max = max(_dense_by_id.values()) if _dense_by_id else 1.0
+    else:
+        _dense_by_id = {}
+        _dense_max = 1.0
     return True
 
 
@@ -65,13 +74,12 @@ def bm25_jd_match(cand: Candidate) -> tuple[float, str]:
 
 
 def dense_cosine_jd_match(cand: Candidate) -> tuple[float, str]:
-    """Dense embedding cosine of the JD against this candidate's text."""
-    if not _load_artefacts() or _dense_by_id is None:
+    """Dense embedding cosine. Returns 0 if dense artefacts not available."""
+    if not _load_artefacts() or not _dense_by_id:
         return 0.0, ""
     raw = _dense_by_id.get(cand.candidate_id, 0.0)
     if raw <= 0:
         return 0.0, ""
-    # Cosine is already in [-1, 1]; positives are useful, negatives are noise.
     return saturating(raw, threshold=0.7), f"semantic similarity {raw:.3f}"
 
 

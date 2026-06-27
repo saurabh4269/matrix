@@ -10,7 +10,7 @@ TEAM_ID    ?= team_baseline
 .PHONY: help install test sample precompute submission audit score validate compare clean
 
 help:
-	@echo "redrob-ranker — common commands:"
+	@echo "redrob-ranker, common commands:"
 	@echo ""
 	@echo "  make install              install Python + npm dependencies"
 	@echo "  make test                 run the 29 unit tests"

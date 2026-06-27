@@ -1,4 +1,4 @@
-"""Location / logistics / certifications — low-weight additive probes."""
+"""Location / logistics / certifications, low-weight additive probes."""
 from __future__ import annotations
 
 from src.probes._text import saturating
@@ -12,16 +12,25 @@ PREFERRED_LOCATIONS = {
 
 
 def location_match(cand: Candidate) -> tuple[float, str]:
-    """Boost if location is one of the JD-preferred Indian metros OR willing to relocate."""
+    """Boost if location is one of the JD-preferred Indian metros OR willing to relocate.
+
+    JD says: 'Outside India: case-by-case, but we don't sponsor work visas.'
+    Outside-India + not-willing-to-relocate is therefore effectively unhireable.
+    """
     loc = (cand.profile.location or "").lower()
+    country = (cand.profile.country or "").lower()
+    relocate = cand.redrob_signals.willing_to_relocate
+
     if any(city in loc for city in PREFERRED_LOCATIONS):
         return 1.0, f"located in preferred city: {cand.profile.location}"
-    if cand.redrob_signals.willing_to_relocate:
-        return 0.7, f"willing to relocate from {cand.profile.location}"
-    country = (cand.profile.country or "").lower()
+    if country == "india" and relocate:
+        return 0.85, f"in India, willing to relocate from {cand.profile.location}"
     if country == "india":
-        return 0.5, f"in India but not preferred city ({cand.profile.location})"
-    return 0.1, f"outside India, not willing to relocate ({cand.profile.location})"
+        return 0.6, f"in India but not preferred city ({cand.profile.location})"
+    if relocate:
+        return 0.4, f"willing to relocate from {cand.profile.location}"
+    # Outside India + not willing to relocate -> very low (no visa sponsorship)
+    return 0.0, f"outside India, not willing to relocate ({cand.profile.location})"
 
 
 def yoe_band_fit(cand: Candidate) -> tuple[float, str]:
@@ -36,7 +45,7 @@ def yoe_band_fit(cand: Candidate) -> tuple[float, str]:
 
 
 def certifications_micro_boost(cand: Candidate) -> tuple[float, str]:
-    """Cloud certs (AWS/GCP/Azure) or known ML courses — small positive."""
+    """Cloud certs (AWS/GCP/Azure) or known ML courses, small positive."""
     known_issuers = {"aws", "amazon", "google", "gcp", "azure", "microsoft",
                      "coursera", "deeplearning.ai", "fast.ai", "stanford"}
     known_keywords = {"aws", "gcp", "azure", "tensorflow", "pytorch",

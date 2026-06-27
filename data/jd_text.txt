@@ -1,0 +1,29 @@
+Senior AI Engineer — Founding Team at Redrob AI, a Series A AI-native talent
+intelligence platform. Pune or Noida, India. Hybrid. 5-9 years of experience.
+
+We need:
+  - Production experience with embeddings-based retrieval systems
+    (sentence-transformers, OpenAI embeddings, BGE, E5, bi-encoder, dense retrieval).
+    Real production deployment — embedding drift, index refresh, retrieval-quality
+    regression in production.
+  - Production experience with vector databases or hybrid search infrastructure
+    (Pinecone, Weaviate, Qdrant, Milvus, OpenSearch, Elasticsearch, FAISS, HNSW).
+  - Strong Python.
+  - Hands-on experience designing evaluation frameworks for ranking systems —
+    NDCG, MRR, MAP, offline-to-online correlation, A/B test interpretation.
+
+Nice to have:
+  - LLM fine-tuning experience (LoRA, QLoRA, PEFT).
+  - Learning-to-rank models (XGBoost-rank or neural LTR).
+  - Prior HR-tech, recruiting, marketplace product exposure.
+  - Distributed systems or large-scale inference optimization.
+  - Open-source contributions in AI/ML.
+
+Avoid: consulting-only careers (TCS/Infosys/Wipro/etc), pure research-only
+careers without production, framework enthusiasts (LangChain tutorial level),
+title-chasers (1.5-year job-hop pattern), CV/speech/robotics specialists
+without NLP/IR exposure.
+
+The hire will own the intelligence layer — ranking, retrieval, and matching
+systems. They will ship a v2 ranking system, set up evaluation infrastructure,
+and drive long-term architecture as the engineering team grows from 4 to 12.

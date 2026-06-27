@@ -1,4 +1,4 @@
-"""eval/compare.py — diff two submission CSVs.
+"""eval/compare.py, diff two submission CSVs.
 
 Useful for understanding what a system change actually did:
   - candidates added/removed from top 100
@@ -86,8 +86,8 @@ def main():
     sorted_a = sorted(a.items(), key=lambda t: t[1][0])
     sorted_b = sorted(b.items(), key=lambda t: t[1][0])
     for i in range(args.top):
-        ca = sorted_a[i][0] if i < len(sorted_a) else "—"
-        cb = sorted_b[i][0] if i < len(sorted_b) else "—"
+        ca = sorted_a[i][0] if i < len(sorted_a) else "–"
+        cb = sorted_b[i][0] if i < len(sorted_b) else "–"
         same = "  " if ca == cb else "≠ "
         print(f"  {i+1:<4}  {ca:<14}  {cb:<14}  {same}")
 

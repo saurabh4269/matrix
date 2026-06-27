@@ -1,4 +1,4 @@
-"""Scoring composition — combine all probe outputs into a single score per candidate.
+"""Scoring composition, combine all probe outputs into a single score per candidate.
 
 The scoring function follows the spec in final_plan §7:
 
@@ -30,7 +30,7 @@ from src.schema import Candidate
 
 
 # ---------------------------------------------------------------------------
-# Per-probe weights — uniform inside category as starting point; tuned later.
+# Per-probe weights, uniform inside category as starting point; tuned later.
 # Values picked so each category's max contribution matches the §7 mix.
 # ---------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ LOCATION_WEIGHTS = {
     "certifications_micro_boost": 0.10,
 }
 
-# Anti-SNR penalties — each probe's score directly contributes to penalty.
+# Anti-SNR penalties, each probe's score directly contributes to penalty.
 # Multiplied as ∏(1 − w·s). w=1 means full penalty when probe fires at 1.0.
 ANTI_SNR_WEIGHTS = {
     "consulting_only": 0.95,  # near-zeroes the candidate
@@ -73,15 +73,16 @@ ANTI_SNR_WEIGHTS = {
     "cv_speech_robo_only": 0.70,
     "manager_drift": 0.30,
     "keyword_dense_junior": 0.70,
-    "remote_only_vs_hybrid_jd": 0.30,
+    # JD hybrid Pune/Noida is strict on location. Heavier penalty than initial.
+    "remote_only_vs_hybrid_jd": 0.60,
     "dilution": 0.50,
 }
 
-# Behavioural — used as multiplicative modifier directly, no extra weights.
+# Behavioural, used as multiplicative modifier directly, no extra weights.
 # Component-wise product: effectively_available × notice_curve × trust × engagement.
 # Engagement has lighter weight via a clipped contribution.
 
-# Hybrid retrieval — bm25 + dense embedding (read from precomputed artefacts).
+# Hybrid retrieval, bm25 + dense embedding (read from precomputed artefacts).
 # Loaded lazily; gracefully zero-out if data/ is missing (Phase 3 not run yet).
 RETRIEVAL_WEIGHTS = {
     "bm25_jd_match": 0.40,
@@ -176,10 +177,11 @@ def score_candidate(cand: Candidate) -> CandidateScore:
     # Weighted geometric mean across the four behavioural probes:
     # use product of (score^weight), weights chosen below.
     behav_weights = {
-        "effectively_available": 0.45,
-        "notice_period_curve": 0.30,
+        "effectively_available": 0.40,
+        "notice_period_curve": 0.25,
         "trust_modifier": 0.10,
         "engagement_quality": 0.15,
+        "closability": 0.10,
     }
     behav_modifier = 1.0
     for name, score, _ in behav:

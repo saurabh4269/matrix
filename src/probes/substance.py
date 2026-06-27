@@ -1,4 +1,4 @@
-"""Substance / trust probes — high-SNR signals that defeat the keyword-stuffer trap.
+"""Substance / trust probes, high-SNR signals that defeat the keyword-stuffer trap.
 
 These look at the *substance* of descriptions: do they name specific systems,
 use cause-effect language, demonstrate production thinking? AI-tailored
@@ -74,7 +74,7 @@ def production_emphasis(cand: Candidate) -> tuple[float, str]:
 def verification_ratio(cand: Candidate) -> tuple[float, str]:
     """Fraction of claimed skills that have a verified assessment score.
 
-    High-SNR meta-signal — candidates who have actually tested their claims.
+    High-SNR meta-signal, candidates who have actually tested their claims.
     """
     n_claimed = len(cand.skills)
     if n_claimed == 0:
@@ -83,7 +83,7 @@ def verification_ratio(cand: Candidate) -> tuple[float, str]:
     if n_assessed == 0:
         return 0.0, ""
     ratio = min(1.0, n_assessed / n_claimed)
-    # Also weight by the actual scores — high scores boost
+    # Also weight by the actual scores, high scores boost
     avg_score = (
         sum(cand.redrob_signals.skill_assessment_scores.values()) / n_assessed
         if n_assessed else 0
@@ -93,7 +93,7 @@ def verification_ratio(cand: Candidate) -> tuple[float, str]:
 
 
 def acceleration(cand: Candidate) -> tuple[float, str]:
-    """Promotion intervals shrinking over career — career acceleration."""
+    """Promotion intervals shrinking over career, career acceleration."""
     roles = cand.career_history
     if len(roles) < 3:
         return 0.0, ""

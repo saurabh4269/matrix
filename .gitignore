@@ -5,9 +5,16 @@ __pycache__/
 venv/
 .env
 
-data/precomputed_embeddings.npy
-data/bm25_index.pkl
+# Heavy precomputed artefacts. Regenerable via `python -m src.precompute`.
+# The bm25_corpus.pkl in particular is ~194 MB.
+data/bm25_corpus.pkl
+data/embeddings.npy
 data/candidates.jsonl
+# Keep these tracked (they're small and useful):
+#   data/candidate_ids.json
+#   data/bm25_scores.npy
+#   data/dense_scores.npy
+#   data/jd_text.txt
 
 eval/sample_to_label.jsonl
 eval/candidates_to_label.md

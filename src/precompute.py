@@ -1,17 +1,17 @@
-"""Pre-computation pipeline — embeddings + BM25 index for hybrid retrieval.
+"""Pre-computation pipeline, embeddings + BM25 index for hybrid retrieval.
 
 Runs once, **outside** the 5-minute ranking budget. Outputs:
-  data/candidate_ids.json        — list of candidate IDs in row order
-  data/embeddings.npy            — float32 array of shape (N, 384)
-  data/bm25_corpus.pkl           — pickled BM25Okapi index
-  data/jd_text.txt               — the JD text used (for reproducibility)
+  data/candidate_ids.json       , list of candidate IDs in row order
+  data/embeddings.npy           , float32 array of shape (N, 384)
+  data/bm25_corpus.pkl          , pickled BM25Okapi index
+  data/jd_text.txt              , the JD text used (for reproducibility)
 
 Usage:
     python -m src.precompute --candidates ./candidates.jsonl --out-dir ./data
 
 Model: all-MiniLM-L6-v2 (384-dim, ~80MB). Chosen for speed + size, not peak
 accuracy. The score it produces is a *complementary signal* alongside the
-structured probes — not the primary scorer.
+structured probes, not the primary scorer.
 """
 from __future__ import annotations
 
@@ -28,22 +28,22 @@ from src.load import iter_candidates
 from src.schema import Candidate
 
 
-# The JD's text — manually distilled from the official job_description.docx.
+# The JD's text, manually distilled from the official job_description.docx.
 # Kept here in code (rather than read at runtime) so the precompute step is
 # fully reproducible and self-contained.
 JD_TEXT = """
-Senior AI Engineer — Founding Team at Redrob AI, a Series A AI-native talent
+Senior AI Engineer, Founding Team at Redrob AI, a Series A AI-native talent
 intelligence platform. Pune or Noida, India. Hybrid. 5-9 years of experience.
 
 We need:
   - Production experience with embeddings-based retrieval systems
     (sentence-transformers, OpenAI embeddings, BGE, E5, bi-encoder, dense retrieval).
-    Real production deployment — embedding drift, index refresh, retrieval-quality
+    Real production deployment, embedding drift, index refresh, retrieval-quality
     regression in production.
   - Production experience with vector databases or hybrid search infrastructure
     (Pinecone, Weaviate, Qdrant, Milvus, OpenSearch, Elasticsearch, FAISS, HNSW).
   - Strong Python.
-  - Hands-on experience designing evaluation frameworks for ranking systems —
+  - Hands-on experience designing evaluation frameworks for ranking systems,
     NDCG, MRR, MAP, offline-to-online correlation, A/B test interpretation.
 
 Nice to have:
@@ -58,7 +58,7 @@ careers without production, framework enthusiasts (LangChain tutorial level),
 title-chasers (1.5-year job-hop pattern), CV/speech/robotics specialists
 without NLP/IR exposure.
 
-The hire will own the intelligence layer — ranking, retrieval, and matching
+The hire will own the intelligence layer, ranking, retrieval, and matching
 systems. They will ship a v2 ranking system, set up evaluation infrastructure,
 and drive long-term architecture as the engineering team grows from 4 to 12.
 """.strip()
@@ -68,7 +68,7 @@ def _candidate_text(c: Candidate) -> str:
     """Build the embedding/BM25 input for a candidate.
 
     Concatenates: headline + summary + each role's description.
-    Lowercase + stripped — BM25 tokenization expects this.
+    Lowercase + stripped, BM25 tokenization expects this.
     """
     parts = [
         c.profile.headline or "",

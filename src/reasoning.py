@@ -5,9 +5,9 @@ from the structured probe evidence. No LLM. Deterministic seeding by
 candidate_id for reproducible variation.
 
 Three rank bands, six templates each:
-  Top 1-10   — confident lead with strongest High-SNR signal + concern
-  Top 11-50  — corroborating signals + concern
-  Top 51-100 — explicit "why not higher" framing
+  Top 1-10  , confident lead with strongest High-SNR signal + concern
+  Top 11-50 , corroborating signals + concern
+  Top 51-100, explicit "why not higher" framing
 
 Stage-4 checks passed by construction:
   - Specific facts          : every claim is a parsed schema attribute
@@ -26,7 +26,7 @@ from src.scoring import CandidateScore
 
 
 # ---------------------------------------------------------------------------
-# Helpers — extract human-friendly facts
+# Helpers, extract human-friendly facts
 # ---------------------------------------------------------------------------
 
 def _years_str(years: float) -> str:
@@ -63,7 +63,7 @@ def _top_positive_evidence(cs: CandidateScore, k: int = 2) -> list[tuple[str, st
 
 def _top_concern(cs: CandidateScore, cand: Candidate) -> tuple[str, str] | None:
     """Return (label, evidence) for the strongest concern, or None if no concerns."""
-    # First check anti-SNR probes — these are the hardest concerns
+    # First check anti-SNR probes, these are the hardest concerns
     if cs.anti_snr:
         # Sort by score descending (worst penalty first)
         ranked = sorted(cs.anti_snr, key=lambda t: t[1], reverse=True)
@@ -92,12 +92,12 @@ def _top_concern(cs: CandidateScore, cand: Candidate) -> tuple[str, str] | None:
     if cand.redrob_signals.recruiter_response_rate < 0.2 and not cand.redrob_signals.open_to_work_flag:
         return "Engagement", f"low recruiter response ({cand.redrob_signals.recruiter_response_rate:.2f}), not flagged open"
 
-    # Strong candidate with no obvious concern — return a soft acknowledgement
+    # Strong candidate with no obvious concern, return a soft acknowledgement
     return None
 
 
 # ---------------------------------------------------------------------------
-# Top 1-10 templates — confident, fact-rich, names one concern
+# Top 1-10 templates, confident, fact-rich, names one concern
 # ---------------------------------------------------------------------------
 
 def _top_10_templates(
@@ -112,7 +112,7 @@ def _top_10_templates(
         f"{basics}; {e1}{', ' + e2 if e2 else ''}.{c}",
         f"{basics}. {e1.capitalize() if e1 else ''}{'; ' + e2 if e2 else ''}.{c}",
         f"Strong fit: {basics}. {e1}{', plus ' + e2 if e2 else ''}.{c}",
-        f"{basics} — {e1}{'. Also ' + e2 if e2 else ''}.{c}",
+        f"{basics}, {e1}{'. Also ' + e2 if e2 else ''}.{c}",
         f"{basics}; the JD's must-haves land here: {e1}{', and ' + e2 if e2 else ''}.{c}",
         f"{basics}. {e1}{'; ' + e2 if e2 else ''}.{c}",
     ]
@@ -120,7 +120,7 @@ def _top_10_templates(
 
 
 # ---------------------------------------------------------------------------
-# Top 11-50 templates — corroborating but more hedged
+# Top 11-50 templates, corroborating but more hedged
 # ---------------------------------------------------------------------------
 
 def _top_50_templates(
@@ -133,16 +133,16 @@ def _top_50_templates(
     templates = [
         f"{basics}. {e1}{', plus ' + e2 if e2 else ''}.{c}",
         f"{basics}; {e1}{', and ' + e2 if e2 else ''}.{c}",
-        f"Solid match — {basics}. {e1}{'. ' + e2.capitalize() if e2 else ''}.{c}",
+        f"Solid match, {basics}. {e1}{'. ' + e2.capitalize() if e2 else ''}.{c}",
         f"{basics}. Notable: {e1}{'; ' + e2 if e2 else ''}.{c}",
-        f"{basics} — {e1}{', supported by ' + e2 if e2 else ''}.{c}",
+        f"{basics}, {e1}{', supported by ' + e2 if e2 else ''}.{c}",
         f"{basics}; substance: {e1}{'; ' + e2 if e2 else ''}.{c}",
     ]
     return templates
 
 
 # ---------------------------------------------------------------------------
-# Top 51-100 templates — explicit why-not framing
+# Top 51-100 templates, explicit why-not framing
 # ---------------------------------------------------------------------------
 
 def _top_100_templates(
@@ -152,10 +152,10 @@ def _top_100_templates(
     c = concern[1] if concern else "weaker overall signal for this specific role"
 
     templates = [
-        f"{basics}. {e1.capitalize() if e1 else 'Adjacent signal'} — but {c}.",
+        f"{basics}. {e1.capitalize() if e1 else 'Adjacent signal'}, but {c}.",
         f"{basics}; {e1}{', however ' + c}.",
         f"{basics}. Strength: {e1}. Why not higher: {c}.",
-        f"{basics} — adjacent rather than core: {e1}; {c}.",
+        f"{basics}, adjacent rather than core: {e1}; {c}.",
         f"{basics}; some signal ({e1}) but {c}.",
         f"{basics}. {e1}. Ranked here because {c}.",
     ]
@@ -163,7 +163,7 @@ def _top_100_templates(
 
 
 # ---------------------------------------------------------------------------
-# Entry point — generate the reasoning string for a candidate at a given rank
+# Entry point, generate the reasoning string for a candidate at a given rank
 # ---------------------------------------------------------------------------
 
 def generate_reasoning(cand: Candidate, cs: CandidateScore, rank: int) -> str:

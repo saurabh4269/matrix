@@ -26,7 +26,7 @@ def test_tier5_is_not_honeypot():
 
 
 def test_keyword_stuffer_is_not_honeypot():
-    """Trap candidate (keyword stuffer) is bad but not a honeypot — penalised by probes."""
+    """Trap candidate (keyword stuffer) is bad but not a honeypot, penalised by probes."""
     assert detect(KEYWORD_STUFFER_FIXTURE) == {}
 
 

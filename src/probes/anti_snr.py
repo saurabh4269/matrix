@@ -1,4 +1,4 @@
-"""Anti-SNR probes — JD-explicit disqualifiers and red flags.
+"""Anti-SNR probes, JD-explicit disqualifiers and red flags.
 
 The JD names specific disqualifiers under "Things we explicitly do NOT want".
 Each disqualifier here is encoded as a probe that returns (score, evidence)
@@ -13,7 +13,7 @@ These are used in the final scorer as a multiplicative penalty:
 So a probe firing at 1.0 zeros the candidate's overall score; firing at 0.3
 multiplies by 0.7.
 
-Per the spec, these are NEVER hard filters — recall is precious. Heavy penalty
+Per the spec, these are NEVER hard filters, recall is precious. Heavy penalty
 only.
 """
 from __future__ import annotations
@@ -29,7 +29,7 @@ from src.schema import Candidate
 
 
 # ---------------------------------------------------------------------------
-# Consulting-only career — JD's hardest no
+# Consulting-only career, JD's hardest no
 # ---------------------------------------------------------------------------
 
 def consulting_only(cand: Candidate) -> tuple[float, str]:
@@ -53,7 +53,7 @@ def consulting_only(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Bigcorp-only career — JD soft no (Google/Meta well-scoped-role mismatch)
+# Bigcorp-only career, JD soft no (Google/Meta well-scoped-role mismatch)
 # ---------------------------------------------------------------------------
 
 def bigcorp_only(cand: Candidate) -> tuple[float, str]:
@@ -70,7 +70,7 @@ def bigcorp_only(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Pure-research career — JD's first explicit hard no
+# Pure-research career, JD's first explicit hard no
 # ---------------------------------------------------------------------------
 
 _DEPLOYMENT_VERBS_RE = re.compile(
@@ -107,7 +107,7 @@ def pure_research_career(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# No production code in last 18 months — JD says they will not move forward
+# No production code in last 18 months, JD says they will not move forward
 # ---------------------------------------------------------------------------
 
 _HANDS_ON_VERBS_RE = re.compile(
@@ -134,7 +134,7 @@ def no_production_code_18mo(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Framework enthusiast — JD's explicit anti-LangChain-tutorial signal
+# Framework enthusiast, JD's explicit anti-LangChain-tutorial signal
 # ---------------------------------------------------------------------------
 
 _FRAMEWORK_SKILLS = {
@@ -173,7 +173,7 @@ def framework_enthusiast(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Title-chaser — last 3 roles each < 18 months
+# Title-chaser, last 3 roles each < 18 months
 # ---------------------------------------------------------------------------
 
 def title_chaser(cand: Candidate) -> tuple[float, str]:
@@ -188,7 +188,7 @@ def title_chaser(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# CV/Speech/Robotics specialist without NLP/IR — JD will not move forward
+# CV/Speech/Robotics specialist without NLP/IR, JD will not move forward
 # ---------------------------------------------------------------------------
 
 _CV_SPEECH_ROBO_RE = re.compile(
@@ -223,7 +223,7 @@ def cv_speech_robo_only(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Manager-drift — JD wants hands-on, not "just architect / tech-lead"
+# Manager-drift, JD wants hands-on, not "just architect / tech-lead"
 # ---------------------------------------------------------------------------
 
 _MANAGER_VERBS_RE = re.compile(
@@ -247,11 +247,11 @@ def manager_drift(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Keyword-dense junior — high JD-keyword density paired with low YoE
+# Keyword-dense junior, high JD-keyword density paired with low YoE
 # ---------------------------------------------------------------------------
 
 def keyword_dense_junior(cand: Candidate) -> tuple[float, str]:
-    """≥6 JD-relevant skills but <4 years of experience — trap signature."""
+    """≥6 JD-relevant skills but <4 years of experience, trap signature."""
     from src.heuristics import count_jd_keyword_skills
 
     n_kw = count_jd_keyword_skills(cand)
@@ -286,7 +286,7 @@ def remote_only_vs_hybrid_jd(cand: Candidate) -> tuple[float, str]:
 
 
 # ---------------------------------------------------------------------------
-# Dilution — generic engineering years ≫ relevant ML years
+# Dilution, generic engineering years ≫ relevant ML years
 # ---------------------------------------------------------------------------
 
 def dilution(cand: Candidate) -> tuple[float, str]:
@@ -300,7 +300,7 @@ def dilution(cand: Candidate) -> tuple[float, str]:
     )
     if total_months < 24 or relevant_months == 0:
         # Not enough history to dilute, or no ML titles at all
-        # (the other probes — consulting_only, dilution doesn't add signal here)
+        # (the other probes, consulting_only, dilution doesn't add signal here)
         return 0.0, ""
     ratio = relevant_months / total_months
     if ratio < 0.2:

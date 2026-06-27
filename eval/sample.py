@@ -1,12 +1,12 @@
-"""Stratified sampler — selects 300 candidates across 5 buckets for hand-labelling.
+"""Stratified sampler, selects 300 candidates across 5 buckets for hand-labelling.
 
 Single pass over the 100K JSONL. Reservoir-style sampling per bucket so memory
 stays small. Emits three artefacts:
 
-  eval/sample_to_label.jsonl   — full candidate records, for the merger
-  eval/candidates_to_label.md  — scannable Markdown cards
-  eval/labels.csv              — empty CSV template the user fills
-  eval/sampling_report.md      — bucket counts, heuristic doc, calibration
+  eval/sample_to_label.jsonl  , full candidate records, for the merger
+  eval/candidates_to_label.md , scannable Markdown cards
+  eval/labels.csv             , empty CSV template the user fills
+  eval/sampling_report.md     , bucket counts, heuristic doc, calibration
 
 Usage:
     python -m eval.sample \\
@@ -61,7 +61,7 @@ def _stable_hash(s: str) -> int:
 
 
 def reservoir_sample(stream, k: int, key=None) -> list:
-    """Standard reservoir sampling — yields up to k items uniformly from a stream
+    """Standard reservoir sampling, yields up to k items uniformly from a stream
     of unknown length. `key` deterministically seeds randomness from each item
     so the output is reproducible across runs."""
     pool = []
@@ -156,7 +156,7 @@ def main():
         if (i + 1) % 10_000 == 0:
             elapsed = time.time() - t0
             print(
-                f"  {i+1:>7,} candidates scanned ({elapsed:5.1f}s) — "
+                f"  {i+1:>7,} candidates scanned ({elapsed:5.1f}s), "
                 f"buckets: {dict(bucket_counts_raw)}",
                 file=sys.stderr,
             )
@@ -178,7 +178,7 @@ def main():
         for c in chosen:
             selected.append((b, c))
         print(
-            f"  bucket {b:25s} — raw count: {bucket_counts_raw[b]:>7,}  "
+            f"  bucket {b:25s}, raw count: {bucket_counts_raw[b]:>7,}  "
             f"reservoir: {len(pool):>4}  selected: {len(chosen):>3}",
             file=sys.stderr,
         )
@@ -197,7 +197,7 @@ def main():
     # --- Emit eval/candidates_to_label.md -------------------------------------
     md_path = out_dir / "candidates_to_label.md"
     with open(md_path, "w", encoding="utf-8") as fp:
-        fp.write("# Redrob — Candidates to Label\n\n")
+        fp.write("# Redrob, Candidates to Label\n\n")
         fp.write(
             "Read each card (~30s). Fill in `eval/labels.csv` with one row per `candidate_id`.\n\n"
             "**Tier scale (against JD):** 0 honeypot · 1 clear no · 2 weak · 3 maybe · 4 strong · 5 ideal\n\n"
@@ -259,22 +259,22 @@ def main():
         fp.write("## Bucket assignment heuristics\n\n")
         fp.write(
             "Priority order (first match wins, mutually exclusive):\n\n"
-            "1. **`likely_tier5`** — current title contains ML/AI/IR signal "
+            "1. **`likely_tier5`**, current title contains ML/AI/IR signal "
             "AND has a known product company in history AND ≥2 retrieval-substance "
-            "mentions in `career_history.description`. Tier-5 wins over honeypot — "
+            "mentions in `career_history.description`. Tier-5 wins over honeypot, "
             "if a real ML engineer happens to fire a paradox rule, we want to see it.\n"
-            "2. **`honeypot_suspect`** — any structural paradox fires (salary, "
+            "2. **`honeypot_suspect`**, any structural paradox fires (salary, "
             "date inversion, duration > YoE+2, single role > YoE+12mo, "
             "≥3 expert skills with 0 months) AND not already tier-5.\n"
-            "3. **`likely_tier4`** — any past title is ML/AI/IR AND (product co "
+            "3. **`likely_tier4`**, any past title is ML/AI/IR AND (product co "
             "anywhere OR ≥3 retrieval-substance mentions).\n"
-            "4. **`likely_keyword_stuffer`** — ≥6 JD-keyword skills AND no ML "
+            "4. **`likely_keyword_stuffer`**, ≥6 JD-keyword skills AND no ML "
             "title anywhere AND ≤1 retrieval-substance mentions. The trap "
             "signature: keywords on the surface, no execution underneath.\n"
-            "5. **`adjacent_mid`** — any ML title OR ≥1 retrieval mention OR "
+            "5. **`adjacent_mid`**, any ML title OR ≥1 retrieval mention OR "
             "≥2 JD keywords. Mid-strength signal.\n"
-            "6. **`random_control`** — fallthrough. No signal in any direction. "
-            "Boring negatives — anchors the bottom of the relevance scale.\n\n"
+            "6. **`random_control`**, fallthrough. No signal in any direction. "
+            "Boring negatives, anchors the bottom of the relevance scale.\n\n"
             "These are heuristics for *stratification*, not labels. Hand-label "
             "is the truth signal.\n\n"
         )

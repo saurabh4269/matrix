@@ -1,13 +1,13 @@
-"""FastAPI sandbox backend — serves the ranker over HTTP.
+"""FastAPI sandbox backend, serves the ranker over HTTP.
 
 Single endpoint:
-    POST /rank        — accepts an optional small candidates payload, returns
+    POST /rank       , accepts an optional small candidates payload, returns
                         the ranked top-N with structured evidence
 
 When no candidates are provided, the backend uses the pre-loaded curated demo
 set (sandbox/backend/sample_candidates.json) which mixes labelled tier-5s,
 keyword-stuffers, and a honeypot. This is the experience a judge sees on
-first load — no upload required.
+first load, no upload required.
 """
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ from src.scoring import score_candidate  # noqa: E402
 from src.pairwise import refine_top_n  # noqa: E402
 
 
-app = FastAPI(title="Redrob Ranker — Sandbox API")
+app = FastAPI(title="Redrob Ranker, Sandbox API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -113,7 +113,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             reverse=True,
         )
         concerns = [(n, s, e) for n, s, e in cs.anti_snr if s > 0]
-        # Whispered hint criterion: plain-language tier-5 surfacing — high
+        # Whispered hint criterion: plain-language tier-5 surfacing, high
         # substance + low keyword density. We approximate with description
         # specificity high and a non-flashy current title.
         spec_score = next(
@@ -133,6 +133,37 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             "years_of_experience": cand.profile.years_of_experience,
             "location": cand.profile.location,
             "headline": cand.profile.headline,
+            "summary": cand.profile.summary,
+            "career_history": [
+                {
+                    "title": r.title,
+                    "company": r.company,
+                    "company_size": r.company_size,
+                    "industry": r.industry,
+                    "start_date": r.start_date,
+                    "end_date": r.end_date,
+                    "duration_months": r.duration_months,
+                    "is_current": r.is_current,
+                    "description": r.description,
+                }
+                for r in cand.career_history
+            ],
+            "education": [
+                {
+                    "institution": e.institution,
+                    "degree": e.degree,
+                    "field_of_study": e.field_of_study,
+                    "start_year": e.start_year,
+                    "end_year": e.end_year,
+                    "tier": e.tier,
+                    "grade": e.grade,
+                }
+                for e in cand.education
+            ],
+            "certifications": [
+                {"name": c.name, "issuer": c.issuer, "year": c.year}
+                for c in cand.certifications
+            ],
             "reasoning": reasoning,
             "whispered": is_whispered,
             "snr_high": [
@@ -153,13 +184,22 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             "behavioural": {
                 "open_to_work": cand.redrob_signals.open_to_work_flag,
                 "response_rate": cand.redrob_signals.recruiter_response_rate,
+                "response_time_hours": cand.redrob_signals.avg_response_time_hours,
                 "last_active": cand.redrob_signals.last_active_date,
                 "notice_days": cand.redrob_signals.notice_period_days,
-                "verified": (
-                    cand.redrob_signals.verified_email
-                    and cand.redrob_signals.verified_phone
-                    and cand.redrob_signals.linkedin_connected
-                ),
+                "applications_30d": cand.redrob_signals.applications_submitted_30d,
+                "saved_by_recruiters_30d": cand.redrob_signals.saved_by_recruiters_30d,
+                "profile_views_30d": cand.redrob_signals.profile_views_received_30d,
+                "interview_completion_rate": cand.redrob_signals.interview_completion_rate,
+                "github_activity": cand.redrob_signals.github_activity_score,
+                "verified_email": cand.redrob_signals.verified_email,
+                "verified_phone": cand.redrob_signals.verified_phone,
+                "linkedin_connected": cand.redrob_signals.linkedin_connected,
+                "behav_modifier_total": round(cs.behavioural_modifier, 3),
+                "behav_breakdown": [
+                    {"name": n, "score": round(s, 3), "evidence": e}
+                    for n, s, e in cs.behavioural
+                ],
             },
         })
 

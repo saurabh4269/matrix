@@ -1,6 +1,6 @@
 """Shared text-mining utilities for substance / must-have probes.
 
-Vocabularies are JD-coupled — derived from the Senior AI Engineer JD's stated
+Vocabularies are JD-coupled, derived from the Senior AI Engineer JD's stated
 must-haves and named technologies. Each set is small, hand-curated, and tagged.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ VECTOR_DB_TOOLS = {
     "scann", "annoy",
 }
 
-# Ranking eval framework — JD names NDCG, MRR, MAP
+# Ranking eval framework, JD names NDCG, MRR, MAP
 RANKING_EVAL_TERMS = {
     "ndcg", "mrr", "map", "recall@", "precision@", "p@", "hit rate", "hits@",
     "offline evaluation", "offline-online", "a/b test", "ab test",
@@ -49,7 +49,7 @@ RESEARCH_VERBS = {
     "evaluated", "compared", "measured", "examined", "surveyed",
 }
 
-# Named specific systems / tools — used for description_specificity probe.
+# Named specific systems / tools, used for description_specificity probe.
 # These are the high-SNR signals: AI-tailored resumes can fabricate generic
 # verbs but rarely name specific systems with the same density.
 SPECIFIC_TECHNICAL_ENTITIES = {
@@ -83,7 +83,7 @@ SPECIFIC_TECHNICAL_ENTITIES = {
     "learning to rank", "ltr", "two-tower", "cross-encoder", "bi-encoder",
 }
 
-# Narrative-arc connectives — cause-effect indicators of real engineering
+# Narrative-arc connectives, cause-effect indicators of real engineering
 NARRATIVE_CONNECTIVES = {
     "because", "root cause", "led to", "resulted in", "reduced from",
     "improved by", "after discovering", "debugged", "diagnosed",

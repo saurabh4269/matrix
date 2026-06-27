@@ -6,7 +6,7 @@ penalties in `probes/anti_snr.py` but stay in the candidate pool.
 Returns a dict of (rule_name -> evidence_str) for every rule that fires.
 Empty dict = candidate is clean.
 
-NOTE: salary_paradox (min>max) is intentionally NOT included — see
+NOTE: salary_paradox (min>max) is intentionally NOT included, see
 src/heuristics.py for the empirical finding that 18.9% of the synthesized
 dataset has min>max, making it a data artifact rather than a honeypot signal.
 """
@@ -15,7 +15,7 @@ from __future__ import annotations
 from src.schema import Candidate
 
 
-# Known company founding years — used by the tenure-exceeds-company-age rule.
+# Known company founding years, used by the tenure-exceeds-company-age rule.
 # Stays small and conservative; only firms that obviously didn't exist before
 # their founding year. False-positive cost is high (drops a real candidate),
 # so this list is intentionally short.

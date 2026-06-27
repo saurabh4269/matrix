@@ -1,6 +1,6 @@
 """Merge filled-in labels.csv with sample_to_label.jsonl.
 
-Output: eval/labelled.jsonl — one JSON object per labelled candidate, containing
+Output: eval/labelled.jsonl, one JSON object per labelled candidate, containing
 both the candidate record and the human labels. This is the canonical eval-set
 consumed by metrics.py and the weight tuner.
 
@@ -72,7 +72,7 @@ def main():
                 issues.append(f"{cid}: not present in sample")
                 continue
             if not tier_s:
-                # unlabelled — skip silently
+                # unlabelled, skip silently
                 continue
             if tier_s not in VALID_TIERS:
                 issues.append(f"{cid}: invalid tier {tier_s!r}")

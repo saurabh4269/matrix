@@ -63,7 +63,7 @@ def test_tier5_has_specificity():
 
 def test_keyword_stuffer_lacks_specificity():
     results = dict((name, score) for name, score, _ in substance.run_all(KEYWORD_STUFFER_FIXTURE))
-    # Marketing Manager description mentions $200K budget, ChatGPT, etc — generic
+    # Marketing Manager description mentions $200K budget, ChatGPT, etc, generic
     spec = results.get("description_specificity", 0)
     assert spec < 0.4, f"Keyword stuffer should have low specificity, got {spec}"
 
@@ -99,7 +99,7 @@ def test_title_chaser_fires():
 def test_tier5_no_anti_snr():
     """Tier-5 candidate must not fire any anti-SNR penalty."""
     results = anti_snr.run_all(TIER_5_FIXTURE)
-    # The dilution probe may fire mildly if the math says so — but the major
+    # The dilution probe may fire mildly if the math says so, but the major
     # red-flag probes must not.
     fired_majors = {
         name for name, _, _ in results

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 # ---------------------------------------------------------------------------
-# Input — Candidate sub-models (lenient with extras + nulls)
+# Input, Candidate sub-models (lenient with extras + nulls)
 # ---------------------------------------------------------------------------
 
 class Profile(BaseModel):
@@ -118,7 +118,7 @@ class Candidate(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Output — strict; non-conformant rows cannot be constructed
+# Output, strict; non-conformant rows cannot be constructed
 # ---------------------------------------------------------------------------
 
 import re

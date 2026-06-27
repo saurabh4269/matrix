@@ -1,4 +1,4 @@
-"""eval/score.py — score a submission CSV against the labelled eval set.
+"""eval/score.py, score a submission CSV against the labelled eval set.
 
 Usage:
     python -m eval.score --labels eval/labelled.jsonl --submission submissions/x.csv
@@ -70,7 +70,7 @@ def main():
         print(f"FATAL: submission {args.submission} is empty", file=sys.stderr)
         sys.exit(1)
 
-    # Coverage report — how many of the submission's top-100 overlap with labels
+    # Coverage report, how many of the submission's top-100 overlap with labels
     in_labelled = sum(1 for c in ranked if c in label_by_id)
 
     metrics = evaluate(ranked, label_by_id)
@@ -93,7 +93,7 @@ def main():
     print(f"  -----------------------------------------------")
     print(f"  Composite             {metrics['composite']:.4f}")
     print()
-    print(f"  Honeypot rate top-100 {metrics['honeypot_rate_top_100']*100:.1f}%  ({'PASS' if metrics['honeypot_rate_top_100'] <= 0.10 else 'FAIL — Stage-3 DQ at >10%'})")
+    print(f"  Honeypot rate top-100 {metrics['honeypot_rate_top_100']*100:.1f}%  ({'PASS' if metrics['honeypot_rate_top_100'] <= 0.10 else 'FAIL, Stage-3 DQ at >10%'})")
     print(f"  Honeypot rate top-10  {metrics['honeypot_rate_top_10']*100:.1f}%")
     print()
 

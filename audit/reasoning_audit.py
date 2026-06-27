@@ -2,7 +2,7 @@
 
 Each reasoning string is supposed to cite real facts from the candidate's
 schema. Because we generate via deterministic templating from parsed schema
-attributes, hallucination should be impossible by construction — but this
+attributes, hallucination should be impossible by construction, but this
 script catches it if the template logic ever drifts.
 
 The audit checks each reasoning against the candidate's actual schema fields:
@@ -10,7 +10,7 @@ The audit checks each reasoning against the candidate's actual schema fields:
   - every numeric (years/months) must match years_of_experience or duration_months
   - any named skill/tool must appear in either skills[] or career_history descriptions
 
-Pure local — no network required. Run before every submission.
+Pure local, no network required. Run before every submission.
 
 Usage:
     python -m audit.reasoning_audit \\
@@ -33,7 +33,7 @@ from src.schema import Candidate
 
 
 # Patterns we look for in the reasoning column
-_COMPANY_RE = re.compile(r"\bat (?P<co>[A-Z][\w&.,'\- ]+?)(?:[.;,]| —|$)")
+_COMPANY_RE = re.compile(r"\bat (?P<co>[A-Z][\w&.,'\- ]+?)(?:[.;]| ,|$)")
 _YEAR_RE = re.compile(r"\((?P<years>\d+(?:\.\d+)?)\s*(?:y|yr|year)\)")
 _PROBE_EVIDENCE_NUMBERS_RE = re.compile(r"\b(?P<n>\d+)\s+(?:embedding|vector|ranking-eval|specific|hands-on|research)")
 
@@ -51,7 +51,7 @@ def audit_one(reasoning: str, cand: Candidate) -> list[str]:
         mentioned = m.group("co").strip().lower().rstrip(".,;")
         if not mentioned or mentioned in {"product cos", "product co"}:
             continue
-        # The reasoning may say "at Stripe Search team" — try a substring match
+        # The reasoning may say "at Stripe Search team", try a substring match
         if not any(mentioned in kc or kc in mentioned for kc in known_companies if kc):
             issues.append(f"company '{mentioned}' not in candidate's career history")
 

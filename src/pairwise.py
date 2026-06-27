@@ -1,19 +1,19 @@
 """Pairwise refinement on the top 20.
 
 NDCG@10 (50% of the composite score) is fundamentally a pairwise problem on
-the top 10. Linear absolute scoring can be sloppy at the very top — tiny
+the top 10. Linear absolute scoring can be sloppy at the very top, tiny
 absolute differences create big rank differences. So after linear scoring,
 we re-rank the top 20 using hand-coded JD-priority tiebreakers.
 
 Rules (in priority order, first decisive comparison wins):
-  1. Years of applied ML at product co — more is better
-  2. Description specificity — more named systems = more substance
-  3. Ranking-eval framework mentions — JD literally names NDCG/MRR/MAP
-  4. Production embeddings retrieval — must-have
-  5. Verification ratio — tested > claimed
-  6. Behavioural availability — actually hireable beats theoretically hireable
+  1. Years of applied ML at product co, more is better
+  2. Description specificity, more named systems = more substance
+  3. Ranking-eval framework mentions, JD literally names NDCG/MRR/MAP
+  4. Production embeddings retrieval, must-have
+  5. Verification ratio, tested > claimed
+  6. Behavioural availability, actually hireable beats theoretically hireable
   7. Linear score as tiebreaker
-  8. Candidate ID (lexicographic) as ultimate tiebreaker — matches spec
+  8. Candidate ID (lexicographic) as ultimate tiebreaker, matches spec
 """
 from __future__ import annotations
 
@@ -76,7 +76,7 @@ def _pairwise_compare(a: CandidateScore, b: CandidateScore) -> int:
     if abs(a.score - b.score) > 1e-9:
         return -1 if a.score > b.score else 1
 
-    # 8. Ultimate tiebreak — candidate_id ascending (matches submission spec)
+    # 8. Ultimate tiebreak, candidate_id ascending (matches submission spec)
     if a.candidate_id < b.candidate_id:
         return -1
     if a.candidate_id > b.candidate_id:

@@ -11,7 +11,7 @@ export default function WhyNotFlip({ flipped, onToggle, cand }: Props) {
   const whyNotText = cand.concerns.length > 0
     ? cand.concerns[0].evidence
     : cand.behavioural.notice_days > 60
-    ? `${cand.behavioural.notice_days}-day notice — slow start.`
+    ? `${cand.behavioural.notice_days}-day notice, slow start.`
     : 'Few clear concerns. Strong choice.'
 
   return (

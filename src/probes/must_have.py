@@ -1,4 +1,4 @@
-"""Must-have probes — JD's "absolutely need" requirements.
+"""Must-have probes, JD's "absolutely need" requirements.
 
 Each probe returns (score in [0,1], evidence_string). High weight in the
 composite. Map directly to a sentence in the JD.
@@ -47,7 +47,7 @@ def production_embeddings_retrieval(cand: Candidate) -> tuple[float, str]:
     if desc_hits == 0 and skill_hits == 0:
         return 0.0, ""
 
-    # Description hits are worth ~3x skill hits — substance > claim
+    # Description hits are worth ~3x skill hits, substance > claim
     score = saturating(desc_hits * 3 + skill_hits, threshold=6)
     evidence_parts = []
     if desc_hits:
@@ -78,7 +78,7 @@ def production_vector_db(cand: Candidate) -> tuple[float, str]:
 
 
 def ranking_eval_framework(cand: Candidate) -> tuple[float, str]:
-    """Mentions of NDCG/MRR/MAP/A-B test in descriptions — JD literally names these."""
+    """Mentions of NDCG/MRR/MAP/A-B test in descriptions, JD literally names these."""
     desc = _all_descriptions(cand)
     hits = distinct_phrase_hits(desc, RANKING_EVAL_TERMS)
     if hits == 0:
@@ -109,13 +109,13 @@ def python_proficiency(cand: Candidate) -> tuple[float, str]:
 
     base = prof_weight * (0.4 + 0.4 * duration_weight + 0.2 * endorsement_weight)
 
-    # Assessment score multiplier (High-SNR — tested vs claimed)
+    # Assessment score multiplier (High-SNR, tested vs claimed)
     assess = cand.redrob_signals.skill_assessment_scores.get("Python")
     if assess is not None:
         ev = f"Python ({py.proficiency}, {py.duration_months}mo, {py.endorsements}e) verified {assess:.0f}/100"
         return min(1.0, base * (0.7 + 0.3 * (assess / 100))), ev
 
-    return base, f"Python ({py.proficiency}, {py.duration_months}mo, {py.endorsements}e) — not verified"
+    return base, f"Python ({py.proficiency}, {py.duration_months}mo, {py.endorsements}e), not verified"
 
 
 def years_applied_ml_at_product_co(cand: Candidate) -> tuple[float, str]:

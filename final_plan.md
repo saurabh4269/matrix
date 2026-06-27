@@ -1,15 +1,15 @@
-# Redrob Hackathon — Final Plan
+# Redrob Hackathon, Final Plan
 
-**Track:** 01 — Intelligent Candidate Discovery & Ranking
+**Track:** 01, Intelligent Candidate Discovery & Ranking
 **Task:** Rank top 100 of 100,000 candidates against one specific JD (Senior AI Engineer @ Redrob, Pune/Noida).
 **Repo:** `C:\Users\shmishra\Documents\Matrix\redrob-ranker\` (public; declares lineage from `matrix-main` / KnowTruly.me for sandbox UI only).
-**Codename:** project name is just **redrob-ranker** — no marketing branding (no "AURA", no "Kinetic", no "Forensic"). Marketing language is a Stage-5 risk, not an asset.
+**Codename:** project name is just **redrob-ranker**, no marketing branding (no "AURA", no "Kinetic", no "Forensic"). Marketing language is a Stage-5 risk, not an asset.
 
 ---
 
 ## TL;DR
 
-We treat the JD as the algorithm. Each requirement in the JD becomes a probe over the candidate schema. Every probe is tagged High-SNR / Medium-SNR / Low-SNR / Anti-SNR — and weighted by class. Honeypots are gated out by six deterministic structural-impossibility rules. Behavioural availability is a multiplicative modifier. Pairwise refinement on the top 20 because NDCG@10 (50% of the composite score) is fundamentally a pairwise problem. Reasoning is templated from the top contributing probes — no LLM at runtime — so it cannot hallucinate by construction. We submit 3 times: baseline → main → polish. Hand-labelled 300-candidate eval set is the only feedback signal (no live leaderboard); every weight decision is measured against NDCG@10 on it.
+We treat the JD as the algorithm. Each requirement in the JD becomes a probe over the candidate schema. Every probe is tagged High-SNR / Medium-SNR / Low-SNR / Anti-SNR, and weighted by class. Honeypots are gated out by six deterministic structural-impossibility rules. Behavioural availability is a multiplicative modifier. Pairwise refinement on the top 20 because NDCG@10 (50% of the composite score) is fundamentally a pairwise problem. Reasoning is templated from the top contributing probes, no LLM at runtime, so it cannot hallucinate by construction. We submit 3 times: baseline → main → polish. Hand-labelled 300-candidate eval set is the only feedback signal (no live leaderboard); every weight decision is measured against NDCG@10 on it.
 
 ---
 
@@ -52,10 +52,10 @@ We treat the JD as the algorithm. Each requirement in the JD becomes a probe ove
 - True tier-5 candidates are **sparse** (the JD: "we'd rather see 10 great matches than 1000 maybes"). Probably 10–30 in 100K.
 - Three trap categories are explicit: **keyword-stuffers**, **plain-language tier-5s**, **behavioural twins**.
 - ~80 honeypots designed to look skill-rich; >10% in top-100 → Stage-3 DQ.
-- `sample_submission.csv` IS the trap demonstrated — it ranks HR Managers and Civil Engineers with 8 "AI core skills" at the top.
+- `sample_submission.csv` IS the trap demonstrated, it ranks HR Managers and Civil Engineers with 8 "AI core skills" at the top.
 
 **Why this isn't a ranking problem; it's a search-then-rank problem:**
-With ~20 needles in 100K hay, the system must **recall** the needles into a working set before precision-ranking. Hard pre-filters that drop ~85K are reckless — a single fuzzy filter that drops a tier-5 is unrecoverable. **Use scores, not gates, for everything except honeypots and JD-explicit hard nos.**
+With ~20 needles in 100K hay, the system must **recall** the needles into a working set before precision-ranking. Hard pre-filters that drop ~85K are reckless, a single fuzzy filter that drops a tier-5 is unrecoverable. **Use scores, not gates, for everything except honeypots and JD-explicit hard nos.**
 
 ---
 
@@ -65,7 +65,7 @@ With ~20 needles in 100K hay, the system must **recall** the needles into a work
 |---|---|
 | Ranking runtime | ≤ 5 min wall-clock |
 | Memory | ≤ 16 GB RAM |
-| Compute | CPU only — **no GPU** during ranking |
+| Compute | CPU only, **no GPU** during ranking |
 | Network | **No external API calls** during ranking |
 | Disk | ≤ 5 GB intermediate |
 | Submissions | 3 max; last valid counts |
@@ -110,7 +110,7 @@ With ~20 needles in 100K hay, the system must **recall** the needles into a work
 |---|---|---|
 | `production_embeddings_retrieval` | High | Mentions of `embedding/embed/sentence-transformer/BGE/E5/openai/bi-encoder/dense retrieval` in `career_history.description` + corroborating verbs |
 | `production_vector_db` | High | Mentions of `Pinecone/Weaviate/Qdrant/Milvus/OpenSearch/Elasticsearch/FAISS/HNSW/vector index` |
-| `ranking_eval_framework` | High | Mentions of `NDCG/MRR/MAP/P@k/A/B test/offline-online/recall@k/hit rate` — direct Stage-4 hook ("the JD literally says NDCG") |
+| `ranking_eval_framework` | High | Mentions of `NDCG/MRR/MAP/P@k/A/B test/offline-online/recall@k/hit rate`, direct Stage-4 hook ("the JD literally says NDCG") |
 | `python_proficiency` | High | Skill claim + tenure + assessment score on Python |
 | `years_applied_ml_at_product_co` | High | Sum of `duration_months` across roles where (title contains ML/AI/IR/NLP signal) AND (company is a product company). **Single strongest predictor.** |
 
@@ -131,7 +131,7 @@ With ~20 needles in 100K hay, the system must **recall** the needles into a work
 | `description_specificity` | High | Count of capitalized proper-noun technical terms in descriptions per 100 tokens. Vocabulary: ~150 specific terms in ML/IR/data infra |
 | `narrative_arc_density` | High | Regex hits for cause-effect connectives (`because, root cause, led to, reduced from X to Y, after discovering, improved by`) per role |
 | `production_emphasis` | High | Count of `production/prod/shipped/deployed/users/scale/latency/SLA/on-call` in recent role descriptions |
-| `verification_ratio` | High | `len(skill_assessment_scores) / len(skills)` — high ratio = candidate has actually tested their claims |
+| `verification_ratio` | High | `len(skill_assessment_scores) / len(skills)`, high ratio = candidate has actually tested their claims |
 | `acceleration` | Medium | Promotion intervals shrinking over career (second derivative of velocity) |
 | `summary_thoughtfulness` | Medium | Summary length × type-token ratio × first-person voice presence. Terse generic 1-liners score low |
 | `company_stage_alignment` | Medium | Boost if recent companies are 11–500 size (Redrob's band); soft penalty if entire career at 10001+ |
@@ -150,8 +150,8 @@ With ~20 needles in 100K hay, the system must **recall** the needles into a work
 | `title_chaser` | Avg tenure of last 3 roles < 18 months |
 | `cv_speech_robotics_only` | Career titles dominated by Computer Vision / Speech / Robotics with zero NLP/IR |
 | `manager_drift` | Recent roles dominated by `led/managed/owned/directed` without `wrote/built/shipped/deployed/implemented` |
-| `dilution_penalty` | `(generic_engineering_years − ml_relevant_years) / total_years` — the aerospace-dilemma trap |
-| `keyword_dense_junior` | `(JD_keyword_density > 0.7) AND (years_of_experience < 4)` — fresher with right keywords trap |
+| `dilution_penalty` | `(generic_engineering_years − ml_relevant_years) / total_years`, the aerospace-dilemma trap |
+| `keyword_dense_junior` | `(JD_keyword_density > 0.7) AND (years_of_experience < 4)`, fresher with right keywords trap |
 | `remote_only_vs_hybrid_jd` | `preferred_work_mode == "remote"` AND `willing_to_relocate == false` |
 
 ### E. Behavioural availability (multiplicative modifier)
@@ -180,19 +180,19 @@ With ~20 needles in 100K hay, the system must **recall** the needles into a work
 
 ### H. Three latent JD-axes (composite aggregates for structured output)
 
-Vision.md's "Latent JD Archetype" idea — emitted in `submission_structured.jsonl` as three composite scores per candidate:
+Vision.md's "Latent JD Archetype" idea, emitted in `submission_structured.jsonl` as three composite scores per candidate:
 
 | Axis | Composed from |
 |---|---|
 | `tech_stack_core` | `production_embeddings_retrieval + production_vector_db + python_proficiency + ranking_eval_framework` |
 | `execution_environment` | `company_stage_alignment + shipper_vs_researcher_ratio + manager_drift (inverse) + production_emphasis` |
-| `friction_point` | `years_applied_ml_at_product_co + narrative_arc_density + open_source_external_validation` — "has this person actually rebuilt a legacy retrieval system?" |
+| `friction_point` | `years_applied_ml_at_product_co + narrative_arc_density + open_source_external_validation`, "has this person actually rebuilt a legacy retrieval system?" |
 
 ---
 
 ## 5. Honeypot detection (six rules)
 
-Conservative — only fires on truly impossible profiles. Borderline cases get heavy soft penalties but stay in the pool (protects against false-positive drops).
+Conservative, only fires on truly impossible profiles. Borderline cases get heavy soft penalties but stay in the pool (protects against false-positive drops).
 
 1. **Salary paradox**: `expected_salary_range_inr_lpa.min > expected_salary_range_inr_lpa.max`.
 2. **Chronological paradox**: any `start_date > end_date` in career history.
@@ -254,9 +254,9 @@ raw = (
 5. If LGBM-tuned weights beat hand-tuned on the held-out 60 → use LGBM weights for submission 3.
 
 **Why this composition works:**
-- `must_have_score` dominates the headroom — JD's must-haves are non-negotiable.
-- `substance_score` weight (0.6) is intentionally high — this is the trap-defense layer.
-- `retrieval_score` weight (0.2) is intentionally modest — embeddings are a recall channel, not a precision channel. Structured features do the precision work.
+- `must_have_score` dominates the headroom, JD's must-haves are non-negotiable.
+- `substance_score` weight (0.6) is intentionally high, this is the trap-defense layer.
+- `retrieval_score` weight (0.2) is intentionally modest, embeddings are a recall channel, not a precision channel. Structured features do the precision work.
 
 ---
 
@@ -300,9 +300,9 @@ Example: *"Sr ML Engineer (7y) at Stripe Search; verified Python 87/100 + produc
 
 **Rank 51–100 templates:**
 - Explicit **why-not** framing: "Strong X but ranked lower because Y missing."
-- This is the most useful Stage-4 signal — naming what's missing demonstrates the system *read* the candidate.
+- This is the most useful Stage-4 signal, naming what's missing demonstrates the system *read* the candidate.
 
-Example: *"Strong NLP foundation and active on platform, but no evidence of production retrieval system ownership in description text and 120-day notice — strong candidate, wrong role for the team's current phase."*
+Example: *"Strong NLP foundation and active on platform, but no evidence of production retrieval system ownership in description text and 120-day notice, strong candidate, wrong role for the team's current phase."*
 
 ### Stage-4 compliance, by construction
 
@@ -329,11 +329,11 @@ Before final submission: feed each generated reasoning + the candidate profile t
 
 **300 candidates, stratified across 5 buckets (60 each):**
 
-1. `likely_tier5` — ML/AI/IR title + product co + retrieval/ranking mentions in descriptions.
-2. `likely_tier4` — Adjacent strong: data scientist, search engineer at product co.
-3. `adjacent_mid` — Data engineer, backend with ML exposure, NLP-adjacent.
-4. `likely_keyword_stuffer` — High JD-keyword density + non-tech title.
-5. `honeypot_or_random` — Structural-paradox suspects + uniform random.
+1. `likely_tier5`, ML/AI/IR title + product co + retrieval/ranking mentions in descriptions.
+2. `likely_tier4`, Adjacent strong: data scientist, search engineer at product co.
+3. `adjacent_mid`, Data engineer, backend with ML exposure, NLP-adjacent.
+4. `likely_keyword_stuffer`, High JD-keyword density + non-tech title.
+5. `honeypot_or_random`, Structural-paradox suspects + uniform random.
 
 Stratification matters more than raw size; each bucket needs ≥30 examples for metrics to discriminate.
 
@@ -359,9 +359,9 @@ Optional but recommended for tier ≥ 3:
 
 ### Labelling UX (three artifacts)
 
-1. `eval/candidates_to_label.md` — one scannable Markdown profile per candidate. Pre-extracted summary, career path, top skills, key behavioural signals, pre-fired structural flags. Scroll, read 30s, decide.
-2. `eval/labels.csv` — pre-filled with `candidate_id`, blank label columns. Fill in spreadsheet form.
-3. `eval/sampling_report.md` — documents heuristics used for each bucket. Auditable.
+1. `eval/candidates_to_label.md`, one scannable Markdown profile per candidate. Pre-extracted summary, career path, top skills, key behavioural signals, pre-fired structural flags. Scroll, read 30s, decide.
+2. `eval/labels.csv`, pre-filled with `candidate_id`, blank label columns. Fill in spreadsheet form.
+3. `eval/sampling_report.md`, documents heuristics used for each bucket. Auditable.
 
 ### Calibration discipline
 
@@ -372,10 +372,10 @@ Optional but recommended for tier ≥ 3:
 
 ### Eval set serves three purposes simultaneously
 
-1. **Metric computation** — NDCG@10/50, MAP, P@10 on labelled set.
-2. **DQ-risk measurement** — honeypot rate as separate metric.
-3. **Trap-class precision** — "we correctly demote 92% of keyword-stuffers" is a Stage-5 winning line.
-4. **(Bonus)** Reasoning regression corpus — our generated reasonings can be compared against the `primary_strength` / `primary_concern` hand-notes.
+1. **Metric computation**, NDCG@10/50, MAP, P@10 on labelled set.
+2. **DQ-risk measurement**, honeypot rate as separate metric.
+3. **Trap-class precision**, "we correctly demote 92% of keyword-stuffers" is a Stage-5 winning line.
+4. **(Bonus)** Reasoning regression corpus, our generated reasonings can be compared against the `primary_strength` / `primary_concern` hand-notes.
 
 ---
 
@@ -406,7 +406,7 @@ Catered to systematically. Each pain point maps to a concrete design decision.
 | Reading between the lines (plain-language tier-5s) | Description-specificity probe rewards terse-but-real descriptions over verbose keyword-stuffers |
 | Need pipeline visibility, not just a rank | `submission_structured.jsonl` with per-candidate evidence array + stub `next_step` field |
 | Interview signal isn't in the resume | `interview_completion_rate`, `recruiter_response_rate`, `saved_by_recruiters_30d` weighted as High-SNR |
-| Everyone uses ChatGPT to tailor — keywords mean nothing | Substance-over-syntax architecture; specificity / narrative-arc / production-emphasis as primary trust signals |
+| Everyone uses ChatGPT to tailor, keywords mean nothing | Substance-over-syntax architecture; specificity / narrative-arc / production-emphasis as primary trust signals |
 | Find me the underdog hidden gem | `verification_ratio` (assessed but didn't claim a lot) + `acceleration` (under-titled climbing fast) |
 | Tell me why someone *didn't* make the list | Reasoning for rank 50–100 explicitly names what's missing |
 
@@ -414,7 +414,7 @@ Catered to systematically. Each pain point maps to a concrete design decision.
 
 ## 13. Judges' / Redrob's perspective addressed
 
-The judges are Redrob engineers — they built the dataset, wrote the JD. Stage 5 is a 30-minute video call: judging *and* recruiting. We design for both.
+The judges are Redrob engineers, they built the dataset, wrote the JD. Stage 5 is a 30-minute video call: judging *and* recruiting. We design for both.
 
 | Judge concern | Our answer |
 |---|---|
@@ -436,7 +436,7 @@ The judges are Redrob engineers — they built the dataset, wrote the JD. Stage 
 
 ## 14. matrix-main reuse policy
 
-`matrix-main` is the team's **KnowTruly.me** project (public repo) — semantic resume + verification platform for students. FastAPI + Postgres + Qdrant + React.
+`matrix-main` is the team's **KnowTruly.me** project (public repo), semantic resume + verification platform for students. FastAPI + Postgres + Qdrant + React.
 
 **Reuse policy:**
 
@@ -453,7 +453,7 @@ The judges are Redrob engineers — they built the dataset, wrote the JD. Stage 
 
 > *"Sandbox UI components adapted from team's prior project KnowTruly.me (public repo at github.com/.../matrix-main). The ranking algorithm, probe library, eval set, and submission pipeline are built fresh for this hackathon."*
 
-Hidden lineage is a risk. Declared lineage is a credibility marker — shows we're a team that builds, not just submits.
+Hidden lineage is a risk. Declared lineage is a credibility marker, shows we're a team that builds, not just submits.
 
 ---
 
@@ -461,7 +461,7 @@ Hidden lineage is a risk. Declared lineage is a credibility marker — shows we'
 
 ### 15.1 Why design matters here
 
-Most teams will submit a Streamlit form with a textbox and a "Run" button. The submission spec requires a sandbox — most will satisfy it minimally. A *designed* product is an implicit signal to Redrob engineers that we think like product builders, not just modellers. The sandbox isn't a Stage-1 checkbox — it's the most direct way a judge experiences our system before reading any code.
+Most teams will submit a Streamlit form with a textbox and a "Run" button. The submission spec requires a sandbox, most will satisfy it minimally. A *designed* product is an implicit signal to Redrob engineers that we think like product builders, not just modellers. The sandbox isn't a Stage-1 checkbox, it's the most direct way a judge experiences our system before reading any code.
 
 **The judge's path:**
 1. Opens our submission portal entry.
@@ -481,11 +481,11 @@ Ten rules. If a design choice violates one of these, it's wrong.
 2. **Content is the chrome.** No headers, footers, sidebars unless they earn their place. Strip every default chrome element until removing it would break the function.
 3. **Show, don't tell.** Visualise SNR with colour and opacity, not labels. A child should understand which candidate is strong without reading text.
 4. **Less is more, said in fewer words.** Every label, button, heading must justify itself. "Why?" beats "Explanation." "Begin." beats "Click here to start exploring candidates."
-5. **One accent colour, used sparingly.** A single warm tone reserved for the decisive moment — the system's choice, the user's pick, the verified signal. Everything else is monochrome.
+5. **One accent colour, used sparingly.** A single warm tone reserved for the decisive moment, the system's choice, the user's pick, the verified signal. Everything else is monochrome.
 6. **Calm typography.** Big serif headlines, small sans body. Generous line-height. No all-caps. No tiny text. No squashed kerning.
 7. **Animations earn their keep.** Only animate to convey meaning. Loading states, score reveals, page transitions. Never decorative motion.
 8. **Real data, real names.** Show actual candidates from the labelled set. No "User_001." No placeholder text.
-9. **The reasoning IS the design.** Reasoning text reads like Claude wrote it — calm, specific, honest. The system's voice is the system's interface.
+9. **The reasoning IS the design.** Reasoning text reads like Claude wrote it, calm, specific, honest. The system's voice is the system's interface.
 10. **No skeuomorphism, no gloss.** Flat surfaces. Hairline borders. No drop shadows on drop shadows. No gradients. Apple's iOS 7 reset, not the previous decade of glassmorphism.
 
 ---
@@ -499,38 +499,38 @@ Great artists steal. Here's the explicit attribution and how each shows up in ou
 | **Apple** | Typography hierarchy, generous whitespace, content over chrome, smooth physics-based motion, one accent colour, no onboarding | Whole visual language; first screen is a single thought, not a dashboard |
 | **Linear** | Keyboard-first feel, hairline borders, calm density, the courage to remove things others would keep | Keyboard shortcuts as primary navigation through the deck (Enter to interview, → to next, ← to back); no scrollbars where unneeded |
 | **Cron / Notion Calendar** | Soft animations, command-palette restraint, the way information feels weightless | Page transitions; the calm pause cards between acts |
-| **Things 3** | Quiet status indicators, never demanding attention, the dignity it gives a single to-do | Shortlist counter — a small text count, no badge animation |
-| **Pinterest / Tinder** | One item at a time, full viewport, the feeling of *flicking* through possibilities | **The deck** — the central interaction. Each candidate is full-screen, briefly, before they pass |
+| **Things 3** | Quiet status indicators, never demanding attention, the dignity it gives a single to-do | Shortlist counter, a small text count, no badge animation |
+| **Pinterest / Tinder** | One item at a time, full viewport, the feeling of *flicking* through possibilities | **The deck**, the central interaction. Each candidate is full-screen, briefly, before they pass |
 | **Claude** | Off-white background (warm, never pure #FFF), calm conversational copy, hairline borders, the reasoning text that reads like a thoughtful colleague wrote it | Background palette; every line of micro-copy; the literary feel of candidate introductions |
 | **Stripe Dashboard / Docs** | Specific over generic, calm density, code-like precision in data display | The way evidence strings are written ("3.2y at Stripe Search, BGE-based retrieval") |
-| **iA Writer** | The discipline of reducing to essence; the way blank space is content | The opening JD digest screen — almost nothing on it |
-| **Duolingo (selectively)** | Micro-progress states that make waits feel like progress | `Reading 1,000 profiles. Listening for signal. Ready.` — three states, each 200ms. **No** streaks, **no** XP, **no** mascot. Gamifying recruitment is undignified |
+| **iA Writer** | The discipline of reducing to essence; the way blank space is content | The opening JD digest screen, almost nothing on it |
+| **Duolingo (selectively)** | Micro-progress states that make waits feel like progress | `Reading 1,000 profiles. Listening for signal. Ready.`, three states, each 200ms. **No** streaks, **no** XP, **no** mascot. Gamifying recruitment is undignified |
 
 ---
 
 ### 15.4 Visual language
 
-#### Colour palette — two-colour system
+#### Colour palette, two-colour system
 
 Each colour does exactly one job. Restraint is the brand.
 
 | Token | Hex | Job |
 |---|---|---|
-| `--bg-canvas` | `#FBF8F2` | Page background — warm off-white. Never `#FFF` |
+| `--bg-canvas` | `#FBF8F2` | Page background, warm off-white. Never `#FFF` |
 | `--bg-card` | `#FFFFFF` | Card surfaces, slight contrast against canvas |
 | `--ink-primary` | `#1A1A1A` | Headings, candidate names, primary text |
 | `--ink-secondary` | `#5A5A5A` | Body, evidence strings |
 | `--ink-tertiary` | `#9A9A9A` | Captions, time stamps, micro-labels |
-| `--hairline` | `#EAE6DC` | Borders, dividers — always thin, always quiet |
-| **`--action`** | `#1F2933` | Primary actions — graphite. *"Interview"*, *"Show me who fits"*, *"Send shortlist"*. Confident, professional, calm |
-| **`--accent`** | `#B8843B` | Reserved for *the system found something* moments — the whispered hint, a verified signal, the closing reflection. Used sparingly, like an editor's marginalia |
-| `--signal-verified` | `#B8843B` | High-SNR — warm ochre (matches accent — they're the same idea) |
-| `--signal-claimed` | `#C9C2B1` | Low-SNR — muted parchment |
-| `--signal-concern` | `#A85B3A` | Concerns — muted earth-red, never alarm-bright |
+| `--hairline` | `#EAE6DC` | Borders, dividers, always thin, always quiet |
+| **`--action`** | `#1F2933` | Primary actions, graphite. *"Interview"*, *"Show me who fits"*, *"Send shortlist"*. Confident, professional, calm |
+| **`--accent`** | `#B8843B` | Reserved for *the system found something* moments, the whispered hint, a verified signal, the closing reflection. Used sparingly, like an editor's marginalia |
+| `--signal-verified` | `#B8843B` | High-SNR, warm ochre (matches accent, they're the same idea) |
+| `--signal-claimed` | `#C9C2B1` | Low-SNR, muted parchment |
+| `--signal-concern` | `#A85B3A` | Concerns, muted earth-red, never alarm-bright |
 
 No bright blues. No corporate accents. No gradients. No glassmorphism. Two purposeful colours; everything else is ink on cream.
 
-#### Typography — Fraunces + Inter
+#### Typography, Fraunces + Inter
 
 - **Display** (landing JD digest, candidate names): **Fraunces** (Google Fonts), 56–72px on desktop, weight 400 with optical size set to display. Fraunces is an opinionated literary serif with personality but not weirdness. Free. Editorial feel.
 - **Body** (UI text, evidence, paragraphs): **Inter**, 16–18px, weight 400, line-height 1.6.
@@ -539,23 +539,23 @@ No bright blues. No corporate accents. No gradients. No glassmorphism. Two purpo
 
 Hierarchy comes from **size and family contrast**, never from weight. No bold-everything. No all-caps. No squashed kerning.
 
-> **Why Fraunces over IBM Plex Serif:** Plex is fine but slightly corporate. Fraunces has the personality of a magazine — exactly the editorial calm we want for candidate cards that should feel curated, not data-rendered.
+> **Why Fraunces over IBM Plex Serif:** Plex is fine but slightly corporate. Fraunces has the personality of a magazine, exactly the editorial calm we want for candidate cards that should feel curated, not data-rendered.
 
 #### Spacing
 
-8-point grid. Components breathe. No element touches another within a card unless they're semantically connected. Section spacing is generous — 64px+ between major blocks.
+8-point grid. Components breathe. No element touches another within a card unless they're semantically connected. Section spacing is generous, 64px+ between major blocks.
 
 #### Iconography
 
-Lucide React or Heroicons (outline weight). Iconography is purely functional — never decorative. Icon-only buttons must have a tooltip; otherwise use a short text label.
+Lucide React or Heroicons (outline weight). Iconography is purely functional, never decorative. Icon-only buttons must have a tooltip; otherwise use a short text label.
 
 ---
 
-### 15.5 The engineered "ahha" moments — distributed across the journey
+### 15.5 The engineered "ahha" moments, distributed across the journey
 
 Not one demo at the front. **Five moments distributed across the user's actual journey.** Each one earned by what came before it. Earned moments stick; demoed moments don't.
 
-#### Ahha #1 — *"It listened to me."* (0:05, the JD digest)
+#### Ahha #1, *"It listened to me."* (0:05, the JD digest)
 
 The first screen isn't a form, isn't a demo, isn't a sales pitch. It's the JD reflected back as a calm 4–6 line summary the system extracted:
 
@@ -566,25 +566,25 @@ The first screen isn't a form, isn't a demo, isn't a sales pitch. It's the JD re
 >
 > `Show me who fits.`
 
-The user reads it. They feel *seen*. The system understood the JD the same way they would have explained it to a junior recruiter. The SNR extraction is on display — but humbly, as an act of listening, not a magic trick.
+The user reads it. They feel *seen*. The system understood the JD the same way they would have explained it to a junior recruiter. The SNR extraction is on display, but humbly, as an act of listening, not a magic trick.
 
-#### Ahha #2 — *"This is gorgeous."* (0:30, the first candidate)
+#### Ahha #2, *"This is gorgeous."* (0:30, the first candidate)
 
-The deck opens. One candidate, full viewport. Fraunces serif name in 64px. Their role beneath. The SNR Split below the role — dense left panel, sparse right. Below that, a literary one-paragraph introduction that reads like a colleague describing them:
+The deck opens. One candidate, full viewport. Fraunces serif name in 64px. Their role beneath. The SNR Split below the role, dense left panel, sparse right. Below that, a literary one-paragraph introduction that reads like a colleague describing them:
 
 > Sarah leads retrieval at Stripe Search. Three years on BGE-based systems, owns the NDCG evaluation harness, ships weekly. Eight-week notice.
 
 Two actions at the bottom: `Interview` (graphite), `Next` (quiet text link). The user feels they're meeting a person, not querying a database.
 
-#### Ahha #3 — *"It found someone I'd have missed."* (~2:00, candidate ~11)
+#### Ahha #3, *"It found someone I'd have missed."* (~2:00, candidate ~11)
 
-Around candidate 11–12, a plain-language tier-5 appears — a profile that looks unassuming on the surface but whose description text reveals a real production ranking system shipped at scale. A small italic line appears beneath their name:
+Around candidate 11–12, a plain-language tier-5 appears, a profile that looks unassuming on the surface but whose description text reveals a real production ranking system shipped at scale. A small italic line appears beneath their name:
 
 > *"Easy to overlook. Watch this one."*
 
-That's it. The system whispers, doesn't lecture. The user pauses, reads carefully, and clicks `Interview`. This is the *trap demo* from before — but **earned**, in the flow of work, not pre-emptively performed.
+That's it. The system whispers, doesn't lecture. The user pauses, reads carefully, and clicks `Interview`. This is the *trap demo* from before, but **earned**, in the flow of work, not pre-emptively performed.
 
-#### Ahha #4 — *"It's honest about its concerns even on top picks."* (~3:00, top-rank candidate with a real issue)
+#### Ahha #4, *"It's honest about its concerns even on top picks."* (~3:00, top-rank candidate with a real issue)
 
 A clearly strong candidate appears. Their introduction is glowing. But beneath, in matter-of-fact tone:
 
@@ -592,7 +592,7 @@ A clearly strong candidate appears. Their introduction is glowing. But beneath, 
 
 The system doesn't hide the gap. The user trusts the system more because of this honesty, not less. (Stage-4 reviewers will love this. It's the explicit "rank consistency: top candidates aren't perfect either" signal the spec rewards.)
 
-#### Ahha #5 — *"It knew what I valued."* (~6:00, the reflection)
+#### Ahha #5, *"It knew what I valued."* (~6:00, the reflection)
 
 After the user has worked through ~20 candidates and reviewed their shortlist, they click `Send shortlist`. JSON copies to clipboard. A quiet line appears:
 
@@ -604,43 +604,43 @@ Below it, italicised:
 
 > *You favoured production retrieval over framework familiarity. We'll remember.*
 
-This is the HITL learning **made warm**. It's not the system demonstrating its ability to learn — it's the system *being* a colleague who noticed something about you. This is the line that makes recruiters tell their peers about the tool.
+This is the HITL learning **made warm**. It's not the system demonstrating its ability to learn, it's the system *being* a colleague who noticed something about you. This is the line that makes recruiters tell their peers about the tool.
 
 ---
 
-### 15.6 The journey — six acts
+### 15.6 The journey, six acts
 
-Not a screen architecture — a **journey** with acts, pacing, and emotional beats. The product feels like an experience the user moves through, not a dashboard they navigate.
+Not a screen architecture, a **journey** with acts, pacing, and emotional beats. The product feels like an experience the user moves through, not a dashboard they navigate.
 
-#### Act 1 — Arrival (the JD digest)
+#### Act 1, Arrival (the JD digest)
 
 - Full viewport. Warm cream background. Nothing else but the JD distilled to 4–6 lines, Fraunces serif type, generous line-height.
 - One CTA at the bottom: `Show me who fits.`
 - No nav, no logo, no chrome, no menu. The page IS the JD reflection.
-- Cycles through `Reading 1,000 profiles → Listening for signal → Ready.` on click — three states, 200ms each.
+- Cycles through `Reading 1,000 profiles → Listening for signal → Ready.` on click, three states, 200ms each.
 
-#### Act 2 — The deck (one candidate at a time)
+#### Act 2, The deck (one candidate at a time)
 
 This is the central interaction. Not a list. Not a table. **The deck.**
 
 - Each candidate occupies the full viewport. Name in 64px Fraunces. Role beneath in calm sans.
-- The SNR Split sits below — dense "we trust this" panel left, sparse "they claim this" panel right.
+- The SNR Split sits below, dense "we trust this" panel left, sparse "they claim this" panel right.
 - A single literary paragraph (the reasoning) reads beneath as the candidate's introduction.
 - A small concern line if applicable (matter-of-fact, never alarmist).
 - Two actions: `Interview` (graphite primary) | `Next` (quiet text link).
 - **Keyboard-first:** Enter or `I` to interview, `→` or space for next, `←` to go back, `K` to keep moving.
 - Rank position is **never shown as a number**. Users see candidates in rank order; the ordering is implicit.
-- Background hue is subtly warmer for top picks, more neutral as we descend the deck — perceptible but not labelled.
+- Background hue is subtly warmer for top picks, more neutral as we descend the deck, perceptible but not labelled.
 
-#### Act 3 — Whispered insights (distributed through the deck)
+#### Act 3, Whispered insights (distributed through the deck)
 
 - Around candidate 11–12: a plain-language tier-5 with a small italic *"Easy to overlook. Watch this one."* beneath their name.
-- Around candidate 16: a top candidate with a real concern. *"Two months out — fair warning."* in italic. No exclamation. No alert icon. Calm honesty.
+- Around candidate 16: a top candidate with a real concern. *"Two months out, fair warning."* in italic. No exclamation. No alert icon. Calm honesty.
 - Around candidate 20–25: a candidate whose strengths are mismatched. *"Strong, but for a different role. Save anyway?"*
 
 The system whispers. Doesn't lecture. Doesn't break the deck rhythm.
 
-#### Act 4 — Pause (the breath)
+#### Act 4, Pause (the breath)
 
 After ~20 candidates a single calm card appears, separate from the deck flow:
 
@@ -651,14 +651,14 @@ After ~20 candidates a single calm card appears, separate from the deck flow:
 
 No urgency. No streak counter. Just the dignity of a pause. (Recruiting is emotional work; the system acknowledges that.)
 
-#### Act 5 — Shortlist review
+#### Act 5, Shortlist review
 
 - The candidates the user kept appear as a 2× grid (or stack on mobile).
 - The system's proposed priority order is shown; the user can drag to reorder.
 - No numbers on the cards. Just the people they chose.
 - One action at the bottom: `Send shortlist.`
 
-#### Act 6 — Reflection (the close)
+#### Act 6, Reflection (the close)
 
 - `Send shortlist` copies a clean JSON to clipboard (mimics HRMS webhook shape per spec §10.3).
 - Confirmation: a single quiet line:
@@ -675,8 +675,8 @@ No urgency. No streak counter. Just the dignity of a pause. (Recruiting is emoti
 
 #### Inline moments (appear within the journey, never as standalone screens)
 
-- **Compare** — appears organically when the user shortlists 3+ candidates whose scores are close: a soft prompt *"Three of these are close calls. Side by side?"* The user can dismiss. If they accept, two cards appear with `This one.` | `That one.` actions.
-- **Micro-Interrogation** — appears only when the user passes on a candidate the system ranked highly. A modal overlay: *"What did we miss?"* with four calm options. Reads like an editor's correction, not an interrogation. No-op for hackathon; Stage-5 narrative says: *"one click is one SGD step on the relevant probe weight."*
+- **Compare**, appears organically when the user shortlists 3+ candidates whose scores are close: a soft prompt *"Three of these are close calls. Side by side?"* The user can dismiss. If they accept, two cards appear with `This one.` | `That one.` actions.
+- **Micro-Interrogation**, appears only when the user passes on a candidate the system ranked highly. A modal overlay: *"What did we miss?"* with four calm options. Reads like an editor's correction, not an interrogation. No-op for hackathon; Stage-5 narrative says: *"one click is one SGD step on the relevant probe weight."*
 
 ---
 
@@ -690,7 +690,7 @@ Every label, button, and heading is written to spec. The voice is *calm colleagu
 | Loading sequence | `Reading 1,000 profiles. Listening for signal. Ready.` | "Loading…" |
 | Primary candidate action | `Interview` | "Add to shortlist" |
 | Secondary candidate action | `Next` | "Pass" or "Reject" |
-| Card concern callout | `Two months out — fair warning.` | "Risk factors: extended notice period" |
+| Card concern callout | `Two months out, fair warning.` | "Risk factors: extended notice period" |
 | Whispered hint | *`Easy to overlook. Watch this one.`* | "Hidden gem detected" |
 | SNR panel labels | `We trust this.` / `They claim this.` | "Verified" / "Self-reported" |
 | Why-not flip | `Tell me more.` | "Show explanation" |
@@ -734,7 +734,7 @@ The judge may preview on their phone. The sandbox must work fully on mobile.
 - **Trap demo:** cards stack vertically; reveal still functions.
 - **Ranking:** single-column list, card height ~120px each.
 - **Deep-dive:** SNR split becomes vertical stack on narrow viewports (≤640px).
-- **Compare mode:** uses swipe gestures natively on touch — actually *better* on mobile than desktop.
+- **Compare mode:** uses swipe gestures natively on touch, actually *better* on mobile than desktop.
 - **Typography:** display sizes scale with `clamp()` so headlines don't break on small screens.
 - **Touch targets:** minimum 44×44px for any tappable element.
 
@@ -754,7 +754,7 @@ We test on iPhone Safari and Chrome Android before submission.
 **Backend:**
 - FastAPI exposing a single `/rank` endpoint.
 - Our `rank.py` logic underneath.
-- Pre-loaded with a curated 30-candidate sample (mix of tier-5, tier-3, keyword-stuffers, and a honeypot or two — chosen from our labelled eval set).
+- Pre-loaded with a curated 30-candidate sample (mix of tier-5, tier-3, keyword-stuffers, and a honeypot or two, chosen from our labelled eval set).
 - Optional: accept user-uploaded `candidates.jsonl` (≤100 rows per spec §10.5).
 
 **Deployment:**
@@ -801,7 +801,7 @@ This is the full choreographed user journey from arrival to reflection. Every be
 | **0:10** | Clicks `Show me who fits.` Three quick loader states: `Reading 1,000 profiles. Listening for signal. Ready.` Each 200ms. | "It's working, and showing me it's working." |
 | **0:15** | First candidate fills the viewport. Big serif name. SNR Split below. Literary intro paragraph. Two actions. | *"This is gorgeous."* (Ahha #2) |
 | **0:30** | Reads the intro. Sees the dense High-SNR panel. Clicks `Interview`. Card softly exits left. Next candidate arrives. | "I want to keep going." |
-| **1:00** | Five candidates in. Two interviewed, three passed. Shortlist counter shows *Shortlist of 2* in the corner — quiet, unobtrusive. | "I'm making progress." |
+| **1:00** | Five candidates in. Two interviewed, three passed. Shortlist counter shows *Shortlist of 2* in the corner, quiet, unobtrusive. | "I'm making progress." |
 | **2:00** | Candidate 11 appears. A plain-language tier-5 with the small italic *"Easy to overlook. Watch this one."* under their name. User pauses, reads carefully. Clicks `Interview`. | *"It found someone I'd have missed."* (Ahha #3) |
 | **3:00** | A strong candidate appears with a 60-day notice flagged matter-of-factly. The system didn't hide the concern even on a top pick. | *"It's honest about its concerns even on top picks."* (Ahha #4) |
 | **4:00** | The pause card appears: `Take a breath. Shortlist of 4.` User pauses, breathes, clicks `See shortlist`. | "It respects my time." |
@@ -820,11 +820,11 @@ These are the lines and moments engineered to be **quoted** by recruiters tellin
 
 | Quote | Engineered by |
 |---|---|
-| *"It shows you candidates one at a time, like Tinder — but for hiring."* | The deck as the central interaction |
+| *"It shows you candidates one at a time, like Tinder, but for hiring."* | The deck as the central interaction |
 | *"It admits when it might be wrong."* | The inline concern callouts on top picks |
 | *"It told me at the end what I'd been biased toward. I didn't even realise."* | The reflection sentence in Act 6 |
 | *"It's beautiful. Like the calendar app I actually want to use."* | Fraunces typography + cream palette + restraint |
-| *"It doesn't have photos. Just words."* | No avatars — typography is identity |
+| *"It doesn't have photos. Just words."* | No avatars, typography is identity |
 | *"It found someone I would have missed."* | The whispered hint on candidate 11 |
 | *"The way it explains itself is calm."* | Claude-voice micro-copy throughout |
 
@@ -850,9 +850,9 @@ Every distinct idea from vision.md mapped to status. Complete sweep.
 | Pairwise / contrastive | ✅ pairwise refinement on top 20 |
 | Cultural OS Lexicon | ✅ softened to summary-thoughtfulness + shipper-verb |
 | OAVS / privilege normalization | ✅ correct interpretation = education weight zero |
-| Environmental DNA — Pace & Volatility | ✅ company_stage_alignment |
-| Environmental DNA — Governance | ✅ cut (not JD-relevant) |
-| Environmental DNA — Engineering Culture | ⚠️ light-weight description-text features capture some |
+| Environmental DNA, Pace & Volatility | ✅ company_stage_alignment |
+| Environmental DNA, Governance | ✅ cut (not JD-relevant) |
+| Environmental DNA, Engineering Culture | ⚠️ light-weight description-text features capture some |
 | AI-tailored resume stuffing | ✅ central design defense |
 | Critical-thinking inferred not matched | ✅ narrative arc density |
 | YoE/education bias | ✅ education = 0; YoE = gaussian |
@@ -870,7 +870,7 @@ Every distinct idea from vision.md mapped to status. Complete sweep.
 | Scalar Weight Online Update | ✅ implicit in linear probe weights |
 | Contextual Memory Buffer | ✅ cut (no LLM) |
 | Why & Why Not explainability | ✅ tier 50–100 names what's missing; sandbox shows Why-Not for top rank too |
-| SNR Classification — High vs Low | ✅ central architectural principle |
+| SNR Classification, High vs Low | ✅ central architectural principle |
 | High-SNR examples (verified velocity, GitHub, etc.) | ✅ all mapped to probes |
 | Low-SNR examples downweighted | ✅ |
 | Real-Time Forensic Explainer Panel | ✅ sandbox evidence panel |
@@ -883,7 +883,7 @@ Every distinct idea from vision.md mapped to status. Complete sweep.
 | Consulting-only penalty | ✅ hard-no probe |
 | Product-co boost | ✅ probe |
 | Pydantic output validation | ✅ added |
-| Cross-encoder reranker | ⚠️ deferred — submission-3 consideration if eval-set NDCG@10 allows |
+| Cross-encoder reranker | ⚠️ deferred, submission-3 consideration if eval-set NDCG@10 allows |
 | Qdrant / Faiss | ✅ not needed (numpy matmul faster on CPU for 100K-row one-shot query); documented in README |
 | preferred_work_mode probe | ✅ added |
 | certifications probe | ✅ added |
@@ -894,33 +894,33 @@ Every distinct idea from vision.md mapped to status. Complete sweep.
 
 ## 17. Stage-by-stage defense (Stages 1–5)
 
-**Stage 1 — Format validation:**
+**Stage 1, Format validation:**
 - Pydantic-validated CSV row schema in `rank.py`.
 - Local pre-flight run of `validate_submission.py` before every submission.
 - Output filename = team_id.csv per spec.
 
-**Stage 2 — Scoring:**
+**Stage 2, Scoring:**
 - Optimized weights via eval-set NDCG@10.
 - Pairwise refinement on top 20 targets the 50%-weighted metric directly.
 - Submission 1 is health-validation; submission 2 is main shot; submission 3 is polish.
 
-**Stage 3 — Code reproduction + honeypot check:**
+**Stage 3, Code reproduction + honeypot check:**
 - Single command in README: `python rank.py --candidates ./candidates.jsonl --out ./submission.csv`.
 - Dockerfile with pinned `requirements.txt`.
 - Sandbox-tested before submission.
-- 6-rule honeypot detector — conservative but defensible; expected honeypot rate in top-100: ≤2%.
+- 6-rule honeypot detector, conservative but defensible; expected honeypot rate in top-100: ≤2%.
 
-**Stage 4 — Manual review:**
+**Stage 4, Manual review:**
 - Reasoning passes all 6 checks by construction (specific facts, JD connection, honest concerns, no hallucination, variation, rank consistency).
 - README is engineering-spec quality, no marketing.
 - Real git history with 8–12 commits over the week.
 - `methodology_summary` in `submission_metadata.yaml` is ≤200 words leading with SNR architecture.
 
-**Stage 5 — Defend-your-work interview:**
+**Stage 5, Defend-your-work interview:**
 - 90-second opening narrative locked in (see §21).
 - Per-design-choice defense ready: every weight maps to a JD sentence.
 - Sandbox demo runnable live with Why-Not panel and Micro-Interrogation mock.
-- *Discovered insight* about the dataset (TBD during EDA) — memorable hook.
+- *Discovered insight* about the dataset (TBD during EDA), memorable hook.
 
 ---
 
@@ -935,11 +935,11 @@ redrob-ranker/
 ├── Dockerfile                           # Stage-3 reproduction.
 ├── .gitignore
 │
-├── rank.py                              # Single entry point — runs in <30s for 100K
+├── rank.py                              # Single entry point, runs in <30s for 100K
 │
 ├── src/
 │   ├── __init__.py
-│   ├── schema.py                        # Pydantic models — input + output validation
+│   ├── schema.py                        # Pydantic models, input + output validation
 │   ├── load.py                          # Stream candidates.jsonl
 │   ├── honeypot.py                      # 6 deterministic rules
 │   ├── probes/
@@ -955,7 +955,7 @@ redrob-ranker/
 │   ├── pairwise.py                      # Top-20 refinement
 │   ├── reasoning.py                     # 6 templates per band
 │   ├── output.py                        # CSV + structured JSONL
-│   └── precompute.py                    # Standalone — embeds candidates
+│   └── precompute.py                    # Standalone, embeds candidates
 │
 ├── data/
 │   ├── precomputed_embeddings.npy       # Generated by precompute.py
@@ -973,20 +973,20 @@ redrob-ranker/
 ├── sandbox/
 │   ├── Dockerfile                       # Multi-stage: build frontend, serve via FastAPI
 │   ├── backend/
-│   │   ├── main.py                      # FastAPI app — /rank endpoint
+│   │   ├── main.py                      # FastAPI app, /rank endpoint
 │   │   ├── inference.py                 # Wrapper around src/ rank logic
 │   │   └── sample_candidates.json       # Pre-loaded curated 30-candidate demo set
 │   ├── frontend/
 │   │   ├── package.json                 # React + Vite + Tailwind + Framer Motion
 │   │   ├── vite.config.ts
-│   │   ├── tailwind.config.cjs          # Custom tokens — colours, type scale, spacing
+│   │   ├── tailwind.config.cjs          # Custom tokens, colours, type scale, spacing
 │   │   ├── index.html
 │   │   └── src/
 │   │       ├── main.tsx
 │   │       ├── App.tsx                  # Journey router (Act state machine)
 │   │       ├── acts/
-│   │       │   ├── Act1_JDDigest.tsx    # Landing — JD reflected back
-│   │       │   ├── Act2_Deck.tsx        # The deck — one candidate at a time
+│   │       │   ├── Act1_JDDigest.tsx    # Landing, JD reflected back
+│   │       │   ├── Act2_Deck.tsx        # The deck, one candidate at a time
 │   │       │   ├── Act4_Pause.tsx       # "Take a breath" card
 │   │       │   ├── Act5_Shortlist.tsx   # Grid review with drag-reorder
 │   │       │   └── Act6_Reflection.tsx  # Closing line + reflection
@@ -1002,7 +1002,7 @@ redrob-ranker/
 │   │       │   └── LoaderSequence.tsx   # Three-state progress loader
 │   │       ├── hooks/
 │   │       │   ├── useKeyboard.ts       # Enter/→/←/I/K shortcuts
-│   │       │   └── useDeck.ts           # Deck state — position, shortlist, etc.
+│   │       │   └── useDeck.ts           # Deck state, position, shortlist, etc.
 │   │       ├── styles/
 │   │       │   ├── tokens.css           # CSS custom properties matching §15.4
 │   │       │   └── fonts.css            # Fraunces + Inter via Google Fonts
@@ -1020,7 +1020,7 @@ redrob-ranker/
 ```
 
 **Submission deliverables:**
-1. `<team_id>.csv` — the ranked output.
+1. `<team_id>.csv`, the ranked output.
 2. GitHub repo (public): `github.com/<user>/redrob-ranker`.
 3. Sandbox link: HuggingFace Space.
 4. Portal metadata + `submission_metadata.yaml` in repo root.
@@ -1029,59 +1029,59 @@ redrob-ranker/
 
 ## 19. Build order and milestones
 
-**Phase 0 — Eval set foundation (Day 1):**
+**Phase 0, Eval set foundation (Day 1):**
 - Build stratified sampler.
 - Generate `candidates_to_label.md` + `labels.csv` for 300 candidates.
 - Hand-label all 300 (one focused session, 3–6 hours).
 - Calibration check: `bucket × tier` crosstab.
 
-**Phase 1 — Honeypot + Hard-DQ (Day 2):**
+**Phase 1, Honeypot + Hard-DQ (Day 2):**
 - 6-rule honeypot detector.
 - Hard-no anti-SNR probes (consulting-only, bigcorp-only, pure-research, etc.).
-- Validate against labelled honeypots — should achieve ≥95% recall on `is_honeypot=true`.
+- Validate against labelled honeypots, should achieve ≥95% recall on `is_honeypot=true`.
 
-**Phase 2 — Probe library (Day 2–3):**
+**Phase 2, Probe library (Day 2–3):**
 - All 30+ probes implemented as pure functions.
 - Each probe returns `(score, evidence_string)`.
 - Each probe has unit test against fixture candidates.
 
-**Phase 3 — Precomputation + hybrid retrieval (Day 3):**
+**Phase 3, Precomputation + hybrid retrieval (Day 3):**
 - Embed all 100K candidates with `all-MiniLM-L6-v2`.
 - BM25 index over candidate text.
 - Save to `data/precomputed_embeddings.npy`.
 
-**Phase 4 — Scoring + pairwise (Day 3–4):**
+**Phase 4, Scoring + pairwise (Day 3–4):**
 - Composition function.
 - Pairwise refinement on top 20.
 - Hand-tuned initial weights.
-- **Submission 1** — health validation, format-pass, format-validate.
+- **Submission 1**, health validation, format-pass, format-validate.
 
-**Phase 5 — Reasoning generator (Day 4):**
+**Phase 5, Reasoning generator (Day 4):**
 - 6 templates × 3 bands.
 - Deterministic seeding by candidate_id.
 - Spot-check on labelled eval set.
 
-**Phase 6 — Iteration (Day 5):**
+**Phase 6, Iteration (Day 5):**
 - Eval-set tuning.
 - Optional LightGBM-Rank weight learner.
-- **Submission 2** — main shot.
+- **Submission 2**, main shot.
 
-**Phase 7 — Sandbox & design (Day 5–7, parallel with Phase 6):**
+**Phase 7, Sandbox & design (Day 5–7, parallel with Phase 6):**
 - Lift React/Vite/Tailwind base from `matrix-main`; strip KnowTruly-specific code.
 - Build 5 screens per §15.6: Landing (Trap Demo), Ranking, Candidate Detail, Compare, Override modal.
-- Implement design tokens per §15.4 — colour palette, type scale, spacing.
-- Implement micro-interactions per §15.8 — page transitions, card flip, SNR Split, swipe.
+- Implement design tokens per §15.4, colour palette, type scale, spacing.
+- Implement micro-interactions per §15.8, page transitions, card flip, SNR Split, swipe.
 - Curate 30-candidate sample for sandbox demo (includes labelled tier-5s, keyword-stuffers, one honeypot for the trap demo).
 - Mobile responsive test (iPhone Safari, Chrome Android).
 - Deploy to HuggingFace Space via Docker.
 
-**Phase 8 — Final polish (Day 7):**
+**Phase 8, Final polish (Day 7):**
 - Manual review of submission 2 top-100 (~50 min).
 - Offline LLM reasoning audit on the 100 generated reasonings.
-- README polish — lead with SNR architecture, declare matrix-main lineage, include knowledge-graph diagram.
+- README polish, lead with SNR architecture, declare matrix-main lineage, include knowledge-graph diagram.
 - `submission_metadata.yaml` filled.
 - Stage-5 narrative rehearsed.
-- **Submission 3** — polish (only if it improves eval NDCG@10).
+- **Submission 3**, polish (only if it improves eval NDCG@10).
 
 **Git discipline:** real commits at each phase, not single dump. Commit messages describe the design decision, not just the file change.
 
@@ -1092,27 +1092,27 @@ redrob-ranker/
 These are honest acknowledgments for the README and Stage-5 interview.
 
 1. **Eval set ≠ ground truth.** Our 300 hand labels approximate the hidden ground truth; they're our best signal but not perfect. Risk of overfitting to our biases.
-2. **Company stage history not in dataset.** We can't see what a company's size was when the candidate joined — only the current size. Can't directly reward "scaled-with-company" experience.
+2. **Company stage history not in dataset.** We can't see what a company's size was when the candidate joined, only the current size. Can't directly reward "scaled-with-company" experience.
 3. **No longitudinal profile data.** Can't detect "candidate recently AI-tailored their profile" beyond weak heuristics (signup vs last_active proximity).
 4. **Cross-encoder reranker not used.** Could marginally improve top 20 with a CPU-small cross-encoder. Deferred to submission 3 only if budget permits.
 5. **Single JD only.** Probe weights are tuned to this JD. The architecture generalizes to other JDs by re-deriving probes; the weight calibration would need to be redone.
 6. **No A/B test data.** A real production system would correlate offline NDCG with online recruiter-engagement metrics. We can't.
 
-These are *features* for the interview, not bugs — they show we understand the limits of our own system, which is a senior-engineer trait the JD explicitly looks for.
+These are *features* for the interview, not bugs, they show we understand the limits of our own system, which is a senior-engineer trait the JD explicitly looks for.
 
 ---
 
 ## 21. Stage-5 interview narrative (90-second version)
 
-> *"We rejected the conventional architecture — embed everything, cosine similarity, cross-encoder rerank — because the dataset was explicitly designed to defeat it. The JD itself flagged keyword-stuffers, plain-language tier-5s, and behavioural twins.*
+> *"We rejected the conventional architecture, embed everything, cosine similarity, cross-encoder rerank, because the dataset was explicitly designed to defeat it. The JD itself flagged keyword-stuffers, plain-language tier-5s, and behavioural twins.*
 >
-> *Instead, we treated the JD as the algorithm. Every JD requirement maps to a probe over the candidate schema. Each probe is tagged High-SNR, Medium-SNR, Low-SNR, or Anti-SNR — and we weight by class. Tested, verified, or unfakeable signals dominate; self-asserted claims are downweighted.*
+> *Instead, we treated the JD as the algorithm. Every JD requirement maps to a probe over the candidate schema. Each probe is tagged High-SNR, Medium-SNR, Low-SNR, or Anti-SNR, and we weight by class. Tested, verified, or unfakeable signals dominate; self-asserted claims are downweighted.*
 >
-> *Honeypots are gated out by six deterministic structural-impossibility rules. Behavioural availability is a multiplicative modifier — a perfect-paper candidate who hasn't logged in for six months gets multiplied down toward zero.*
+> *Honeypots are gated out by six deterministic structural-impossibility rules. Behavioural availability is a multiplicative modifier, a perfect-paper candidate who hasn't logged in for six months gets multiplied down toward zero.*
 >
-> *The reasoning column is composed directly from the top contributing probes per candidate — no LLM at runtime — so it can't hallucinate by construction. Every rank has a defensible reason that's also auditable by a human.*
+> *The reasoning column is composed directly from the top contributing probes per candidate, no LLM at runtime, so it can't hallucinate by construction. Every rank has a defensible reason that's also auditable by a human.*
 >
-> *We added pairwise refinement on the top 20, because NDCG@10 is fundamentally a pairwise problem on the top 10 — that's where 50% of the composite score lives.*
+> *We added pairwise refinement on the top 20, because NDCG@10 is fundamentally a pairwise problem on the top 10, that's where 50% of the composite score lives.*
 >
 > *The whole architecture is online-updatable: each probe weight is independently SGD-updatable. We didn't have hiring-decision data, so we tuned against a hand-labelled 300-candidate eval set. In production, every recruiter override would be one gradient step. No retraining.*
 >

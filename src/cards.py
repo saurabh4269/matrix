@@ -29,13 +29,13 @@ def render_card(cand: Candidate, bucket: str, card_index: int) -> str:
     p = cand.profile
     s = cand.redrob_signals
 
-    # Career path — most recent first, compact
+    # Career path, most recent first, compact
     career_lines = []
     for r in cand.career_history[:5]:
         end = "present" if r.is_current or not r.end_date else r.end_date[:7]
         start = r.start_date[:7] if r.start_date else "?"
         career_lines.append(
-            f"  - **{r.title}** @ {r.company} ({r.company_size}, {r.industry}) — "
+            f"  - **{r.title}** @ {r.company} ({r.company_size}, {r.industry}), "
             f"{start} → {end}, {r.duration_months}mo"
         )
         # Append a one-line clip of the description so the labeller sees substance
@@ -44,8 +44,8 @@ def render_card(cand: Candidate, bucket: str, card_index: int) -> str:
             clip = desc[:240] + ("…" if len(desc) > 240 else "")
             career_lines.append(f"    > {clip}")
 
-    # Education — top entry
-    edu_line = "—"
+    # Education, top entry
+    edu_line = "(none)"
     if cand.education:
         e = cand.education[0]
         edu_line = (
@@ -53,7 +53,7 @@ def render_card(cand: Candidate, bucket: str, card_index: int) -> str:
             f"({e.start_year}–{e.end_year}, tier: {e.tier})"
         )
 
-    # Top skills — first 10
+    # Top skills, first 10
     skill_lines = []
     for sk in cand.skills[:10]:
         assess = s.skill_assessment_scores.get(sk.name)
@@ -64,11 +64,11 @@ def render_card(cand: Candidate, bucket: str, card_index: int) -> str:
             f"{assess_str}"
         )
 
-    # Pre-fired structural flags — paradoxes + consulting-only
+    # Pre-fired structural flags, paradoxes + consulting-only
     flags = fires_any_structural_paradox(cand)
     if is_consulting_only_career(cand):
         flags.append("consulting_only_career")
-    flag_str = ", ".join(flags) if flags else "—"
+    flag_str = ", ".join(flags) if flags else "–"
 
     # Behavioural snapshot
     salary = s.expected_salary_range_inr_lpa
@@ -93,23 +93,23 @@ def render_card(cand: Candidate, bucket: str, card_index: int) -> str:
 
     return f"""---
 
-## #{card_index:03d} — {p.anonymized_name or "(unnamed)"} · `{cand.candidate_id}`
+## #{card_index:03d} · {p.anonymized_name or "(unnamed)"} · `{cand.candidate_id}`
 
 **Bucket:** `{bucket}`  ·  **⚠ Pre-fired flags:** `{flag_str}`
 
-**Headline:** {p.headline or "—"}
+**Headline:** {p.headline or "(none)"}
 
 **Current:** **{p.current_title}** @ {p.current_company} ({p.current_company_size}, {p.current_industry}) · {p.years_of_experience:.1f}y total · {p.location}, {p.country}
 
-**Summary:** {summary or "—"}
+**Summary:** {summary or "(none)"}
 
 **Career:**
-{chr(10).join(career_lines) if career_lines else "  —"}
+{chr(10).join(career_lines) if career_lines else "  (none)"}
 
 **Education:** {edu_line}
 
 **Top skills:**
-{chr(10).join(skill_lines) if skill_lines else "  —"}
+{chr(10).join(skill_lines) if skill_lines else "  (none)"}
 
 **Behavioural signals:**
 {behav}

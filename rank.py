@@ -1,4 +1,4 @@
-"""Redrob ranking — single-command entry point.
+"""Redrob ranking, single-command entry point.
 
     python rank.py --candidates ./candidates.jsonl --out ./submission.csv
 
@@ -75,7 +75,7 @@ def main():
         if seen % 10_000 == 0:
             print(
                 f"  {seen:>7,} candidates processed "
-                f"({time.time()-t0:5.1f}s) — honeypots so far: {n_honeypot}",
+                f"({time.time()-t0:5.1f}s), honeypots so far: {n_honeypot}",
                 file=sys.stderr,
             )
 
@@ -108,7 +108,7 @@ def main():
         baseline_min = max(0.001, min(cs.score for cs in top))
         spread = baseline_max - baseline_min
         if spread <= 0:
-            # All same — assign decreasing dummy scores
+            # All same, assign decreasing dummy scores
             for i, cs in enumerate(top):
                 cs.score = float(round(1.0 - 0.001 * i, 6))
         else:

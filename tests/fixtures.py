@@ -3,14 +3,14 @@
 Each fixture is a minimal dict that satisfies the schema and encodes a
 specific archetype the system needs to handle correctly:
 
-  TIER_5_FIXTURE          — strong ML/IR engineer at product co
-  TIER_4_FIXTURE          — adjacent strong with one gap
-  KEYWORD_STUFFER_FIXTURE — Marketing Manager with AI keywords (the trap)
-  CONSULTING_ONLY_FIXTURE — entire career at TCS
-  BIGCORP_ONLY_FIXTURE    — entire career at FAANG-scale companies
-  FRAMEWORK_ENTHUSIAST_FIXTURE — LangChain-only, no production
-  TITLE_CHASER_FIXTURE    — three short-tenure recent roles
-  HONEYPOT_FIXTURES       — six honeypots, one per rule
+  TIER_5_FIXTURE         , strong ML/IR engineer at product co
+  TIER_4_FIXTURE         , adjacent strong with one gap
+  KEYWORD_STUFFER_FIXTURE, Marketing Manager with AI keywords (the trap)
+  CONSULTING_ONLY_FIXTURE, entire career at TCS
+  BIGCORP_ONLY_FIXTURE   , entire career at FAANG-scale companies
+  FRAMEWORK_ENTHUSIAST_FIXTURE, LangChain-only, no production
+  TITLE_CHASER_FIXTURE   , three short-tenure recent roles
+  HONEYPOT_FIXTURES      , six honeypots, one per rule
 
 Used by tests/* to ensure each probe and rule fires (and only fires) on the
 right candidates.
