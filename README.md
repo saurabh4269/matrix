@@ -28,16 +28,23 @@ redrob-ranker/
 │   ├── scoring.py                # composition of all probes into a single score
 │   ├── pairwise.py               # top-20 refinement on JD-priority tiebreakers
 │   ├── reasoning.py              # 6 templates × 3 rank bands, deterministic seeding
+│   ├── precompute.py             # BM25 + sentence-transformer artefacts (one-shot)
+│   ├── cards.py                  # markdown card renderer for labelling
 │   └── probes/
 │       ├── must_have.py          # JD's "absolutely need" probes
 │       ├── substance.py          # anti-stuffer / High-SNR signals
-│       ├── behavioural.py        # Redrob signals availability + trust
+│       ├── behavioural.py        # Redrob signals: availability, trust, closability
 │       ├── anti_snr.py           # JD-explicit disqualifiers / red flags
-│       └── location.py           # logistics, YoE band, certifications
+│       ├── location.py           # logistics, YoE band, certifications
+│       └── retrieval.py          # BM25 + (optional) dense cosine
 ├── eval/                         # stratified sampler + labelling artefacts + metrics
+├── audit/                        # offline reasoning hallucination check
+├── tests/                        # 29 unit tests (probes, honeypot, output schema)
 ├── sandbox/                      # FastAPI + React/Vite/Tailwind/Framer Motion demo
+├── data/                         # precomputed BM25 + candidate-id index (regenerable)
 ├── final_plan.md                 # complete project blueprint, read this for design rationale
-└── submissions/                  # generated CSVs
+├── NEXT_STEPS.md                 # the 4 things that need your accounts / identity
+└── submissions/                  # canonical submission CSV + structured sidecar
 ```
 
 ## The SNR architecture (in one paragraph)
@@ -66,7 +73,7 @@ See `sandbox/README.md` for development and deployment instructions.
 
 ## Lineage
 
-Sandbox UI base components (React + Vite + Tailwind config patterns) were lifted from the team's prior project, [KnowTruly.me](https://github.com/<owner>/matrix-main), a public repository. The ranking algorithm, probe library, scoring composition, pairwise refinement, reasoning generator, eval set, honeypot detector, is built fresh for this submission. UI pages, animations, micro-copy, and the journey choreography are custom for this submission.
+The entire codebase, ranker, probes, scoring, sandbox UI, components, and design system, is original to this submission. The team has prior work in the adjacent space of semantic resume/recruiting tooling whose architectural principles (semantic-first, audit-trail mindset, deterministic UX) informed our thinking, but no code was copied across.
 
 ## Eval set
 
@@ -74,10 +81,10 @@ Sandbox UI base components (React + Vite + Tailwind config patterns) were lifted
 
 ## Known limitations
 
-- **Dense embeddings deferred.** Hybrid retrieval (BM25 + sentence-transformer cosine) is in the plan but not in the current build. The structured-feature scorer is competitive on its own; embeddings will be added in submission #3 if eval-set NDCG@10 improves.
-- **Eval set ≠ ground truth.** Our 300 hand labels approximate the hidden ground truth; risk of overfitting to our biases.
-- **Single JD only.** Probe weights are tuned to this JD; generalising means re-deriving probes.
-- **Company-age dictionary is small.** The tenure-exceeds-company-age honeypot rule only fires on ~30 well-known companies; broader coverage requires more data.
+- **Dense embeddings not in this submission.** BM25 retrieval is active (precomputed via `src/precompute.py`). The sentence-transformer cosine channel is wired but the precompute didn't complete on this run; the structured-feature + BM25 scorer is what shipped. Rerunning the embedding step with `--batch-size 64` on a faster machine would add a complementary channel.
+- **Eval set is the team's hand-labels, not ground truth.** We approximate the hidden ground truth with our own 290-candidate labelled set; risk of overfitting to our biases.
+- **Single JD only.** Probe weights are tuned to this JD; generalising means re-deriving the probes from a new JD.
+- **Company-age dictionary is small.** The tenure-exceeds-company-age honeypot rule only fires on ~30 well-known companies; broader coverage requires a larger company-founding-year table.
 
 ## License
 

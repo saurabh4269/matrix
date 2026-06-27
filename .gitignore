@@ -1,3 +1,4 @@
+# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -5,28 +6,27 @@ __pycache__/
 venv/
 .env
 
+# Pytest
+.pytest_cache/
+
 # Heavy precomputed artefacts. Regenerable via `python -m src.precompute`.
-# The bm25_corpus.pkl in particular is ~194 MB.
+# bm25_corpus.pkl in particular is ~194 MB.
 data/bm25_corpus.pkl
 data/embeddings.npy
+data/dense_scores.npy
 data/candidates.jsonl
-# Keep these tracked (they're small and useful):
-#   data/candidate_ids.json
-#   data/bm25_scores.npy
-#   data/dense_scores.npy
-#   data/jd_text.txt
 
-eval/sample_to_label.jsonl
-eval/candidates_to_label.md
+# Filled labels — these are user-specific work.
+# Keep eval/labels.csv (the empty template) tracked so others know the schema.
 eval/labels_filled.csv
+eval/labelled.jsonl
 
-submissions/
-*.csv
-
+# Node / Vite
 sandbox/frontend/node_modules/
 sandbox/frontend/dist/
 sandbox/frontend/.vite/
 
+# OS / IDE
 .DS_Store
 Thumbs.db
 .vscode/

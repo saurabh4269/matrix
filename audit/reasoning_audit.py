@@ -15,7 +15,7 @@ Pure local, no network required. Run before every submission.
 Usage:
     python -m audit.reasoning_audit \\
         --candidates "<path>/candidates.jsonl" \\
-        --submission submissions/team_baseline.csv
+        --submission submissions/team_v2.csv
 """
 from __future__ import annotations
 

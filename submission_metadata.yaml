@@ -13,7 +13,7 @@ team_members:
     email: "TODO@example.com"
     role: "Team Lead / ML Engineer"
 
-github_repo: "https://github.com/TODO/redrob-ranker"
+github_repo: "https://github.com/saurabh4269/matrix"
 sandbox_link: "https://huggingface.co/spaces/TODO/redrob-ranker"
 reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
 
