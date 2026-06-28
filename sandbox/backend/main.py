@@ -126,6 +126,8 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
 
         out_rows.append({
             "rank": rank,
+            "confidence": cs.confidence,
+            "breakdown": cs.breakdown,
             "candidate_id": cs.candidate_id,
             "name": cand.profile.anonymized_name,
             "current_title": cand.profile.current_title,

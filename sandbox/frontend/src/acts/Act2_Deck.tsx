@@ -5,6 +5,8 @@ import SNRSplit from '../components/SNRSplit'
 import ShortlistCounter from '../components/ShortlistCounter'
 import WhisperedHint from '../components/WhisperedHint'
 import ProfileSheet from '../components/ProfileSheet'
+import ConfidencePill from '../components/ConfidencePill'
+import ScoreBreakdownBar from '../components/ScoreBreakdownBar'
 
 interface Props {
   cand: RankedCandidate
@@ -98,6 +100,11 @@ export default function Act2Deck({
           {cand.current_title} <span className="text-ink-tertiary">at</span> {cand.current_company}
         </p>
 
+        {/* Confidence pill: the single most glanceable trust signal */}
+        <div className="mt-4">
+          <ConfidencePill confidence={cand.confidence} />
+        </div>
+
         {cand.whispered && <WhisperedHint />}
 
         {/* The verdict, calm, generous leading, prose-width */}
@@ -130,6 +137,12 @@ export default function Act2Deck({
             </>
           )}
         </div>
+
+        {/* What's driving the score — horizontal stacked bar inspired by TellTale */}
+        <ScoreBreakdownBar
+          breakdown={cand.breakdown}
+          behaviouralModifier={cand.behavioural.behav_modifier_total}
+        />
 
         {/* Disclosure links */}
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 font-sans text-small text-ink-tertiary">

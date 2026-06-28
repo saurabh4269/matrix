@@ -135,6 +135,8 @@ def main():
             "candidate_id": cs.candidate_id,
             "rank": rank,
             "score": cs.score,
+            "confidence": cs.confidence,
+            "breakdown": cs.breakdown,
             "reasoning": reasoning,
             "must_have": [
                 {"name": n, "score": round(s, 4), "evidence": e}

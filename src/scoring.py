@@ -123,6 +123,12 @@ class CandidateScore:
     anti_snr_penalty: float = 1.0
     behavioural_modifier: float = 1.0
 
+    # Derived after scoring. 'high' / 'medium' / 'low' tag for UI + downstream.
+    confidence: str = "low"
+
+    # Breakdown of how the raw score decomposes by category (sums to ~1.0).
+    breakdown: dict[str, float] = field(default_factory=dict)
+
 
 def score_candidate(cand: Candidate) -> CandidateScore:
     """Apply all probes to a candidate and return a CandidateScore.
@@ -191,13 +197,40 @@ def score_candidate(cand: Candidate) -> CandidateScore:
     result.behavioural_modifier = behav_modifier
 
     # ----- Composite -----
-    base = (
-        CATEGORY_WEIGHTS["must_have"] * result.must_have_sum
-        + CATEGORY_WEIGHTS["substance"] * result.substance_sum
-        + CATEGORY_WEIGHTS["retrieval"] * result.retrieval_sum
-        + CATEGORY_WEIGHTS["location"] * result.location_sum
-    )
+    contrib = {
+        "must_have": CATEGORY_WEIGHTS["must_have"] * result.must_have_sum,
+        "substance": CATEGORY_WEIGHTS["substance"] * result.substance_sum,
+        "retrieval": CATEGORY_WEIGHTS["retrieval"] * result.retrieval_sum,
+        "location":  CATEGORY_WEIGHTS["location"]  * result.location_sum,
+    }
+    base = sum(contrib.values())
     result.score = base * penalty * behav_modifier
+
+    # Breakdown as fractions (sum to 1.0). Useful for the sandbox stacked bar.
+    if base > 0:
+        result.breakdown = {k: round(v / base, 4) for k, v in contrib.items()}
+    else:
+        result.breakdown = {k: 0.0 for k in contrib}
+
+    # ----- Confidence bucket -----
+    # Heuristic, derived from probe-firing patterns rather than the numeric score.
+    # High: deep + corroborated coverage of the JD's must-haves + no major red flag.
+    # Medium: partial coverage, OR strong coverage with one moderate concern.
+    # Low: scattered signal, or strong red flag.
+    strong_must = sum(1 for _, s, _ in result.must_have if s > 0.5)
+    strong_subst = sum(1 for _, s, _ in result.substance if s > 0.4)
+    major_anti = sum(
+        1 for n, s, _ in result.anti_snr
+        if s > 0.4 and ANTI_SNR_WEIGHTS.get(n, 0.0) >= 0.7
+    )
+    available = result.behavioural_modifier
+    if strong_must >= 3 and strong_subst >= 2 and major_anti == 0 and available > 0.5:
+        result.confidence = "high"
+    elif strong_must >= 2 and major_anti <= 1 and available > 0.3:
+        result.confidence = "medium"
+    else:
+        result.confidence = "low"
+
     return result
 
 

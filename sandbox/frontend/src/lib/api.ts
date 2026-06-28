@@ -74,8 +74,17 @@ export interface Certification {
   year: number | null
 }
 
+export interface ScoreBreakdown {
+  must_have: number
+  substance: number
+  retrieval: number
+  location: number
+}
+
 export interface RankedCandidate {
   rank: number
+  confidence: 'high' | 'medium' | 'low'
+  breakdown: ScoreBreakdown
   candidate_id: string
   name: string
   current_title: string
