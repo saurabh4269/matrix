@@ -16,6 +16,7 @@ import Dashboard from './acts/Dashboard'
 import LoaderSequence from './components/LoaderSequence'
 import TuningPanel from './components/TuningPanel'
 import MicroInterrogation from './components/MicroInterrogation'
+import ErrorBoundary from './components/ErrorBoundary'
 
 type Phase =
   | 'arrival'
@@ -215,13 +216,15 @@ export default function App() {
           />
         )}
         {phase === 'dashboard' && data && (
-          <Dashboard
-            key="dashboard"
-            jd={data.jd_digest}
-            candidates={candidates}
-            totalEvaluated={data.total_evaluated}
-            onBackToDeck={() => setPhase('deck')}
-          />
+          <ErrorBoundary key="dashboard-eb" label="Overview" onBack={() => setPhase('deck')}>
+            <Dashboard
+              key="dashboard"
+              jd={data.jd_digest}
+              candidates={candidates}
+              totalEvaluated={data.total_evaluated}
+              onBackToDeck={() => setPhase('deck')}
+            />
+          </ErrorBoundary>
         )}
         {phase === 'reflection' && (
           <Act6Reflection

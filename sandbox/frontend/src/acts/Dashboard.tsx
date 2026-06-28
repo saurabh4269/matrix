@@ -244,7 +244,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
 
           {/* Score breakdown bar */}
           <ScoreBreakdownBar
-            breakdown={selected.breakdown}
+            breakdown={bd}
             behaviouralModifier={selected.behavioural?.behav_modifier_total ?? 1.0}
           />
 
