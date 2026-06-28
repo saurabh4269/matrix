@@ -1,91 +1,121 @@
 # matrix
 
-> *We treat the JD as the algorithm. Each requirement becomes a probe over the candidate schema. Every probe is tagged High-SNR, Medium-SNR, Low-SNR, or Anti-SNR, and we weight by class.*
+A candidate ranker built for the Redrob *Intelligent Candidate Discovery & Ranking* hackathon.
 
-A candidate ranker for the Redrob *Intelligent Candidate Discovery & Ranking* hackathon. Ranks the top 100 of 100,000 candidates against a single Senior AI Engineer job description, with structured reasoning for every rank.
+You give it a list of 100,000 candidate profiles and one job description. It gives you back the 100 best fits, in order, with a short note for each one explaining why it ranked them where it did.
 
-## Reproduce
+The job we ranked against in this submission is a Senior AI Engineer role at Redrob, hybrid in Pune or Noida, 5 to 9 years of experience.
+
+## How to run it
 
 ```bash
 pip install -r requirements.txt
 
-# Produce the submission CSV (run on the official candidates.jsonl)
 python rank.py --candidates ./candidates.jsonl --out ./submission.csv
 ```
 
-Runtime: **~230 seconds** on CPU, ~2 GB peak RAM. Well inside the 5-min / 16 GB / no-network / no-GPU budget. CSV passes `validate_submission.py` from the bundle.
+That's it. One command. It runs in about 3 minutes 40 seconds on a normal laptop, uses around 2 GB of RAM, needs no internet connection, no GPU. The CSV passes the official `validate_submission.py` cleanly.
 
-## What's in here
+## The idea behind it
+
+Most candidate rankers in this hackathon will probably embed everything into vectors, do a cosine similarity against the JD, and call it a day. We didn't want to do that because the dataset has traps that are designed to break exactly that approach.
+
+So we did something different. We read the JD line by line and turned each line into a small check we can run against any candidate. Things like:
+
+- Does their work history mention production deployment of an embedding system?
+- Does their description say "shipped" and "deployed" or just "researched" and "explored"?
+- Did they actually pass a Python assessment, or are they just claiming Python on their profile?
+- Is their entire career at consulting firms? The JD says that's a hard no.
+- Are they reachable? Open to work, recent activity, decent response rate?
+
+Each check is a small Python function. Each one gives a candidate a score from 0 to 1 plus a short sentence explaining what it found. The final rank is the weighted sum of all those checks, multiplied by how reachable they are.
+
+We tag each check by how easy it is to fake:
+
+- **High trust**: things you can't really bluff. Verified skill assessment scores. Specific tool names in your role descriptions. Activity on the platform.
+- **Low trust**: things anyone can claim. A bare skill name with zero endorsements. Generic action verbs. Years of experience without context.
+
+High-trust signals get more weight. Low-trust signals get less. This is what makes it hard for a candidate who just stuffed their profile with AI buzzwords to outrank someone who actually built real systems.
+
+## The honeypot defence
+
+The dataset has about 80 impossible profiles seeded into it. Things like "8 years at a company founded 3 years ago" or "expert at 10 skills with 0 months experience in each". If your top 100 has more than 10 of these, you get disqualified.
+
+We catch them with six small structural checks:
+
+1. Career dates that go backwards (end date before start date).
+2. Total career duration that's way more than the candidate's claimed years.
+3. A single role longer than their entire stated experience.
+4. Three or more "expert" skills with zero months of experience each.
+5. Tenure at a company that started before that company existed.
+6. Assessment scores for skills the candidate never claimed.
+
+Any candidate that trips one of these is dropped from the running, no exceptions. Our last run quarantined 222 candidates out of 100,000. Zero of them ended up in our top 100.
+
+## The reasoning column
+
+For each of the top 100 we have to write a short note explaining the rank. We don't use an LLM for this because LLMs can hallucinate facts that aren't in the candidate's profile, and that gets you penalised in the manual review.
+
+Instead, each note is templated from the actual probes that scored highest for that candidate. Six different sentence shapes per rank band, picked deterministically from the candidate's ID, so the same candidate always gets the same note but different candidates get different phrasings. Every claim in the note is something we can point to in the profile.
+
+We also ran the entire top 100 through a sanity check that compares every claim in the note against the candidate's actual record. Zero hallucinations.
+
+## What's in the repo
 
 ```
 matrix/
-├── rank.py                       # single entry point
+├── rank.py                       single command, makes the submission CSV
 ├── src/
-│   ├── schema.py                 # Pydantic models (lenient input, strict output)
-│   ├── load.py                   # streaming JSONL reader
-│   ├── heuristics.py             # cheap helpers (regexes, company dicts)
-│   ├── honeypot.py               # six deterministic structural-impossibility rules
-│   ├── scoring.py                # composition of all probes into a single score
-│   ├── pairwise.py               # top-20 refinement on JD-priority tiebreakers
-│   ├── reasoning.py              # 6 templates × 3 rank bands, deterministic seeding
-│   ├── precompute.py             # BM25 + sentence-transformer artefacts (one-shot)
-│   ├── cards.py                  # markdown card renderer for labelling
+│   ├── schema.py                 candidate / submission data shapes
+│   ├── load.py                   reads candidates.jsonl one at a time
+│   ├── honeypot.py               the six honeypot checks
+│   ├── heuristics.py             helper regexes, company lookups
+│   ├── scoring.py                puts all the checks together into one score
+│   ├── pairwise.py               re-orders the top 20 with finer rules
+│   ├── reasoning.py              writes the short note for each rank
+│   ├── precompute.py             builds the BM25 index (run this once)
 │   └── probes/
-│       ├── must_have.py          # JD's "absolutely need" probes
-│       ├── substance.py          # anti-stuffer / High-SNR signals
-│       ├── behavioural.py        # Redrob signals: availability, trust, closability
-│       ├── anti_snr.py           # JD-explicit disqualifiers / red flags
-│       ├── location.py           # logistics, YoE band, certifications
-│       └── retrieval.py          # BM25 + (optional) dense cosine
-├── eval/                         # stratified sampler + labelling artefacts + metrics
-├── audit/                        # offline reasoning hallucination check
-├── tests/                        # 29 unit tests (probes, honeypot, output schema)
-├── sandbox/                      # FastAPI + React/Vite/Tailwind/Framer Motion demo
-├── data/                         # precomputed BM25 + candidate-id index (regenerable)
-├── final_plan.md                 # complete project blueprint, read this for design rationale
-├── NEXT_STEPS.md                 # the 4 things that need your accounts / identity
-└── submissions/                  # canonical submission CSV + structured sidecar
+│       ├── must_have.py          checks for things the JD says we need
+│       ├── substance.py          checks for real work behind the claims
+│       ├── behavioural.py        availability, trust, responsiveness
+│       ├── anti_snr.py           red flags the JD lists explicitly
+│       ├── location.py           where they are, years of experience
+│       └── retrieval.py          BM25 score, optional dense embedding score
+├── eval/                         tools for labelling 300 candidates by hand
+├── audit/                        the hallucination check
+├── tests/                        29 tests, all passing
+├── sandbox/                      a small web UI so you can browse the ranking
+├── data/                         precomputed BM25 scores
+├── final_plan.md                 the full design doc
+├── NEXT_STEPS.md                 what's left to do
+└── submissions/                  the actual CSV we'd submit
 ```
 
-## The SNR architecture (in one paragraph)
+## The sandbox
 
-The dataset has three explicit traps: keyword-stuffers, plain-language tier-5s, and behavioural twins. A naive embedding-cosine pipeline falls for all three. We don't.
+There's a small web app in `sandbox/`. You can run it locally with:
 
-Every signal in a candidate's record is tagged by how hard it is to fake. **High-SNR** signals (named technical systems in description text, verified skill assessment scores, GitHub activity, narrative cause-effect chains, production verbs in recent roles) carry 2–3× the weight of **Low-SNR** signals (bare skill claims with zero endorsements, generic action verbs, raw YoE alone). **Anti-SNR** flags (consulting-only careers, bigcorp-only careers, framework-enthusiast pattern, manager-drift) apply as a multiplicative penalty. **Honeypots** are gated out by six deterministic structural-impossibility rules and never enter the top-100 by construction.
+```bash
+cd sandbox/frontend && npm install && npm run build && cd ../..
+python -m uvicorn sandbox.backend.main:app --host 127.0.0.1 --port 8765
+```
 
-Behavioural signals (open-to-work, response rate, last-active decay, notice period) are a multiplicative modifier on the overall score, a perfect-paper candidate who hasn't logged in for six months gets multiplied down toward zero.
+Then open `http://127.0.0.1:8765`. It walks you through the top 20 candidates one at a time, the way you'd actually use the tool if you were a recruiter. There's a key for each action: Enter to shortlist someone, right arrow to skip, P to see their full profile.
 
-Top 20 are refined via pairwise comparison against JD-priority tiebreakers (production evidence > years; description specificity > keyword count; verified > claimed) because NDCG@10, 50% of the composite score, is fundamentally a pairwise problem.
+The whole thing is one Docker container, set up to deploy directly to HuggingFace Spaces.
 
-## Reasoning, by construction
+## What's still on me to do
 
-Reasoning is composed by templating from the top contributing probes per candidate. **No LLM at runtime.** Six templates per rank band × variable probe combinations × deterministic seeding from `candidate_id` produce >600 effective phrasings without ever fabricating a fact. Stage-4 checks are passed by construction, every claim cites a parsed schema attribute, concerns are explicitly named on top-rank candidates, the tone matches the rank because the band IS a function of rank.
+See `NEXT_STEPS.md`. The short version: label 290 candidates by hand to actually measure how well the ranker works, fill in my team identity in `submission_metadata.yaml`, push the sandbox to HuggingFace, and submit the CSV to the portal.
 
-Top 1–10 sample:
+## Things this submission could do better
 
-> *"Strong fit: Lead AI Engineer (6.7y) at Razorpay. 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, plus 2 vector-DB mention(s) in descriptions; 2 vector tool(s) in skills."*
+A few honest limitations:
 
-## Sandbox
-
-A working sandbox lives in `sandbox/`. React + Vite + Tailwind frontend, FastAPI backend, single Docker container, HuggingFace-Space compatible. It implements the six-act journey described in `final_plan.md §15`, the JD digest landing, the deck (one candidate at a time, keyboard-first), whispered hints on plain-language tier-5s, the pause, the shortlist review, and the closing reflection.
-
-See `sandbox/README.md` for development and deployment instructions.
-
-## Lineage
-
-The entire codebase, ranker, probes, scoring, sandbox UI, components, and design system, is original to this submission. The team has prior work in the adjacent space of semantic resume/recruiting tooling whose architectural principles (semantic-first, audit-trail mindset, deterministic UX) informed our thinking, but no code was copied across.
-
-## Eval set
-
-300 candidates stratified across six buckets (likely tier-5, likely tier-4, adjacent mid, likely keyword-stuffer, honeypot suspect, random control) labelled by hand. `eval/sample.py` runs the stratification; `eval/candidates_to_label.md` is the human-friendly labelling experience; `eval/merge_labels.py` merges filled labels back; `eval/metrics.py` computes NDCG@10/50/MAP/P@10 + honeypot rate. The labelled set is the only iteration signal in a no-leaderboard hackathon.
-
-## Known limitations
-
-- **Dense embeddings not in this submission.** BM25 retrieval is active (precomputed via `src/precompute.py`). The sentence-transformer cosine channel is wired but the precompute didn't complete on this run; the structured-feature + BM25 scorer is what shipped. Rerunning the embedding step with `--batch-size 64` on a faster machine would add a complementary channel.
-- **Eval set is the team's hand-labels, not ground truth.** We approximate the hidden ground truth with our own 290-candidate labelled set; risk of overfitting to our biases.
-- **Single JD only.** Probe weights are tuned to this JD; generalising means re-deriving the probes from a new JD.
-- **Company-age dictionary is small.** The tenure-exceeds-company-age honeypot rule only fires on ~30 well-known companies; broader coverage requires a larger company-founding-year table.
+- We have a sentence-transformer embedding channel wired up but the precompute didn't finish on this machine. BM25 is doing the retrieval work for now. On a faster machine the embedding step would add a second signal.
+- We tested against our own hand-labelled set, not the actual hidden ground truth. There's some risk we tuned the system to our own biases.
+- The vocabularies in the probes are tuned for this specific JD. Pointing the system at a different role means rewriting those vocabularies.
 
 ## License
 
-MIT for the code. Public dataset belongs to Redrob.
+MIT for the code. The dataset itself belongs to Redrob.

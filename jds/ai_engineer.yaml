@@ -1,0 +1,523 @@
+# jds/ai_engineer.yaml
+# The Senior AI Engineer @ Redrob JD. This is the default JD config the
+# ranker is calibrated for. Everything probe-relevant lives here; the Python
+# code in src/ is JD-agnostic.
+
+name: ai_engineer
+display_name: "Senior AI Engineer"
+
+digest:
+  role: "Senior AI Engineer."
+  location: "Pune or Noida. Hybrid."
+  experience: "Five to nine years."
+  style: "Hands-on, not architect-only."
+  avoid:
+    - "Consulting-only careers."
+    - "Framework enthusiasts."
+    - "Pure researchers without production."
+
+jd_text: |
+  Senior AI Engineer, Founding Team at Redrob AI, a Series A AI-native talent
+  intelligence platform. Pune or Noida, India. Hybrid. 5-9 years of experience.
+
+  We need:
+    - Production experience with embeddings-based retrieval systems
+      (sentence-transformers, OpenAI embeddings, BGE, E5, bi-encoder, dense retrieval).
+      Real production deployment, embedding drift, index refresh, retrieval-quality
+      regression in production.
+    - Production experience with vector databases or hybrid search infrastructure
+      (Pinecone, Weaviate, Qdrant, Milvus, OpenSearch, Elasticsearch, FAISS, HNSW).
+    - Strong Python.
+    - Hands-on experience designing evaluation frameworks for ranking systems,
+      NDCG, MRR, MAP, offline-to-online correlation, A/B test interpretation.
+
+  Nice to have:
+    - LLM fine-tuning experience (LoRA, QLoRA, PEFT).
+    - Learning-to-rank models (XGBoost-rank or neural LTR).
+    - Prior HR-tech, recruiting, marketplace product exposure.
+    - Distributed systems or large-scale inference optimization.
+    - Open-source contributions in AI/ML.
+
+  Avoid: consulting-only careers (TCS/Infosys/Wipro/etc), pure research-only
+  careers without production, framework enthusiasts (LangChain tutorial level),
+  title-chasers (1.5-year job-hop pattern), CV/speech/robotics specialists
+  without NLP/IR exposure.
+
+  The hire will own the intelligence layer, ranking, retrieval, and matching
+  systems. They will ship a v2 ranking system, set up evaluation infrastructure,
+  and drive long-term architecture as the engineering team grows from 4 to 12.
+
+yoe:
+  peak: 7.0
+  sigma: 2.5
+
+location:
+  preferred_cities:
+    - pune
+    - noida
+    - delhi
+    - new delhi
+    - ncr
+    - gurugram
+    - gurgaon
+    - mumbai
+    - bangalore
+    - bengaluru
+    - hyderabad
+    - chennai
+  country: India
+  visa_sponsorship: false
+
+title_patterns:
+  relevant_titles: '\b(ml|machine[\s\-]?learning|ai|artificial[\s\-]?intelligence|applied[\s\-]?scientist|research[\s\-]?engineer|data[\s\-]?scientist|nlp|natural[\s\-]?language|search[\s\-]?engineer|information[\s\-]?retrieval|recommendation|ranking|retrieval|relevance)\b'
+  nlp_ir: '\b(nlp|natural[\s\-]?language|information[\s\-]?retrieval|search|ranking|retrieval|recommendation|relevance|text|applied[\s\-]?scientist[\s\w]*nlp)\b'
+  excluded_subdomain: '\b(computer[\s\-]?vision|cv\s+engineer|image[\s\-]?classification|object[\s\-]?detection|segmentation|speech[\s\-]?recognition|asr|tts|text[\s\-]?to[\s\-]?speech|robotics|slam|autonomous[\s\-]?vehicle|lidar)\b'
+
+must_haves:
+  python_skill_name: Python
+  embedding_tools:
+    - sentence-transformers
+    - sentence transformers
+    - bge
+    - e5
+    - openai embeddings
+    - embedding
+    - embeddings
+    - bi-encoder
+    - biencoder
+    - dense retrieval
+    - dense embedding
+    - sentence-bert
+    - sbert
+  vector_db_tools:
+    - pinecone
+    - weaviate
+    - qdrant
+    - milvus
+    - opensearch
+    - elasticsearch
+    - faiss
+    - hnsw
+    - ivf
+    - vector database
+    - vector db
+    - vector index
+    - scann
+    - annoy
+  ranking_eval_terms:
+    - ndcg
+    - mrr
+    - map
+    - recall@
+    - precision@
+    - p@
+    - hit rate
+    - hits@
+    - offline evaluation
+    - offline-online
+    - a/b test
+    - ab test
+  framework_skills:
+    - langchain
+    - llamaindex
+    - llama-index
+    - haystack
+    - autogen
+    - crewai
+    - agentops
+
+substance:
+  hands_on_verbs:
+    - wrote
+    - built
+    - shipped
+    - deployed
+    - implemented
+    - coded
+    - developed
+    - engineered
+    - designed
+    - prototyped
+    - integrated
+    - refactored
+    - debugged
+    - optimized
+    - optimised
+    - tuned
+    - trained
+    - fine-tuned
+    - fine tuned
+  research_verbs:
+    - researched
+    - explored
+    - investigated
+    - studied
+    - analyzed
+    - analysed
+    - evaluated
+    - compared
+    - measured
+    - examined
+    - surveyed
+  production_verbs:
+    - production
+    - prod
+    - shipped
+    - deployed
+    - deployment
+    - in prod
+    - users
+    - scale
+    - latency
+    - sla
+    - on-call
+    - on call
+    - throughput
+    - qps
+    - served
+    - live
+  manager_verbs:
+    - led
+    - managed
+    - owned
+    - directed
+    - oversaw
+    - coordinated
+    - mentored
+    - architected
+    - strategized
+    - stakeholders
+  deployment_verbs:
+    - deployed
+    - deployment
+    - production
+    - in prod
+    - shipped
+    - users
+    - scale
+    - latency
+    - sla
+    - on-call
+    - on call
+    - throughput
+    - qps
+    - served
+    - live
+    - a/b
+    - ab test
+    - ab-test
+    - rolled out
+    - launched
+    - api
+    - service
+  narrative_connectives:
+    - because
+    - root cause
+    - led to
+    - resulted in
+    - reduced from
+    - improved by
+    - after discovering
+    - debugged
+    - diagnosed
+    - identified that
+    - found that
+    - we realized
+    - we discovered
+    - due to
+    - as a result
+    - consequently
+    - which caused
+    - this enabled
+    - this allowed
+    - to address
+    - to mitigate
+  research_org_pattern: '\b(research|lab|labs|university|institute|academia|cnrs|max planck|allen institute|google research|microsoft research|deepmind|fair)\b'
+
+specific_technical_entities:
+  - pytorch
+  - tensorflow
+  - jax
+  - flax
+  - huggingface
+  - transformers
+  - sentence-transformers
+  - scikit-learn
+  - sklearn
+  - xgboost
+  - lightgbm
+  - catboost
+  - spacy
+  - nltk
+  - fastai
+  - lora
+  - qlora
+  - peft
+  - deepspeed
+  - vllm
+  - tgi
+  - tensorrt
+  - onnx
+  - ggml
+  - gguf
+  - llama.cpp
+  - bge
+  - e5
+  - openai embeddings
+  - instructor
+  - cohere embeddings
+  - faiss
+  - pinecone
+  - weaviate
+  - qdrant
+  - milvus
+  - scann
+  - annoy
+  - elasticsearch
+  - opensearch
+  - vespa
+  - ndcg
+  - mrr
+  - map
+  - wandb
+  - weights & biases
+  - mlflow
+  - tensorboard
+  - kafka
+  - spark
+  - airflow
+  - dbt
+  - snowflake
+  - redshift
+  - bigquery
+  - databricks
+  - delta lake
+  - iceberg
+  - kubernetes
+  - k8s
+  - docker
+  - ray
+  - argo
+  - fastapi
+  - grpc
+  - redis
+  - postgres
+  - postgresql
+  - mongodb
+  - cassandra
+  - aws
+  - gcp
+  - azure
+  - sagemaker
+  - vertex
+  - ec2
+  - s3
+  - lambda
+  - rag
+  - fine-tuning
+  - fine tuning
+  - supervised fine-tuning
+  - sft
+  - rlhf
+  - dpo
+  - ipo
+  - kto
+  - lstm
+  - transformer
+  - bert
+  - gpt
+  - diffusion
+  - vae
+  - gan
+  - rnn
+  - cnn
+  - attention
+  - bm25
+  - tf-idf
+  - tfidf
+  - hnsw
+  - ivf
+  - pq
+  - product quantization
+  - learning to rank
+  - ltr
+  - two-tower
+  - cross-encoder
+  - bi-encoder
+
+companies:
+  consulting_firms:
+    - tcs
+    - tata consultancy services
+    - tata consultancy
+    - infosys
+    - wipro
+    - accenture
+    - cognizant
+    - capgemini
+    - hcl
+    - hcl technologies
+    - lti
+    - larsen & toubro infotech
+    - mindtree
+    - tech mahindra
+    - mphasis
+    - ibm services
+    - deloitte
+    - kpmg
+    - ey
+    - pwc
+  product_companies:
+    - google
+    - meta
+    - facebook
+    - amazon
+    - apple
+    - microsoft
+    - netflix
+    - openai
+    - anthropic
+    - cohere
+    - databricks
+    - snowflake
+    - swiggy
+    - zomato
+    - ola
+    - uber
+    - razorpay
+    - cred
+    - phonepe
+    - paytm
+    - freshworks
+    - zoho
+    - byju
+    - unacademy
+    - meesho
+    - nykaa
+    - lenskart
+    - urban company
+    - udaan
+    - policybazaar
+    - stripe
+    - shopify
+    - airbnb
+    - pinterest
+    - spotify
+    - linkedin
+    - twitter
+    - reddit
+    - discord
+    - notion
+    - linear
+    - vercel
+    - scale ai
+    - hugging face
+    - weights & biases
+    - scale
+  named_employers:
+    - google
+    - meta
+    - facebook
+    - amazon
+    - apple
+    - microsoft
+    - stripe
+    - shopify
+    - airbnb
+    - pinterest
+    - spotify
+    - openai
+    - anthropic
+    - databricks
+    - snowflake
+    - scale ai
+    - linkedin
+    - twitter
+    - netflix
+    - uber
+
+sizes:
+  bigcorp_size: "10001+"
+  small_mid_sizes:
+    - "11-50"
+    - "51-200"
+    - "201-500"
+
+honeypot_company_ages:
+  openai: 2015
+  anthropic: 2021
+  cohere: 2019
+  hugging face: 2016
+  huggingface: 2016
+  scale ai: 2016
+  weights & biases: 2017
+  weights and biases: 2017
+  wandb: 2017
+  databricks: 2013
+  snowflake: 2012
+  stripe: 2010
+  perplexity: 2022
+  perplexity ai: 2022
+  mistral: 2023
+  mistral ai: 2023
+  razorpay: 2014
+  cred: 2018
+  swiggy: 2014
+  zomato: 2008
+  phonepe: 2015
+  byju's: 2011
+  byjus: 2011
+  unacademy: 2015
+  udaan: 2016
+  meesho: 2015
+  yellow.ai: 2016
+  yellow ai: 2016
+  aganitha: 2017
+
+weights:
+  must_have:
+    production_embeddings_retrieval: 0.25
+    production_vector_db: 0.20
+    ranking_eval_framework: 0.15
+    python_proficiency: 0.10
+    years_applied_ml_at_product_co: 0.30
+  substance:
+    description_specificity: 0.20
+    narrative_arc_density: 0.10
+    production_emphasis: 0.15
+    verification_ratio: 0.15
+    acceleration: 0.05
+    summary_thoughtfulness: 0.05
+    company_stage_alignment: 0.10
+    shipper_vs_researcher_ratio: 0.10
+    named_employer_micro_boost: 0.10
+  anti_snr:
+    consulting_only: 0.95
+    bigcorp_only: 0.40
+    pure_research_career: 0.95
+    no_production_code_18mo: 0.70
+    framework_enthusiast: 0.50
+    title_chaser: 0.30
+    cv_speech_robo_only: 0.70
+    manager_drift: 0.30
+    keyword_dense_junior: 0.70
+    remote_only_vs_hybrid_jd: 0.60
+    dilution: 0.50
+  retrieval:
+    bm25_jd_match: 0.40
+    dense_cosine_jd_match: 0.60
+  location:
+    location_match: 0.50
+    yoe_band_fit: 0.40
+    certifications_micro_boost: 0.10
+  category:
+    must_have: 1.0
+    substance: 0.6
+    retrieval: 0.2
+    location: 0.1
+  behavioural:
+    effectively_available: 0.40
+    notice_period_curve: 0.25
+    trust_modifier: 0.10
+    engagement_quality: 0.15
+    closability: 0.10
