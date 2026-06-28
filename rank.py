@@ -33,6 +33,7 @@ from src.calibration import (
 )
 from src.conformal import compute_rank_intervals
 from src.load import iter_candidates
+from src.next_action import main_risk, next_action
 from src.pairwise import refine_top_n
 from src.reasoning import generate_reasoning
 from src.schema import SubmissionRow
@@ -190,6 +191,8 @@ def main():
                 "posterior_tier5": round(bayes_posterior, 4),
             },
             "breakdown": cs.breakdown,
+            "next_action": next_action(cs, current_title=cand.profile.current_title),
+            "main_risk": main_risk(cs),
             "calibration": {
                 "must_have_percentile": percentile_from_z(z["must_have_z"]),
                 "substance_percentile": percentile_from_z(z["substance_z"]),

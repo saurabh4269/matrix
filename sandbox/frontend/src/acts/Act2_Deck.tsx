@@ -125,6 +125,18 @@ export default function Act2Deck({
           </p>
         )}
 
+        {/* Prescriptive next action — what the recruiter should actually do */}
+        {cand.next_action && (
+          <div className="mt-5 p-4 bg-card border-l-2 border-accent rounded-r">
+            <p className="font-sans text-micro uppercase text-accent mb-1">
+              Next action
+            </p>
+            <p className="font-serif text-body text-ink leading-snug">
+              {cand.next_action}
+            </p>
+          </div>
+        )}
+
         {/* Status row, compact and structured */}
         <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-small text-ink-tertiary">
           {b.open_to_work && (

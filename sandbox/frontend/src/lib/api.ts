@@ -86,6 +86,8 @@ export interface RankedCandidate {
   confidence: 'high' | 'medium' | 'low'
   rank_ci_95?: [number, number]
   breakdown: ScoreBreakdown
+  next_action?: string
+  main_risk?: string
   candidate_id: string
   name: string
   current_title: string

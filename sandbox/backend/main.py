@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from src.conformal import compute_rank_intervals  # noqa: E402
+from src.next_action import main_risk, next_action  # noqa: E402
 from src.reasoning import generate_reasoning  # noqa: E402
 from src.schema import Candidate  # noqa: E402
 from src.scoring import score_candidate  # noqa: E402
@@ -135,6 +136,8 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             "rank_ci_95": [ci_lo, ci_hi],
             "breakdown": cs.breakdown,
             "anti_snr_penalty": round(cs.anti_snr_penalty, 3),
+            "next_action": next_action(cs, current_title=cand.profile.current_title),
+            "main_risk": main_risk(cs),
             "candidate_id": cs.candidate_id,
             "name": cand.profile.anonymized_name,
             "current_title": cand.profile.current_title,

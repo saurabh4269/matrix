@@ -199,6 +199,32 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             {selected.reasoning}
           </p>
 
+          {/* Next action + main risk side by side */}
+          {(selected.next_action || selected.main_risk) && (
+            <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
+              {selected.next_action && (
+                <div className="p-4 bg-card border-l-2 border-accent rounded-r">
+                  <p className="font-sans text-micro uppercase text-accent mb-1.5">
+                    Next action
+                  </p>
+                  <p className="font-serif text-body text-ink leading-snug">
+                    {selected.next_action}
+                  </p>
+                </div>
+              )}
+              {selected.main_risk && (
+                <div className="p-4 bg-card border-l-2 border-signal-concern rounded-r">
+                  <p className="font-sans text-micro uppercase text-signal-concern mb-1.5">
+                    Main risk
+                  </p>
+                  <p className="font-serif text-body text-ink leading-snug">
+                    {selected.main_risk}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Score breakdown bar */}
           <ScoreBreakdownBar
             breakdown={selected.breakdown}
