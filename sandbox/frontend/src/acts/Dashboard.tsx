@@ -54,17 +54,19 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
   }
 
   // Build spider radar from the candidate's structured signals.
+  // Defensive against missing fields if the backend is stale.
+  const bd = selected.breakdown ?? { must_have: 0, substance: 0, retrieval: 0, location: 0 }
   const radarAxes = [
-    { label: 'Must-haves', value: selected.breakdown.must_have ?? 0 },
-    { label: 'Substance',  value: selected.breakdown.substance ?? 0 },
-    { label: 'Retrieval',  value: selected.breakdown.retrieval ?? 0 },
-    { label: 'Location',   value: selected.breakdown.location  ?? 0 },
+    { label: 'Must-haves', value: bd.must_have ?? 0 },
+    { label: 'Substance',  value: bd.substance ?? 0 },
+    { label: 'Retrieval',  value: bd.retrieval ?? 0 },
+    { label: 'Location',   value: bd.location  ?? 0 },
     { label: 'Available',  value: selected.behavioural?.behav_modifier_total ?? 0 },
   ]
 
-  const verified = selected.behavioural?.verified_email
+  const verified = !!(selected.behavioural?.verified_email
     && selected.behavioural?.verified_phone
-    && selected.behavioural?.linkedin_connected
+    && selected.behavioural?.linkedin_connected)
 
   return (
     <motion.section
