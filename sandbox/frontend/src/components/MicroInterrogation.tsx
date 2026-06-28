@@ -73,13 +73,30 @@ function clamp(v: number, lo: number, hi: number) {
 export default function MicroInterrogation({ cand, kind, onClose, weights, onAdjust }: Props) {
   const [selected, setSelected] = useState<string | null>(null)
   const [free, setFree] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (cand) {
       setSelected(null)
       setFree('')
+      setSubmitting(false)
     }
   }, [cand])
+
+  // Picking a reason IS the action. Auto-submit with a short visual beat so
+  // the user sees the radio register before the modal slides out. If they
+  // also typed free text, we wait for an explicit Submit so they don't lose
+  // unsent text.
+  const handleSelect = (id: string) => {
+    setSelected(id)
+    if (free.trim().length > 0) return  // wait for explicit Submit
+    setSubmitting(true)
+    window.setTimeout(() => {
+      const reason = (kind === 'shortlist_override' ? SHORTLIST_REASONS : SKIP_REASONS).find(r => r.id === id)
+      if (reason) onAdjust(reason.adjust(weights))
+      onClose()
+    }, 280)
+  }
 
   useEffect(() => {
     if (!cand) return
@@ -160,11 +177,11 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg px-6"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg px-4 max-h-[92vh]"
             onClick={e => e.stopPropagation()}
           >
-            <div className="bg-canvas border border-hairline rounded-2xl p-8 shadow-2xl">
-              <p className="font-sans text-micro uppercase text-ink-tertiary mb-3">
+            <div className="bg-canvas border border-hairline rounded-2xl p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+              <p className="font-sans text-micro uppercase text-ink-tertiary mb-2">
                 {isOverride ? 'Shortlisted against our rank' : 'Skipped a top pick'}
               </p>
               <h3 className="font-serif text-title text-ink leading-snug">
@@ -172,63 +189,75 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
                   ? `Interesting. What did we miss about ${cand.name}?`
                   : `Interesting. What stood out to you about ${cand.name} as a no?`}
               </h3>
-              <p className="mt-2 font-sans text-small text-ink-tertiary leading-relaxed">
+              <p className="mt-1.5 font-sans text-small text-ink-tertiary leading-relaxed">
                 Telling us why helps us tune the ranking for your eye, so the next time we surface
                 candidates we already know what you do and don't value.
               </p>
 
-              <ul className="mt-6 space-y-3">
-                {reasons.map(r => (
-                  <li key={r.id}>
-                    <label className="flex items-start gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="interrogation"
-                        value={r.id}
-                        checked={selected === r.id}
-                        onChange={() => setSelected(r.id)}
-                        className="mt-1 accent-action"
-                      />
-                      <span className="font-sans text-body text-ink-secondary group-hover:text-ink transition-colors leading-snug">
-                        {r.label}
-                      </span>
-                    </label>
-                  </li>
-                ))}
-                <li>
-                  <label className="block font-sans text-small text-ink-tertiary mt-2">
+              <ul className="mt-4 space-y-2">
+                {reasons.map(r => {
+                  const isSelected = selected === r.id
+                  return (
+                    <li key={r.id}>
+                      <label
+                        className={`flex items-start gap-3 cursor-pointer group rounded-lg px-3 py-2 transition-colors ${
+                          isSelected ? 'bg-card border border-action' : 'border border-transparent hover:bg-card'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="interrogation"
+                          value={r.id}
+                          checked={isSelected}
+                          onChange={() => handleSelect(r.id)}
+                          disabled={submitting}
+                          className="mt-1 accent-action"
+                        />
+                        <span className="font-sans text-body text-ink-secondary group-hover:text-ink transition-colors leading-snug">
+                          {r.label}
+                        </span>
+                      </label>
+                    </li>
+                  )
+                })}
+                <li className="pt-1">
+                  <label className="block font-sans text-small text-ink-tertiary">
                     Something else
                     <textarea
                       value={free}
                       onChange={e => setFree(e.target.value)}
                       rows={2}
-                      placeholder="(optional, for our records)"
+                      placeholder="(optional, will be saved for next session)"
                       className="mt-1.5 w-full px-3 py-2 bg-card border border-hairline rounded font-sans text-small text-ink resize-none focus:outline-none focus:border-action"
                     />
                   </label>
                 </li>
               </ul>
 
-              <div className="mt-7 flex items-center gap-4">
-                <button
-                  onClick={handleSubmit}
-                  disabled={!selected && !free}
-                  className="font-sans text-body bg-action text-canvas px-6 py-3 rounded-full
-                             hover:bg-ink disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                  {selected ? 'Adjust ranking' : 'Submit'}
-                </button>
+              <div className="mt-5 flex items-center gap-4">
+                {/* Submit button only shown when there's free-text — radio
+                    selection auto-submits, so a Submit button would be a
+                    second confirmation the user doesn't need. */}
+                {free.trim().length > 0 && (
+                  <button
+                    onClick={handleSubmit}
+                    className="font-sans text-body bg-action text-canvas px-6 py-2.5 rounded-full
+                               hover:bg-ink transition-all"
+                  >
+                    {selected ? 'Adjust ranking' : 'Submit note'}
+                  </button>
+                )}
                 <button
                   onClick={onClose}
-                  className="font-sans text-body text-ink-tertiary hover:text-ink transition-colors"
+                  className="font-sans text-body text-ink-tertiary hover:text-ink transition-colors ml-auto"
                 >
-                  Skip
+                  Skip and continue
                 </button>
               </div>
 
-              {selected && (
-                <p className="mt-5 font-serif italic text-small text-accent leading-snug">
-                  One click is one SGD step. The deck reranks instantly.
+              {submitting && (
+                <p className="mt-3 font-serif italic text-small text-accent leading-snug">
+                  Tuning the ranking for your eye…
                 </p>
               )}
             </div>

@@ -26,6 +26,12 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from src.conformal import compute_rank_intervals  # noqa: E402
+from src.jd_config import (  # noqa: E402
+    get_config,
+    list_available_jds,
+    load_jd,
+    set_config,
+)
 from src.next_action import main_risk, next_action  # noqa: E402
 from src.reasoning import generate_reasoning  # noqa: E402
 from src.schema import Candidate  # noqa: E402
@@ -59,17 +65,17 @@ class JDDigest(BaseModel):
     avoid: list[str]
 
 
-JD_DIGEST = JDDigest(
-    role="Senior AI Engineer.",
-    location="Pune or Noida. Hybrid.",
-    experience="Five to nine years.",
-    style="Hands-on, not architect-only.",
-    avoid=[
-        "Consulting-only careers.",
-        "Framework enthusiasts.",
-        "Pure researchers without production.",
-    ],
-)
+def _current_digest() -> dict[str, Any]:
+    """Dump the active JD's digest. Re-reads on every call so switching the
+    active JD via /api/jd/select is reflected immediately."""
+    d = get_config().digest
+    return {
+        "role": d.role,
+        "location": d.location,
+        "experience": d.experience,
+        "style": d.style,
+        "avoid": list(d.avoid),
+    }
 
 
 class RankRequest(BaseModel):
@@ -217,7 +223,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
         })
 
     return {
-        "jd_digest": JD_DIGEST.model_dump(),
+        "jd_digest": _current_digest(),
         "ranked": out_rows,
         "total_evaluated": len(cands),
     }
@@ -225,7 +231,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
 
 @app.get("/api/jd")
 def get_jd() -> dict[str, Any]:
-    return JD_DIGEST.model_dump()
+    return _current_digest()
 
 
 @app.get("/api/demo")
@@ -271,6 +277,125 @@ def get_discarded() -> dict[str, Any]:
                 ],
             })
     return {"discarded": out}
+
+
+# --- JD selection + custom-JD bootstrap ---------------------------------
+
+JDS_DIR = ROOT / "jds"
+_ACTIVE_JD_NAME = "ai_engineer"  # bootstrap default, mirrors jd_config._DEFAULT_JD_PATH
+
+
+class JDSelectRequest(BaseModel):
+    name: str
+
+
+class JDBootstrapRequest(BaseModel):
+    text: str
+    name: str | None = None
+
+
+@app.get("/api/jds")
+def list_jds() -> dict[str, Any]:
+    """List every jds/*.yaml available for the JD-picker UI."""
+    items = []
+    for p in list_available_jds():
+        if p.name.startswith("_"):
+            continue  # skip _template.yaml
+        try:
+            cfg = load_jd(p)
+        except Exception:
+            continue
+        items.append({
+            "name": cfg.name,
+            "display_name": cfg.display_name,
+            "digest": {
+                "role": cfg.digest.role,
+                "location": cfg.digest.location,
+                "experience": cfg.digest.experience,
+                "style": cfg.digest.style,
+                "avoid": list(cfg.digest.avoid),
+            },
+            "is_active": cfg.name == _ACTIVE_JD_NAME,
+        })
+    return {"jds": items, "active": _ACTIVE_JD_NAME}
+
+
+@app.post("/api/jd/select")
+def select_jd(req: JDSelectRequest) -> dict[str, Any]:
+    """Swap the active JD config. Subsequent /api/demo calls re-rank against
+    the new vocab + weights."""
+    global _ACTIVE_JD_NAME
+    safe = "".join(ch for ch in req.name if ch.isalnum() or ch in ("_", "-"))
+    if not safe or safe != req.name:
+        raise HTTPException(status_code=400, detail="Invalid JD name.")
+    path = JDS_DIR / f"{safe}.yaml"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"JD '{safe}' not found.")
+    try:
+        cfg = load_jd(path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"JD file is invalid: {e}")
+    set_config(cfg)
+    _ACTIVE_JD_NAME = cfg.name
+    return {"active": cfg.name, "digest": _current_digest()}
+
+
+@app.post("/api/jd/bootstrap")
+def bootstrap_jd(req: JDBootstrapRequest) -> dict[str, Any]:
+    """Accept raw JD text, run the LLM-extract bootstrap, save a new YAML,
+    and activate it. Returns the new active digest."""
+    if not req.text or len(req.text.strip()) < 80:
+        raise HTTPException(status_code=400, detail="Paste at least a few lines of JD text.")
+    try:
+        from jds.bootstrap import build_yaml, call_llm
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bootstrap import failed: {e}")
+
+    # Slugify the requested name (or derive from the JD text's first line)
+    if req.name:
+        slug_src = req.name
+    else:
+        slug_src = req.text.strip().splitlines()[0][:40]
+    slug = "".join(
+        ch.lower() if ch.isalnum() else "_"
+        for ch in slug_src
+    ).strip("_") or "custom_jd"
+    slug = slug[:48]
+
+    # Don't clobber an existing file with the same slug; append a counter.
+    out = JDS_DIR / f"{slug}.yaml"
+    counter = 2
+    while out.exists():
+        out = JDS_DIR / f"{slug}_{counter}.yaml"
+        counter += 1
+
+    try:
+        extracted = call_llm(req.text)
+        extracted["digest"]["_full_text"] = req.text
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"LLM extraction failed: {e}")
+
+    base = load_jd(JDS_DIR / "ai_engineer.yaml").model_dump()
+    cfg_dict = build_yaml(out.stem, extracted, mined=None, base=base)
+
+    try:
+        import yaml as _yaml
+        out.write_text(
+            _yaml.safe_dump(cfg_dict, default_flow_style=False, sort_keys=False, width=100),
+            encoding="utf-8",
+        )
+        new_cfg = load_jd(out)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to write/validate JD: {e}")
+
+    set_config(new_cfg)
+    global _ACTIVE_JD_NAME
+    _ACTIVE_JD_NAME = new_cfg.name
+    return {
+        "active": new_cfg.name,
+        "yaml_path": str(out.relative_to(ROOT)),
+        "digest": _current_digest(),
+    }
 
 
 @app.post("/api/rank")
