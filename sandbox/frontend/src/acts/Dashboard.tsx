@@ -150,7 +150,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
                       {c.name}
                     </span>
                     <span className="font-mono text-small text-ink-tertiary">
-                      {c.score.toFixed(2)}
+                      {(c.score ?? 0).toFixed(2)}
                     </span>
                   </button>
                 </li>
@@ -175,7 +175,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
                 {selected.current_title} <span className="text-ink-tertiary">at</span> {selected.current_company}
               </p>
               <p className="mt-0.5 font-sans text-small text-ink-tertiary">
-                {selected.location} · {selected.years_of_experience.toFixed(1)}y total
+                {selected.location} · {(selected.years_of_experience ?? 0).toFixed(1)}y total
               </p>
             </div>
             <ConfidencePill
@@ -195,7 +195,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             />
             <KPICard
               label="Match score"
-              value={selected.score.toFixed(2)}
+              value={(selected.score ?? 0).toFixed(2)}
               sublabel="0–1+ composite"
             />
             <KPICard

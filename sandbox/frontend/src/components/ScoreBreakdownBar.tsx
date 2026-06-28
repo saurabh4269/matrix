@@ -33,7 +33,7 @@ export default function ScoreBreakdownBar({ breakdown, behaviouralModifier }: Pr
           What's driving the score
         </p>
         <p className="font-sans text-small text-ink-tertiary">
-          × {behaviouralModifier.toFixed(2)} availability
+          × {(behaviouralModifier ?? 1).toFixed(2)} availability
         </p>
       </div>
 

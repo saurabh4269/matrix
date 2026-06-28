@@ -132,6 +132,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
         ci_lo, ci_hi = rank_intervals.get(cs.candidate_id, (rank, rank))
         out_rows.append({
             "rank": rank,
+            "score": round(cs.score, 4),
             "confidence": cs.confidence,
             "rank_ci_95": [ci_lo, ci_hi],
             "breakdown": cs.breakdown,
