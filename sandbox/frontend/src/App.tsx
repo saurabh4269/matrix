@@ -32,6 +32,7 @@ type InterrogationKind = 'shortlist_override' | 'skip_override' | null
 export default function App() {
   const [phase, setPhase] = useState<Phase>('arrival')
   const [data, setData] = useState<RankResponse | null>(null)
+  const [previewDigest, setPreviewDigest] = useState<import('./lib/api').JDDigest | null>(null)
   const [shortlist, setShortlist] = useState<RankedCandidate[]>([])
   const [skipped, setSkipped] = useState<RankedCandidate[]>([])
   const [deckIndex, setDeckIndex] = useState(0)
@@ -82,6 +83,18 @@ export default function App() {
       setError(String(e))
       setPhase('arrival')
     }
+  }
+
+  // JD switched on arrival screen → drop cached data so beginJourney re-fetches
+  // against the new active JD. Hold the digest in previewDigest so the user
+  // sees the new role on the arrival screen before clicking Begin.
+  const handleJdChanged = (digest: import('./lib/api').JDDigest) => {
+    setData(null)
+    setPreviewDigest(digest)
+    setShortlist([])
+    setSkipped([])
+    setDeckIndex(0)
+    setError(null)
   }
 
   // Client-side rerank: apply user weights to the backend's structured probes.
@@ -167,8 +180,9 @@ export default function App() {
         {phase === 'arrival' && data === null && (
           <Act1JDDigest
             key="arrival"
-            jd={null}
+            jd={previewDigest}
             onBegin={beginJourney}
+            onJdChanged={handleJdChanged}
             error={error}
           />
         )}
@@ -177,6 +191,7 @@ export default function App() {
             key="arrival-data"
             jd={data.jd_digest}
             onBegin={beginJourney}
+            onJdChanged={handleJdChanged}
             error={null}
           />
         )}

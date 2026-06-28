@@ -83,6 +83,7 @@ export interface ScoreBreakdown {
 
 export interface RankedCandidate {
   rank: number
+  score: number
   confidence: 'high' | 'medium' | 'low'
   rank_ci_95?: [number, number]
   breakdown: ScoreBreakdown
@@ -133,4 +134,39 @@ export async function fetchDiscarded(): Promise<DiscardedItem[]> {
   if (!r.ok) throw new Error(`API error ${r.status}`)
   const d = await r.json()
   return d.discarded as DiscardedItem[]
+}
+
+// ---- JD selection -----------------------------------------------------------
+
+export interface JdListItem {
+  name: string
+  display_name: string
+  digest: JDDigest
+  is_active: boolean
+}
+
+export async function listJds(): Promise<{ jds: JdListItem[]; active: string }> {
+  const r = await fetch('/api/jds')
+  if (!r.ok) throw new Error(`API error ${r.status}`)
+  return r.json()
+}
+
+export async function selectJd(name: string): Promise<{ active: string; digest: JDDigest }> {
+  const r = await fetch('/api/jd/select', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  })
+  if (!r.ok) throw new Error((await r.json()).detail ?? `API error ${r.status}`)
+  return r.json()
+}
+
+export async function bootstrapJd(text: string, name?: string): Promise<{ active: string; yaml_path: string; digest: JDDigest }> {
+  const r = await fetch('/api/jd/bootstrap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, name }),
+  })
+  if (!r.ok) throw new Error((await r.json()).detail ?? `API error ${r.status}`)
+  return r.json()
 }

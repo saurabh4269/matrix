@@ -2,10 +2,12 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import type { JDDigest } from '../lib/api'
 import { clearMemory, loadMemory, type MemoryEntry } from '../lib/memory'
+import JDPicker from '../components/JDPicker'
 
 interface Props {
   jd: JDDigest | null
   onBegin: () => void
+  onJdChanged?: (digest: JDDigest) => void
   error: string | null
 }
 
@@ -21,9 +23,10 @@ const FALLBACK: JDDigest = {
   ],
 }
 
-export default function Act1JDDigest({ jd, onBegin, error }: Props) {
+export default function Act1JDDigest({ jd, onBegin, onJdChanged, error }: Props) {
   const digest = jd ?? FALLBACK
   const [memory, setMemory] = useState<MemoryEntry[]>([])
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => { setMemory(loadMemory()) }, [])
 
@@ -111,6 +114,15 @@ export default function Act1JDDigest({ jd, onBegin, error }: Props) {
           <p className="font-sans text-small text-ink-tertiary">
             or press <kbd>Enter</kbd>
           </p>
+          {onJdChanged && (
+            <button
+              onClick={() => setPickerOpen(true)}
+              className="ml-auto font-sans text-small text-ink-tertiary hover:text-ink transition-colors underline decoration-1 underline-offset-4 decoration-hairline hover:decoration-ink"
+              title="Switch JD or paste your own"
+            >
+              Change JD
+            </button>
+          )}
         </motion.div>
 
         {error && (
@@ -144,6 +156,14 @@ export default function Act1JDDigest({ jd, onBegin, error }: Props) {
           </motion.div>
         )}
       </div>
+
+      {onJdChanged && (
+        <JDPicker
+          open={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+          onJdChanged={d => { onJdChanged(d); setPickerOpen(false) }}
+        />
+      )}
     </motion.section>
   )
 }
