@@ -1,12 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { fetchDemo, RankResponse, RankedCandidate } from './lib/api'
+import {
+  loadStoredWeights,
+  rerank,
+  saveStoredWeights,
+  type UserWeights,
+} from './lib/rerank'
 import Act1JDDigest from './acts/Act1_JDDigest'
 import Act2Deck from './acts/Act2_Deck'
 import Act4Pause from './acts/Act4_Pause'
 import Act5Shortlist from './acts/Act5_Shortlist'
 import Act6Reflection from './acts/Act6_Reflection'
 import LoaderSequence from './components/LoaderSequence'
+import TuningPanel from './components/TuningPanel'
+import MicroInterrogation from './components/MicroInterrogation'
 
 type Phase =
   | 'arrival'
@@ -16,12 +24,41 @@ type Phase =
   | 'shortlist'
   | 'reflection'
 
+type InterrogationKind = 'shortlist_override' | 'skip_override' | null
+
 export default function App() {
   const [phase, setPhase] = useState<Phase>('arrival')
   const [data, setData] = useState<RankResponse | null>(null)
   const [shortlist, setShortlist] = useState<RankedCandidate[]>([])
+  const [skipped, setSkipped] = useState<RankedCandidate[]>([])
   const [deckIndex, setDeckIndex] = useState(0)
   const [error, setError] = useState<string | null>(null)
+
+  // User-tuned weights (persisted in localStorage).
+  const [weights, setWeights] = useState<UserWeights>(() => loadStoredWeights())
+  const [tuningOpen, setTuningOpen] = useState(false)
+
+  // Micro-interrogation state — fires when user overrides the system's ranking.
+  const [interrogation, setInterrogation] = useState<{
+    cand: RankedCandidate
+    kind: InterrogationKind
+  } | null>(null)
+
+  // Persist weights to localStorage whenever they change.
+  useEffect(() => { saveStoredWeights(weights) }, [weights])
+
+  // Open the tuning panel with `T` key.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return
+      if (e.target instanceof HTMLTextAreaElement) return
+      if (e.key.toLowerCase() === 't' && phase === 'deck') {
+        setTuningOpen(t => !t)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [phase])
 
   // Lazy-fetch on first move
   const beginJourney = async () => {
@@ -40,18 +77,52 @@ export default function App() {
     }
   }
 
-  const candidates = data?.ranked ?? []
+  // Client-side rerank: apply user weights to the backend's structured probes.
+  const candidates = useMemo(
+    () => (data ? rerank(data.ranked, weights) : []),
+    [data, weights],
+  )
   const current = candidates[deckIndex]
+
+  // Detect "override" actions — user takes the opposite of the system's lean.
+  // System leans 'interview' if rank ≤ 8 (top of the deck). User skipping a
+  // top-8 candidate is an override; user shortlisting a bottom-half candidate
+  // is also an override.
+  const wantsToInterview = current && current.rank <= 8
 
   const handleInterview = () => {
     if (!current) return
     if (!shortlist.find(c => c.candidate_id === current.candidate_id)) {
       setShortlist(s => [...s, current])
     }
+    // Override: shortlisted someone the system didn't put at the top
+    if (!wantsToInterview) {
+      setInterrogation({ cand: current, kind: 'shortlist_override' })
+      // Don't advance until they close the modal; advance() runs in onClose.
+      return
+    }
     advance()
   }
 
-  const handleNext = () => advance()
+  const handleNext = () => {
+    if (!current) return
+    setSkipped(s => [...s, current])
+    // Override: skipped a top-of-deck candidate
+    if (wantsToInterview && deckIndex < 8) {
+      setInterrogation({ cand: current, kind: 'skip_override' })
+      return
+    }
+    advance()
+  }
+
+  const closeInterrogation = () => {
+    setInterrogation(null)
+    advance()
+  }
+
+  const handleAdjustFromInterrogation = (next: UserWeights) => {
+    setWeights(next)
+  }
 
   const advance = () => {
     const next = deckIndex + 1
@@ -60,7 +131,6 @@ export default function App() {
       return
     }
     setDeckIndex(next)
-    // Soft pauses every 7 candidates (when shortlist has at least 2)
     if ((next + 1) % 7 === 0 && shortlist.length >= 2) {
       setPhase('pause')
     }
@@ -107,6 +177,7 @@ export default function App() {
             onInterview={handleInterview}
             onNext={handleNext}
             onBack={goBack}
+            onOpenTuning={() => setTuningOpen(true)}
             shortlistCount={shortlist.length}
             position={deckIndex + 1}
             total={candidates.length}
@@ -135,14 +206,32 @@ export default function App() {
             shortlistCount={finishedSavings.shortlisted}
             fromTotal={finishedSavings.fromTotal}
             hoursSaved={finishedSavings.hoursSaved}
+            shortlist={shortlist}
+            skipped={skipped}
             onRestart={() => {
               setDeckIndex(0)
               setShortlist([])
+              setSkipped([])
               setPhase('arrival')
             }}
           />
         )}
       </AnimatePresence>
+
+      <TuningPanel
+        open={tuningOpen}
+        onClose={() => setTuningOpen(false)}
+        weights={weights}
+        onChange={setWeights}
+      />
+
+      <MicroInterrogation
+        cand={interrogation?.cand ?? null}
+        kind={interrogation?.kind ?? null}
+        onClose={closeInterrogation}
+        weights={weights}
+        onAdjust={handleAdjustFromInterrogation}
+      />
     </main>
   )
 }

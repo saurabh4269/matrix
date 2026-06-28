@@ -1,0 +1,197 @@
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import type { RankedCandidate } from '../lib/api'
+import type { UserWeights } from '../lib/rerank'
+
+interface Props {
+  cand: RankedCandidate | null
+  kind: 'shortlist_override' | 'skip_override' | null
+  onClose: () => void
+  weights: UserWeights
+  onAdjust: (next: UserWeights) => void
+}
+
+// Each reason maps to a small, bounded adjustment of one or two weights.
+// The adjustments are designed to be visible but non-destructive: one click
+// nudges a category by 10-15%. Multiple clicks compound.
+interface Reason {
+  id: string
+  label: string
+  adjust: (w: UserWeights) => UserWeights
+}
+
+const SHORTLIST_REASONS: Reason[] = [
+  {
+    id: 'domain_specific',
+    label: 'Strong domain experience we missed',
+    adjust: w => ({ ...w, substance: clamp(w.substance + 0.10, 0, 1.5) }),
+  },
+  {
+    id: 'company_fit',
+    label: 'Right company stage / culture match',
+    adjust: w => ({ ...w, substance: clamp(w.substance + 0.05, 0, 1.5), location: clamp(w.location + 0.025, 0, 0.5) }),
+  },
+  {
+    id: 'narrative',
+    label: 'Project narrative resonates with our work',
+    adjust: w => ({ ...w, substance: clamp(w.substance + 0.10, 0, 1.5), retrieval: clamp(w.retrieval - 0.025, 0, 1.0) }),
+  },
+  {
+    id: 'availability_ok',
+    label: 'Availability concerns are acceptable for this role',
+    adjust: w => ({ ...w, behavioural_sensitivity: clamp(w.behavioural_sensitivity - 0.2, 0.3, 2.5) }),
+  },
+]
+
+const SKIP_REASONS: Reason[] = [
+  {
+    id: 'pedigree_dependent',
+    label: 'Too dependent on big-brand pedigree',
+    adjust: w => ({ ...w, substance: clamp(w.substance + 0.10, 0, 1.5), must_have: clamp(w.must_have - 0.05, 0, 2.0) }),
+  },
+  {
+    id: 'paper_only',
+    label: 'Looks good on paper but lacks substance',
+    adjust: w => ({ ...w, substance: clamp(w.substance + 0.15, 0, 1.5) }),
+  },
+  {
+    id: 'wrong_stage',
+    label: 'Wrong company stage / culture for us',
+    adjust: w => ({ ...w, location: clamp(w.location + 0.05, 0, 0.5) }),
+  },
+  {
+    id: 'unavailable',
+    label: 'Realistically unavailable',
+    adjust: w => ({ ...w, behavioural_sensitivity: clamp(w.behavioural_sensitivity + 0.3, 0.3, 2.5) }),
+  },
+]
+
+function clamp(v: number, lo: number, hi: number) {
+  return Math.max(lo, Math.min(hi, v))
+}
+
+export default function MicroInterrogation({ cand, kind, onClose, weights, onAdjust }: Props) {
+  const [selected, setSelected] = useState<string | null>(null)
+  const [free, setFree] = useState('')
+
+  useEffect(() => {
+    if (cand) {
+      setSelected(null)
+      setFree('')
+    }
+  }, [cand])
+
+  useEffect(() => {
+    if (!cand) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [cand, onClose])
+
+  const reasons = kind === 'shortlist_override' ? SHORTLIST_REASONS : SKIP_REASONS
+  const isOverride = kind === 'shortlist_override'
+
+  const handleSubmit = () => {
+    if (!selected) {
+      onClose()
+      return
+    }
+    const reason = reasons.find(r => r.id === selected)
+    if (reason) onAdjust(reason.adjust(weights))
+    onClose()
+  }
+
+  return (
+    <AnimatePresence>
+      {cand && kind && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-ink/10 backdrop-blur-[2px] z-50"
+            onClick={onClose}
+          />
+
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg px-6"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="bg-canvas border border-hairline rounded-2xl p-8 shadow-2xl">
+              <p className="font-sans text-micro uppercase text-ink-tertiary mb-3">
+                {isOverride ? 'Shortlisted against our rank' : 'Skipped a top pick'}
+              </p>
+              <h3 className="font-serif text-title text-ink leading-snug">
+                {isOverride
+                  ? `Interesting. What did we miss about ${cand.name}?`
+                  : `Interesting. What stood out to you about ${cand.name} as a no?`}
+              </h3>
+
+              <ul className="mt-6 space-y-3">
+                {reasons.map(r => (
+                  <li key={r.id}>
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="interrogation"
+                        value={r.id}
+                        checked={selected === r.id}
+                        onChange={() => setSelected(r.id)}
+                        className="mt-1 accent-action"
+                      />
+                      <span className="font-sans text-body text-ink-secondary group-hover:text-ink transition-colors leading-snug">
+                        {r.label}
+                      </span>
+                    </label>
+                  </li>
+                ))}
+                <li>
+                  <label className="block font-sans text-small text-ink-tertiary mt-2">
+                    Something else
+                    <textarea
+                      value={free}
+                      onChange={e => setFree(e.target.value)}
+                      rows={2}
+                      placeholder="(optional, for our records)"
+                      className="mt-1.5 w-full px-3 py-2 bg-card border border-hairline rounded font-sans text-small text-ink resize-none focus:outline-none focus:border-action"
+                    />
+                  </label>
+                </li>
+              </ul>
+
+              <div className="mt-7 flex items-center gap-4">
+                <button
+                  onClick={handleSubmit}
+                  disabled={!selected && !free}
+                  className="font-sans text-body bg-action text-canvas px-6 py-3 rounded-full
+                             hover:bg-ink disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  {selected ? 'Adjust ranking' : 'Submit'}
+                </button>
+                <button
+                  onClick={onClose}
+                  className="font-sans text-body text-ink-tertiary hover:text-ink transition-colors"
+                >
+                  Skip
+                </button>
+              </div>
+
+              {selected && (
+                <p className="mt-5 font-serif italic text-small text-accent leading-snug">
+                  One click is one SGD step. The deck reranks instantly.
+                </p>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  )
+}
