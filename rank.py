@@ -32,6 +32,7 @@ from src.calibration import (
     z_scores,
 )
 from src.conformal import compute_rank_intervals
+from src.cross_encoder_rerank import rerank_with_cross_encoder
 from src.load import iter_candidates
 from src.next_action import main_risk, next_action
 from src.pairwise import refine_top_n
@@ -68,6 +69,11 @@ def main():
         "--jd",
         default=None,
         help="Path to a JD YAML config (default: jds/ai_engineer.yaml).",
+    )
+    ap.add_argument(
+        "--cross-encoder",
+        action="store_true",
+        help="Blend a cross-encoder rerank into the top 50 (slower; ~30s extra on CPU).",
     )
     args = ap.parse_args()
 
@@ -138,6 +144,11 @@ def main():
     # Pairwise refinement on top window
     print(f"Pairwise refinement on top {args.pairwise_window}…", file=sys.stderr)
     scored = refine_top_n(scored, n=args.pairwise_window)
+
+    # Optional: cross-encoder rerank on the top 50 (blended with linear score)
+    if args.cross_encoder:
+        print("Cross-encoder rerank on top 50 (this adds ~30s on CPU)…", file=sys.stderr)
+        scored = rerank_with_cross_encoder(scored, lambda cid: by_id[cid], n=50, alpha=0.4)
 
     # Portfolio-diversity pass on top 20: nudges the order to spread across
     # companies / locations without bumping strong candidates out.
