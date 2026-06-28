@@ -4,8 +4,8 @@
 #   make submission CANDIDATES="C:/path/to/candidates.jsonl"
 
 CANDIDATES ?= ./candidates.jsonl
-SUBMISSION ?= submissions/team_v2.csv
-TEAM_ID    ?= team_v2
+SUBMISSION ?= submissions/team_v3.csv
+TEAM_ID    ?= team_v3
 
 .PHONY: help install test sample precompute submission audit score validate compare clean
 

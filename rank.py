@@ -22,6 +22,15 @@ import sys
 import time
 from pathlib import Path
 
+from src.calibration import (
+    bayesian_confidence,
+    compute_pool_stats,
+    diversify_top_n,
+    is_statistical_outlier,
+    mahalanobis_distance,
+    percentile_from_z,
+    z_scores,
+)
 from src.load import iter_candidates
 from src.pairwise import refine_top_n
 from src.reasoning import generate_reasoning
@@ -63,13 +72,27 @@ def main():
     by_id = {}  # candidate_id -> Candidate (for reasoning generation)
     seen = 0
     n_honeypot = 0
+    # Discarded candidates — honeypots quarantined upfront. Written as a sidecar
+    # JSONL for transparency ("we filtered these out, here's why").
+    discarded: list[dict] = []
 
     for cand in iter_candidates(args.candidates):
         seen += 1
         cs = score_candidate(cand)
         if cs.is_honeypot:
             n_honeypot += 1
-            continue  # excluded from selection
+            discarded.append({
+                "candidate_id": cand.candidate_id,
+                "name": cand.profile.anonymized_name,
+                "current_title": cand.profile.current_title,
+                "current_company": cand.profile.current_company,
+                "discard_kind": "honeypot",
+                "rules_fired": [
+                    {"name": k, "evidence": v}
+                    for k, v in cs.honeypot_evidence.items()
+                ],
+            })
+            continue
         scored.append(cs)
         by_id[cand.candidate_id] = cand
         if seen % 10_000 == 0:
@@ -85,12 +108,28 @@ def main():
         file=sys.stderr,
     )
 
+    # Compute pool statistics for z-score / Mahalanobis / Bayesian calibration
+    print("Computing pool calibration stats…", file=sys.stderr)
+    pool_stats = compute_pool_stats(scored)
+
+    # Flag statistical outliers (extra honeypot defence beyond deterministic rules)
+    extra_outliers = 0
+    for cs in scored:
+        if is_statistical_outlier(cs, pool_stats):
+            extra_outliers += 1
+    print(f"  Statistical outliers (Mahalanobis > 4): {extra_outliers}", file=sys.stderr)
+
     # Sort by linear score, then ID for stable ordering
     scored.sort(key=lambda cs: (-cs.score, cs.candidate_id))
 
     # Pairwise refinement on top window
     print(f"Pairwise refinement on top {args.pairwise_window}…", file=sys.stderr)
     scored = refine_top_n(scored, n=args.pairwise_window)
+
+    # Portfolio-diversity pass on top 20: nudges the order to spread across
+    # companies / locations without bumping strong candidates out.
+    print(f"Portfolio diversity pass on top 20…", file=sys.stderr)
+    scored = diversify_top_n(scored, lambda cid: by_id[cid], n=20, diversity_weight=0.05)
 
     # Take top N
     top = scored[: args.top]
@@ -131,12 +170,25 @@ def main():
             reasoning=reasoning,
         )
         rows.append(row)
+        # Bayesian + z-score calibration metadata
+        bayes_bucket, bayes_posterior = bayesian_confidence(cs, pool_stats)
+        z = z_scores(cs, pool_stats)
         structured.append({
             "candidate_id": cs.candidate_id,
             "rank": rank,
             "score": cs.score,
             "confidence": cs.confidence,
+            "confidence_bayes": {
+                "bucket": bayes_bucket,
+                "posterior_tier5": round(bayes_posterior, 4),
+            },
             "breakdown": cs.breakdown,
+            "calibration": {
+                "must_have_percentile": percentile_from_z(z["must_have_z"]),
+                "substance_percentile": percentile_from_z(z["substance_z"]),
+                "score_percentile": percentile_from_z(z["score_z"]),
+                "mahalanobis": round(mahalanobis_distance(cs, pool_stats), 3),
+            },
             "reasoning": reasoning,
             "must_have": [
                 {"name": n, "score": round(s, 4), "evidence": e}
@@ -176,9 +228,64 @@ def main():
         for s in structured:
             fp.write(json.dumps(s, ensure_ascii=False) + "\n")
 
+    # ----- Write discarded (graveyard) sidecar -----
+    # Every honeypot quarantined + the worst anti-SNR offenders (top 50),
+    # with the rule(s) that fired. Transparency about what the system rejected.
+    bad_offenders = sorted(
+        [cs for cs in scored if cs.anti_snr_penalty < 0.2],
+        key=lambda cs: cs.anti_snr_penalty,
+    )[:50]
+    for cs in bad_offenders:
+        cand = by_id[cs.candidate_id]
+        discarded.append({
+            "candidate_id": cs.candidate_id,
+            "name": cand.profile.anonymized_name,
+            "current_title": cand.profile.current_title,
+            "current_company": cand.profile.current_company,
+            "discard_kind": "heavy_anti_snr",
+            "rules_fired": [
+                {"name": n, "score": round(s, 3), "evidence": e}
+                for n, s, e in cs.anti_snr if s > 0
+            ],
+        })
+    discard_path = out_path.parent / (out_path.stem + ".discarded.jsonl")
+    with open(discard_path, "w", encoding="utf-8") as fp:
+        for d in discarded:
+            fp.write(json.dumps(d, ensure_ascii=False) + "\n")
+
+    # ----- Cooling watchlist -----
+    # Candidates with strong skill profiles (above-median must-have) but very
+    # weak behavioural availability (dormant, slow, high notice). The
+    # "great fit, wrong timing" pile. Useful for the recruiter to come back to.
+    mh_median = pool_stats.must_have_mean
+    cooling = sorted(
+        [
+            cs for cs in scored
+            if cs.must_have_sum > mh_median * 1.5
+            and cs.behavioural_modifier < 0.4
+            and not cs.is_honeypot
+        ],
+        key=lambda cs: -cs.must_have_sum,
+    )[:30]
+    cooling_path = out_path.parent / (out_path.stem + ".cooling.jsonl")
+    with open(cooling_path, "w", encoding="utf-8") as fp:
+        for cs in cooling:
+            cand = by_id[cs.candidate_id]
+            fp.write(json.dumps({
+                "candidate_id": cs.candidate_id,
+                "name": cand.profile.anonymized_name,
+                "current_title": cand.profile.current_title,
+                "current_company": cand.profile.current_company,
+                "must_have_sum": round(cs.must_have_sum, 3),
+                "behavioural_modifier": round(cs.behavioural_modifier, 3),
+                "reason": "strong profile, currently unreachable — try later",
+            }, ensure_ascii=False) + "\n")
+
     elapsed = time.time() - t0
     print(f"\nWrote {out_path} ({len(rows)} rows)", file=sys.stderr)
     print(f"Wrote {sidecar} (structured evidence)", file=sys.stderr)
+    print(f"Wrote {discard_path} ({len(discarded)} discarded candidates)", file=sys.stderr)
+    print(f"Wrote {cooling_path} ({len(cooling)} cooling watchlist)", file=sys.stderr)
     print(f"Total elapsed: {elapsed:.1f}s", file=sys.stderr)
     print(f"Honeypots quarantined: {n_honeypot}/{seen}", file=sys.stderr)
 

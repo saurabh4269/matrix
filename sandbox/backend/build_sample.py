@@ -24,7 +24,7 @@ CHALLENGE_FILE = (
 
 OUT_FILE = Path(__file__).parent / "sample_candidates.json"
 
-CSV_FILE = ROOT / "submissions" / "team_v2.csv"
+CSV_FILE = ROOT / "submissions" / "team_v3.csv"
 
 
 def main():

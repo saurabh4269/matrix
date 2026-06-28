@@ -128,6 +128,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             "rank": rank,
             "confidence": cs.confidence,
             "breakdown": cs.breakdown,
+            "anti_snr_penalty": round(cs.anti_snr_penalty, 3),
             "candidate_id": cs.candidate_id,
             "name": cand.profile.anonymized_name,
             "current_title": cand.profile.current_title,
@@ -223,6 +224,43 @@ def get_demo() -> dict[str, Any]:
     if not DEMO_CANDIDATES:
         raise HTTPException(status_code=500, detail="No demo candidates loaded.")
     return _rank_payload(DEMO_CANDIDATES, top=20)
+
+
+@app.get("/api/discarded")
+def get_discarded() -> dict[str, Any]:
+    """Return the graveyard: every demo candidate that was either honeypot-
+    quarantined or heavily penalised by anti-SNR probes, with the rule(s) that
+    fired. Surfaces the system's defences for inspection."""
+    if not DEMO_CANDIDATES:
+        return {"discarded": []}
+    cands = [Candidate.model_validate(c) for c in DEMO_CANDIDATES]
+    out = []
+    for cand in cands:
+        cs = score_candidate(cand)
+        if cs.is_honeypot:
+            out.append({
+                "candidate_id": cand.candidate_id,
+                "name": cand.profile.anonymized_name,
+                "current_title": cand.profile.current_title,
+                "current_company": cand.profile.current_company,
+                "discard_kind": "honeypot",
+                "rules_fired": [
+                    {"name": k, "evidence": v} for k, v in cs.honeypot_evidence.items()
+                ],
+            })
+        elif cs.anti_snr_penalty < 0.3:
+            out.append({
+                "candidate_id": cand.candidate_id,
+                "name": cand.profile.anonymized_name,
+                "current_title": cand.profile.current_title,
+                "current_company": cand.profile.current_company,
+                "discard_kind": "heavy_anti_snr",
+                "rules_fired": [
+                    {"name": n, "score": round(s, 3), "evidence": e}
+                    for n, s, e in cs.anti_snr if s > 0
+                ],
+            })
+    return {"discarded": out}
 
 
 @app.post("/api/rank")

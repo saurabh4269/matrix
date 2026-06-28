@@ -1106,13 +1106,17 @@ These are *features* for the interview, not bugs, they show we understand the li
 
 > *"We rejected the conventional architecture, embed everything, cosine similarity, cross-encoder rerank, because the dataset was explicitly designed to defeat it. The JD itself flagged keyword-stuffers, plain-language tier-5s, and behavioural twins.*
 >
-> *Instead, we treated the JD as the algorithm. Every JD requirement maps to a probe over the candidate schema. Each probe is tagged High-SNR, Medium-SNR, Low-SNR, or Anti-SNR, and we weight by class. Tested, verified, or unfakeable signals dominate; self-asserted claims are downweighted.*
+> *Instead, we treated the JD as the algorithm. Every JD requirement maps to a probe over the candidate schema, and the whole JD lives in a single YAML file under jds/. To rank against a different role, edit the YAML; no code changes. Each probe is tagged High-SNR, Medium-SNR, Low-SNR, or Anti-SNR, and we weight by class. Tested, verified, or unfakeable signals dominate; self-asserted claims are downweighted.*
 >
 > *Honeypots are gated out by six deterministic structural-impossibility rules. Behavioural availability is a multiplicative modifier, a perfect-paper candidate who hasn't logged in for six months gets multiplied down toward zero.*
 >
-> *The reasoning column is composed directly from the top contributing probes per candidate, no LLM at runtime, so it can't hallucinate by construction. Every rank has a defensible reason that's also auditable by a human.*
+> *Trust is communicated to the recruiter through four signals: a confidence label derived from how many strong probes fired, a horizontal stacked bar that decomposes the rank into must-haves vs substance vs retrieval vs location, percentile rankings against the whole pool, and a Mahalanobis outlier distance that complements the deterministic honeypot rules.*
 >
-> *We added pairwise refinement on the top 20, because NDCG@10 is fundamentally a pairwise problem on the top 10, that's where 50% of the composite score lives.*
+> *The top 20 goes through a portfolio-diversity pass that spreads candidates across companies and locations without bumping strong picks. Two candidates from the same company in the top 10 stops being useful at rank 6.*
+>
+> *The reasoning column is composed directly from the top contributing probes per candidate, no LLM at runtime, so it can't hallucinate by construction.*
+>
+> *We added pairwise refinement on the top 20, because NDCG@10 is fundamentally a pairwise problem on the top 10, that's where 50% of the composite score lives. Bayesian confidence reframes the heuristic buckets as a proper posterior P(tier-5 | evidence).*
 >
 > *The whole architecture is online-updatable: each probe weight is independently SGD-updatable. We didn't have hiring-decision data, so we tuned against a hand-labelled 300-candidate eval set. In production, every recruiter override would be one gradient step. No retraining.*
 >

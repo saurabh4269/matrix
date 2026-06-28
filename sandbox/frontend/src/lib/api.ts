@@ -115,3 +115,19 @@ export async function fetchDemo(): Promise<RankResponse> {
   if (!r.ok) throw new Error(`API error ${r.status}`)
   return r.json()
 }
+
+export interface DiscardedItem {
+  candidate_id: string
+  name: string
+  current_title: string
+  current_company: string
+  discard_kind: 'honeypot' | 'heavy_anti_snr'
+  rules_fired: { name: string; evidence: string; score?: number }[]
+}
+
+export async function fetchDiscarded(): Promise<DiscardedItem[]> {
+  const r = await fetch('/api/discarded')
+  if (!r.ok) throw new Error(`API error ${r.status}`)
+  const d = await r.json()
+  return d.discarded as DiscardedItem[]
+}

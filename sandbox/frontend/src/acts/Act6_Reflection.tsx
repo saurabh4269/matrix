@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
+import GraveyardSheet from '../components/GraveyardSheet'
 
 interface Props {
   shortlistCount: number
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export default function Act6Reflection({ shortlistCount, fromTotal, hoursSaved, onRestart }: Props) {
+  const [showGraveyard, setShowGraveyard] = useState(false)
+
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -30,7 +34,7 @@ export default function Act6Reflection({ shortlistCount, fromTotal, hoursSaved, 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="mt-6 font-serif text-2xl text-ink-secondary space-y-2"
+          className="mt-6 font-serif text-title text-ink-secondary space-y-2"
         >
           <p>{shortlistCount} {shortlistCount === 1 ? 'candidate' : 'candidates'} from {fromTotal.toLocaleString()}.</p>
           <p>About {hoursSaved} {hoursSaved === 1 ? 'hour' : 'hours'} saved.</p>
@@ -40,7 +44,7 @@ export default function Act6Reflection({ shortlistCount, fromTotal, hoursSaved, 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.0, duration: 0.6 }}
-          className="mt-10 font-serif italic text-lg text-accent border-l-2 border-accent pl-4"
+          className="mt-10 font-serif italic text-title text-accent border-l-2 border-accent pl-4"
         >
           You favoured production retrieval over framework familiarity.
           We'll remember.
@@ -50,16 +54,24 @@ export default function Act6Reflection({ shortlistCount, fromTotal, hoursSaved, 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4, duration: 0.4 }}
-          className="mt-12"
+          className="mt-12 flex flex-wrap items-center gap-6 font-sans text-body text-ink-tertiary"
         >
           <button
+            onClick={() => setShowGraveyard(true)}
+            className="hover:text-ink transition-colors underline decoration-1 underline-offset-4 decoration-hairline"
+          >
+            See what we filtered out
+          </button>
+          <button
             onClick={onRestart}
-            className="font-sans text-base text-ink-secondary hover:text-ink transition-colors"
+            className="hover:text-ink transition-colors"
           >
             Start over
           </button>
         </motion.div>
       </div>
+
+      <GraveyardSheet open={showGraveyard} onClose={() => setShowGraveyard(false)} />
     </motion.section>
   )
 }

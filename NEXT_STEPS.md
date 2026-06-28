@@ -24,7 +24,7 @@ This is the only step that needs *recruiter judgment* against the JD. I can't su
 python -m eval.merge_labels
 
 # Then I (or you) can run weight tuning against actual NDCG@10:
-python -m eval.score --submission submissions/team_v2.csv
+python -m eval.score --submission submissions/team_v3.csv
 ```
 
 Touchstone: *"If I had this candidate and only this JD, would I forward them to the hiring manager?"* → tier 4+. *"Worth a call but not necessarily forward?"* → tier 3.
@@ -70,11 +70,11 @@ These need your accounts — I can't act as you.
 
 ## 4. Submit to the hackathon portal
 
-Last submission counts. You can submit `submissions/team_v2.csv` (current best) today as a valid floor while you iterate on weights with labels.
+Last submission counts. You can submit `submissions/team_v3.csv` (current best) today as a valid floor while you iterate on weights with labels.
 
 ```bash
 # Sanity-check before upload:
-python "C:/Users/shmishra/Documents/Matrix/[PUB] India_runs_data_and_ai_challenge/India_runs_data_and_ai_challenge/validate_submission.py" submissions/team_v2.csv
+python "C:/Users/shmishra/Documents/Matrix/[PUB] India_runs_data_and_ai_challenge/India_runs_data_and_ai_challenge/validate_submission.py" submissions/team_v3.csv
 ```
 
 Filename must be `<your_team_id>.csv`. Rename before upload.

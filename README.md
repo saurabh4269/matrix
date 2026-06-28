@@ -30,12 +30,29 @@ So we did something different. We read the JD line by line and turned each line 
 
 Each check is a small Python function. Each one gives a candidate a score from 0 to 1 plus a short sentence explaining what it found. The final rank is the weighted sum of all those checks, multiplied by how reachable they are.
 
+Every JD-specific thing (vocabularies, weights, company lists, location preferences, the JD text itself) lives in a single YAML file under `jds/`. The Python code reads from it. To rank against a different role, edit the YAML. No code changes.
+
 We tag each check by how easy it is to fake:
 
 - **High trust**: things you can't really bluff. Verified skill assessment scores. Specific tool names in your role descriptions. Activity on the platform.
 - **Low trust**: things anyone can claim. A bare skill name with zero endorsements. Generic action verbs. Years of experience without context.
 
 High-trust signals get more weight. Low-trust signals get less. This is what makes it hard for a candidate who just stuffed their profile with AI buzzwords to outrank someone who actually built real systems.
+
+## How we communicate the score to a recruiter
+
+The numeric score by itself doesn't mean much to someone who has to decide. So every ranked candidate carries four pieces of trust metadata alongside their rank:
+
+- **A confidence label**: high, medium, or low. Derived from how many strong probes fired, not from the score itself. A candidate who clears the must-haves comfortably gets a high-confidence pill; someone who scrapes by on a few signals gets medium.
+- **A score breakdown**: a horizontal stacked bar that shows what fraction of the score came from must-haves, substance, retrieval, and location. A recruiter can see whether this person's rank is held up by skills, by description substance, or by location fit.
+- **Pool calibration**: percentiles for the candidate's must-have, substance, and overall scores against the whole 100,000-candidate pool. "97th percentile in substance" tells you a lot more than "0.8 substance score."
+- **Mahalanobis distance**: a statistical outlier measure that flags candidates whose probe vector is unusually far from the pool's centre. Catches profiles that pass the deterministic honeypot rules but still look statistically odd.
+
+## Diversity in the shortlist
+
+When the top 10 is dominated by a single company (we saw this in early runs: 4 candidates from Razorpay in a row), it stops being useful. Even if the linear scorer thinks they're all the best, a recruiter can't talk to 4 people from the same place.
+
+So after the pairwise refinement, we do a small portfolio-style diversity pass on the top 20. It gently spreads the order across companies and locations without bumping strong candidates out of the top 10. Borrows the idea from portfolio theory: a diverse shortlist beats a concentrated one even when the concentrated one has a higher average score.
 
 ## The honeypot defence
 
@@ -65,12 +82,16 @@ We also ran the entire top 100 through a sanity check that compares every claim 
 ```
 matrix/
 ├── rank.py                       single command, makes the submission CSV
+├── jds/
+│   └── ai_engineer.yaml          the active JD as a config file
 ├── src/
+│   ├── jd_config.py              loads jds/*.yaml; everything JD-specific reads from here
 │   ├── schema.py                 candidate / submission data shapes
 │   ├── load.py                   reads candidates.jsonl one at a time
 │   ├── honeypot.py               the six honeypot checks
-│   ├── heuristics.py             helper regexes, company lookups
+│   ├── heuristics.py             helper regexes, company lookups (driven by JD config)
 │   ├── scoring.py                puts all the checks together into one score
+│   ├── calibration.py            pool z-scores, Mahalanobis, Bayesian confidence, diversity
 │   ├── pairwise.py               re-orders the top 20 with finer rules
 │   ├── reasoning.py              writes the short note for each rank
 │   ├── precompute.py             builds the BM25 index (run this once)
@@ -88,7 +109,7 @@ matrix/
 ├── data/                         precomputed BM25 scores
 ├── final_plan.md                 the full design doc
 ├── NEXT_STEPS.md                 what's left to do
-└── submissions/                  the actual CSV we'd submit
+└── submissions/                  the actual CSV we'd submit + structured + discarded + cooling sidecars
 ```
 
 ## The sandbox
