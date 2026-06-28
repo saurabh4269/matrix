@@ -1,0 +1,332 @@
+# jds/_template.yaml
+#
+# Authoring template for a new JD configuration. Copy this file to
+# jds/<your_role>.yaml and fill in every field. The Python code in src/
+# reads vocabularies, weights, and patterns from here. No Python changes
+# are needed to retarget the ranker to a new role.
+#
+# Run with: python rank.py --candidates ./candidates.jsonl --out ./submission.csv
+#           (when the --jd flag is wired, this picks up your YAML automatically;
+#            for now, place it as jds/ai_engineer.yaml or call set_config in code.)
+
+# ============================================================================
+# Identity
+# ============================================================================
+
+# Short slug used in filenames and the API. snake_case, lowercase.
+name: example_role
+
+# Human-readable name shown in the UI.
+display_name: "Example Senior Role"
+
+# ============================================================================
+# JD digest — the user-facing summary on the landing screen
+# ============================================================================
+
+digest:
+  # Short title sentence.
+  role: "Senior <Role>."
+  # Where this lives. Use one or two short sentences.
+  location: "City or Region. Hybrid/Onsite/Remote."
+  # Target experience range.
+  experience: "X to Y years."
+  # One-line cultural / style note.
+  style: "Hands-on. Or: Architect-level."
+  # 2-4 concrete things you will NOT move forward on.
+  avoid:
+    - "First explicit disqualifier."
+    - "Second explicit disqualifier."
+    - "Third (optional)."
+
+# ============================================================================
+# Full JD text — used by precompute for BM25 + dense embedding retrieval
+# ============================================================================
+
+# Paste the actual JD here. The system tokenizes this text for BM25 scoring
+# against every candidate's profile + descriptions, and (when precompute is
+# run with sentence-transformers) embeds it for dense cosine similarity.
+jd_text: |
+  Job Title — Company Name
+  Location. Employment Type. Experience Required.
+
+  We need:
+    - First must-have requirement (be specific about tools/methods).
+    - Second must-have.
+    - Strong <core programming language>.
+    - <Specific deliverable expectation>.
+
+  Nice to have:
+    - First nice-to-have.
+    - ...
+
+  Avoid: <consulting-only-careers / pure-research / specific-anti-patterns>.
+
+  <One-paragraph statement of what the hire will own and grow.>
+
+# ============================================================================
+# Years of experience target — gaussian centered on peak with std=sigma
+# ============================================================================
+
+yoe:
+  peak: 7.0    # most desirable YoE
+  sigma: 2.5   # how forgiving — smaller = stricter
+
+# ============================================================================
+# Location preferences
+# ============================================================================
+
+location:
+  # Cities the candidate is likely listed under, all lowercase
+  preferred_cities:
+    - city1
+    - city2
+    - city3
+  # Country the role is in. Affects the visa-sponsorship rule.
+  country: India
+  # If false, candidates outside `country` who can't relocate get ~0 location score.
+  visa_sponsorship: false
+
+# ============================================================================
+# Title classification regexes (Python regex syntax, IGNORECASE applied)
+# ============================================================================
+
+title_patterns:
+  # Matches a candidate as "in this JD's core domain".
+  # Used by has_ml_title_anywhere / has_ml_title_current heuristics.
+  relevant_titles: '\b(<title token 1>|<title token 2>|<title token 3>)\b'
+
+  # The JD's specific subdomain. For an AI Eng JD this is NLP/IR.
+  # Used to exempt cv_speech_robo_only when the candidate IS in this subdomain.
+  nlp_ir: '\b(<subdomain title token>)\b'
+
+  # Adjacent-but-not-this-JD subdomains. The anti-SNR probe
+  # cv_speech_robo_only fires when a candidate's titles match this AND
+  # they have zero relevant_titles.
+  excluded_subdomain: '\b(<adjacent subdomain 1>|<adjacent subdomain 2>)\b'
+
+# ============================================================================
+# Must-have probes — the JD's "absolutely need" vocabulary
+# ============================================================================
+
+must_haves:
+  # The primary programming language for the role. Exact match on skill name.
+  python_skill_name: Python
+
+  # Tools the JD names as embedding-/retrieval-related.
+  embedding_tools:
+    - sentence-transformers
+    - bge
+    - ...
+
+  # Tools the JD names as vector-DB / hybrid-search.
+  vector_db_tools:
+    - faiss
+    - pinecone
+    - ...
+
+  # Evaluation framework terms. NDCG, MRR, MAP for ranking; other metrics
+  # for other roles (e.g. F1, AUC, RMSE).
+  ranking_eval_terms:
+    - ndcg
+    - mrr
+    - map
+    - ...
+
+  # Frameworks the JD says it does NOT want as the candidate's main credential.
+  # E.g. for an AI Eng JD: LangChain (the "framework enthusiast" anti-pattern).
+  framework_skills:
+    - langchain
+    - llamaindex
+
+# ============================================================================
+# Substance vocabularies — for SNR probes
+# ============================================================================
+
+substance:
+  # Verbs that indicate hands-on engineering work. Used in shipper-vs-researcher
+  # ratio and manager-drift detection.
+  hands_on_verbs:
+    - wrote
+    - built
+    - shipped
+    - deployed
+    - implemented
+    - ...
+
+  # Verbs that indicate research / exploration (not shipping).
+  research_verbs:
+    - researched
+    - explored
+    - investigated
+    - ...
+
+  # Verbs / nouns indicating production deployment. Used as both a positive
+  # signal (production_emphasis probe) and a soft anti-SNR.
+  production_verbs:
+    - production
+    - shipped
+    - deployed
+    - users
+    - latency
+    - sla
+    - ...
+
+  # Verbs indicating manager-level work. Used by manager_drift anti-SNR.
+  manager_verbs:
+    - led
+    - managed
+    - oversaw
+    - architected
+    - ...
+
+  # Verbs that indicate deployment specifically. Used by no_production_code_18mo.
+  deployment_verbs:
+    - deployed
+    - shipped
+    - in prod
+    - users
+    - ...
+
+  # Narrative-arc connectives (cause-effect chains). High count = real
+  # engineering narrative; low count = generic claims.
+  narrative_connectives:
+    - because
+    - root cause
+    - led to
+    - improved by
+    - ...
+
+  # Regex matching research-org names (universities, labs). Used by
+  # pure_research_career anti-SNR.
+  research_org_pattern: '\b(university|lab|labs|research|institute|academia)\b'
+
+# ============================================================================
+# Specific technical entities — for description_specificity probe
+# ============================================================================
+
+# Named tools/systems that real engineers cite in their descriptions. The
+# probe counts how many distinct entities from this list a candidate names
+# per 100 tokens of description. High count = high SNR (real work).
+specific_technical_entities:
+  - pytorch
+  - tensorflow
+  - faiss
+  - pinecone
+  # ... extensive list, ~100-200 specific entities for the JD's domain
+
+# ============================================================================
+# Company classifications
+# ============================================================================
+
+companies:
+  # Consulting firms. Entire-career-at-consulting triggers heavy anti-SNR.
+  consulting_firms:
+    - tcs
+    - infosys
+    - wipro
+    # ...
+
+  # Product companies. Recent tenure at one boosts the candidate.
+  product_companies:
+    - razorpay
+    - stripe
+    - meta
+    # ...
+
+  # Globally recognised employers in the JD's domain. Small micro-boost.
+  named_employers:
+    - google
+    - meta
+    # ...
+
+# ============================================================================
+# Company sizes
+# ============================================================================
+
+sizes:
+  # Companies of this size trigger bigcorp_only anti-SNR.
+  bigcorp_size: "10001+"
+  # Sizes that match the JD company's stage. Boosts via company_stage_alignment.
+  small_mid_sizes:
+    - "11-50"
+    - "51-200"
+    - "201-500"
+
+# ============================================================================
+# Honeypot: known company founding years
+# ============================================================================
+
+# Used by the tenure-exceeds-company-age honeypot rule. Adding a company here
+# means: any candidate claiming tenure before this year at this company is
+# flagged as a honeypot. Be CONSERVATIVE — false positives cost a real
+# candidate. Only add companies you can verify the founding year for.
+honeypot_company_ages:
+  example_company: 2020
+
+# ============================================================================
+# Scoring weights
+# ============================================================================
+
+weights:
+  # Per-probe weights inside the must-have category. Should sum to ~1.0.
+  must_have:
+    production_embeddings_retrieval: 0.25
+    production_vector_db: 0.20
+    ranking_eval_framework: 0.15
+    python_proficiency: 0.10
+    years_applied_ml_at_product_co: 0.30
+
+  # Per-probe weights inside substance. Should sum to ~1.0.
+  substance:
+    description_specificity: 0.18
+    narrative_arc_density: 0.10
+    production_emphasis: 0.15
+    verification_ratio: 0.15
+    acceleration: 0.05
+    summary_thoughtfulness: 0.05
+    company_stage_alignment: 0.10
+    shipper_vs_researcher_ratio: 0.08
+    named_employer_micro_boost: 0.09
+    skill_claim_entropy: 0.05
+
+  # Anti-SNR penalty multipliers. Higher = bigger penalty when the probe fires.
+  # The penalty is multiplicative: penalty *= (1 - w * probe_score).
+  anti_snr:
+    consulting_only: 0.95
+    bigcorp_only: 0.40
+    pure_research_career: 0.95
+    no_production_code_18mo: 0.70
+    framework_enthusiast: 0.50
+    title_chaser: 0.30
+    cv_speech_robo_only: 0.70
+    manager_drift: 0.30
+    keyword_dense_junior: 0.70
+    remote_only_vs_hybrid_jd: 0.60
+    dilution: 0.50
+
+  # Retrieval channel weights. bm25 + dense_cosine should sum to ~1.0.
+  retrieval:
+    bm25_jd_match: 0.40
+    dense_cosine_jd_match: 0.60
+
+  # Location category. Sum ~1.0.
+  location:
+    location_match: 0.50
+    yoe_band_fit: 0.40
+    certifications_micro_boost: 0.10
+
+  # Category-level multipliers. These set the overall mix of how the four
+  # additive categories contribute to the score.
+  category:
+    must_have: 1.0
+    substance: 0.6
+    retrieval: 0.2
+    location: 0.1
+
+  # Behavioural geometric-mean exponents. Should sum to 1.0.
+  behavioural:
+    effectively_available: 0.40
+    notice_period_curve: 0.25
+    trust_modifier: 0.10
+    engagement_quality: 0.15
+    closability: 0.10

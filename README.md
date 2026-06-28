@@ -54,6 +54,26 @@ When the top 10 is dominated by a single company (we saw this in early runs: 4 c
 
 So after the pairwise refinement, we do a small portfolio-style diversity pass on the top 20. It gently spreads the order across companies and locations without bumping strong candidates out of the top 10. Borrows the idea from portfolio theory: a diverse shortlist beats a concentrated one even when the concentrated one has a higher average score.
 
+## Math we borrowed from other fields
+
+Where ideas came from. Each one earns its place by either improving the ranking, increasing trust, or proving correctness.
+
+| What | Where it's from | What it does for us |
+|---|---|---|
+| **Z-score standardisation** | Quantitative finance | Gives the recruiter pool-relative percentiles. "97th percentile in substance" beats "0.8 substance score" for any human reader |
+| **Mahalanobis outlier distance** | Anomaly detection | Statistical outlier complement to our deterministic honeypot rules. Flags candidates whose probe vector is unusually far from the centre |
+| **Bayesian posterior** for confidence | Bayesian statistics | Naive-Bayes posterior `P(tier-5 \| evidence)` reframes the heuristic confidence buckets as a proper probability |
+| **Portfolio diversity (MMR)** | Portfolio theory | The reason our top-10 has 9 unique companies instead of 4 Razorpay candidates back-to-back |
+| **Expected Reciprocal Rank (ERR)** | Information retrieval | A second eval metric that models the recruiter as stopping after the first satisfying hit (closer to actual recruiter behaviour than NDCG) |
+| **Shannon entropy** of skill claims | Information theory | Catches AI-tailored resumes whose skill distribution is suspiciously uniform. Real engineers have messy claim distributions |
+| **Conformal-style rank intervals** | Conformal prediction | "Sarah is rank 1, stable in 1-3" instead of just "rank 1". 50 score-perturbations per candidate, 95% rank CI |
+| **Pairwise NDCG@10 optimisation** | Learning-to-rank | NDCG@10 is intrinsically a pairwise problem on the top 10; our pairwise refinement targets exactly that |
+
+What we **didn't** borrow and why:
+- Survival analysis (for notice periods): overkill, the piecewise curve works
+- Bradley-Terry-Luce (for pairwise): about the same as hand-coded tiebreakers in practice
+- LightGBM-Rank weight learning: the highest-impact possible math addition, but it needs labelled training data we don't have yet. Once the eval set is labelled, this slots in directly
+
 ## The honeypot defence
 
 The dataset has about 80 impossible profiles seeded into it. Things like "8 years at a company founded 3 years ago" or "expert at 10 skills with 0 months experience in each". If your top 100 has more than 10 of these, you get disqualified.

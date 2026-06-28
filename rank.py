@@ -64,7 +64,18 @@ def main():
         default=20,
         help="How many top candidates to refine via pairwise comparison.",
     )
+    ap.add_argument(
+        "--jd",
+        default=None,
+        help="Path to a JD YAML config (default: jds/ai_engineer.yaml).",
+    )
     args = ap.parse_args()
+
+    # Load the JD config BEFORE any probe module imports vocabularies.
+    if args.jd:
+        from src.jd_config import load_jd, set_config
+        set_config(load_jd(args.jd))
+        print(f"Using JD config: {args.jd}", file=sys.stderr)
 
     t0 = time.time()
     print(f"Loading and scoring candidates from {args.candidates}…", file=sys.stderr)

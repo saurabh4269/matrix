@@ -1,0 +1,357 @@
+# jds/data_engineer.yaml
+#
+# A second JD config to prove the YAML-driven architecture is real.
+# Hypothetical role: Senior Data Engineer at the same Series-A Indian startup.
+# Different vocabularies, different anti-patterns, different weights.
+#
+# Same Python code as ai_engineer.yaml. Swap the file, get a different
+# ranking out of the same 100,000 candidates.
+
+name: data_engineer
+display_name: "Senior Data Engineer"
+
+digest:
+  role: "Senior Data Engineer."
+  location: "Bangalore, Pune, or Hyderabad. Hybrid."
+  experience: "Five to nine years."
+  style: "Pipelines and platforms. Not application code."
+  avoid:
+    - "ML-only careers without warehouse / pipeline depth."
+    - "Consulting-only careers."
+    - "Pure ETL-tool-clickers with no scripting."
+
+jd_text: |
+  Senior Data Engineer, Founding Data Team at a Series A AI-native talent
+  intelligence platform. Bangalore, Pune, or Hyderabad. Hybrid. 5-9 years.
+
+  We need:
+    - Production experience with Spark / Flink / Kafka at scale, ideally
+      300+ million rows per day. Not just "I used Spark in a tutorial."
+    - Production experience with a modern warehouse: Snowflake, BigQuery,
+      Redshift, or Databricks. Stronger preference for ones with deep
+      partitioning / clustering / vacuum experience.
+    - Workflow orchestration: Airflow, Dagster, or Prefect, with on-call
+      experience for data quality and pipeline failures.
+    - Strong Python AND SQL. dbt is a plus but not required.
+    - Hands-on with data modelling — star / snowflake schemas, slowly-
+      changing dimensions, partition strategies, materialised view design.
+
+  Nice to have:
+    - Streaming experience (Kafka Streams, Flink).
+    - Data lake formats (Iceberg, Delta Lake, Hudi).
+    - Some exposure to ML feature stores (Feast, Tecton).
+
+  Avoid: consulting-only careers, candidates whose entire data experience
+  is one BI tool (Looker / Tableau without underlying pipeline work), and
+  candidates whose recent work has been only ML model training without
+  any underlying data infrastructure.
+
+  The hire will own the warehouse + the pipelines that feed every team:
+  candidate ranking, growth analytics, finance reporting. As we grow from
+  4 engineers to 12, the warehouse and pipelines are the foundation.
+
+yoe:
+  peak: 7.0
+  sigma: 2.5
+
+location:
+  preferred_cities:
+    - bangalore
+    - bengaluru
+    - pune
+    - hyderabad
+    - mumbai
+    - chennai
+    - noida
+    - delhi
+  country: India
+  visa_sponsorship: false
+
+title_patterns:
+  relevant_titles: '\b(data[\s\-]?engineer|analytics[\s\-]?engineer|platform[\s\-]?engineer|warehouse[\s\-]?engineer|etl[\s\-]?engineer|big[\s\-]?data[\s\-]?engineer|data[\s\-]?platform|data[\s\-]?infrastructure|backend[\s\-]?engineer[\s\w]*data)\b'
+  nlp_ir: '\b(data[\s\-]?engineer|analytics[\s\-]?engineer|warehouse|spark|kafka|airflow|dbt)\b'
+  excluded_subdomain: '\b(computer[\s\-]?vision|cv\s+engineer|nlp[\s\-]?only|machine[\s\-]?learning[\s\-]?researcher)\b'
+
+must_haves:
+  python_skill_name: Python
+  embedding_tools:
+    - spark
+    - apache spark
+    - pyspark
+    - kafka
+    - flink
+    - apache flink
+    - kafka streams
+    - dataflow
+  vector_db_tools:
+    - snowflake
+    - bigquery
+    - redshift
+    - databricks
+    - delta lake
+    - iceberg
+    - hudi
+    - postgres
+    - postgresql
+  ranking_eval_terms:
+    - airflow
+    - dagster
+    - prefect
+    - dbt
+    - data quality
+    - sla
+    - on-call
+    - on call
+    - p95
+    - p99
+    - row counts
+    - schema drift
+  framework_skills:
+    - looker
+    - tableau
+    - power bi
+    - powerbi
+
+substance:
+  hands_on_verbs:
+    - wrote
+    - built
+    - shipped
+    - deployed
+    - implemented
+    - engineered
+    - designed
+    - optimized
+    - optimised
+    - tuned
+    - migrated
+    - refactored
+    - partitioned
+    - indexed
+    - vacuumed
+  research_verbs:
+    - researched
+    - explored
+    - investigated
+    - studied
+    - analyzed
+    - analysed
+    - evaluated
+    - benchmarked
+  production_verbs:
+    - production
+    - prod
+    - shipped
+    - deployed
+    - users
+    - scale
+    - latency
+    - sla
+    - on-call
+    - throughput
+    - tb/day
+    - billions of rows
+  manager_verbs:
+    - led
+    - managed
+    - owned
+    - oversaw
+    - coordinated
+    - architected
+  deployment_verbs:
+    - deployed
+    - production
+    - in prod
+    - shipped
+    - scale
+    - sla
+    - on-call
+    - alerts
+    - dashboards
+    - monitoring
+  narrative_connectives:
+    - because
+    - root cause
+    - led to
+    - reduced from
+    - improved by
+    - after discovering
+    - debugged
+    - investigated
+    - traced
+  research_org_pattern: '\b(research|lab|labs|university|institute|academia)\b'
+
+specific_technical_entities:
+  - python
+  - sql
+  - spark
+  - pyspark
+  - flink
+  - kafka
+  - kafka streams
+  - airflow
+  - dagster
+  - prefect
+  - dbt
+  - snowflake
+  - bigquery
+  - redshift
+  - databricks
+  - postgres
+  - postgresql
+  - mysql
+  - mongodb
+  - cassandra
+  - dynamodb
+  - delta lake
+  - iceberg
+  - hudi
+  - parquet
+  - orc
+  - avro
+  - protobuf
+  - grpc
+  - kubernetes
+  - k8s
+  - docker
+  - terraform
+  - aws
+  - gcp
+  - azure
+  - emr
+  - glue
+  - s3
+  - dataflow
+  - pubsub
+  - cloud composer
+  - star schema
+  - snowflake schema
+  - slowly changing dimension
+  - scd
+  - materialised view
+  - partitioning
+  - clustering
+  - vacuum
+  - feature store
+  - feast
+  - tecton
+
+companies:
+  # Same Indian + global product cos — the lists are JD-agnostic mostly
+  consulting_firms:
+    - tcs
+    - infosys
+    - wipro
+    - accenture
+    - cognizant
+    - capgemini
+    - hcl
+    - lti
+    - mindtree
+    - tech mahindra
+    - mphasis
+    - deloitte
+  product_companies:
+    - google
+    - meta
+    - facebook
+    - amazon
+    - microsoft
+    - netflix
+    - airbnb
+    - stripe
+    - shopify
+    - swiggy
+    - zomato
+    - ola
+    - razorpay
+    - cred
+    - phonepe
+    - paytm
+    - freshworks
+    - zoho
+    - meesho
+    - nykaa
+    - udaan
+    - databricks
+    - snowflake
+    - confluent
+  named_employers:
+    - google
+    - meta
+    - amazon
+    - microsoft
+    - databricks
+    - snowflake
+    - confluent
+    - airbnb
+    - netflix
+    - stripe
+
+sizes:
+  bigcorp_size: "10001+"
+  small_mid_sizes:
+    - "11-50"
+    - "51-200"
+    - "201-500"
+
+honeypot_company_ages:
+  databricks: 2013
+  snowflake: 2012
+  confluent: 2014
+  stripe: 2010
+  razorpay: 2014
+  cred: 2018
+  swiggy: 2014
+  zomato: 2008
+  phonepe: 2015
+  meesho: 2015
+
+weights:
+  must_have:
+    production_embeddings_retrieval: 0.30   # spark/kafka/flink experience
+    production_vector_db: 0.25              # warehouse experience
+    ranking_eval_framework: 0.20            # orchestration + data quality
+    python_proficiency: 0.10
+    years_applied_ml_at_product_co: 0.15    # years in data engineering at product
+  substance:
+    description_specificity: 0.20
+    narrative_arc_density: 0.10
+    production_emphasis: 0.20               # heavier than for AI Eng — scale matters more
+    verification_ratio: 0.10
+    acceleration: 0.05
+    summary_thoughtfulness: 0.05
+    company_stage_alignment: 0.08
+    shipper_vs_researcher_ratio: 0.10
+    named_employer_micro_boost: 0.07
+    skill_claim_entropy: 0.05
+  anti_snr:
+    consulting_only: 0.95
+    bigcorp_only: 0.30                      # less harsh than for AI Eng
+    pure_research_career: 0.90
+    no_production_code_18mo: 0.70
+    framework_enthusiast: 0.40              # less harsh — fewer "framework tutorials" in data eng
+    title_chaser: 0.30
+    cv_speech_robo_only: 0.80               # AI/ML-only career is the wrong fit
+    manager_drift: 0.40                     # data eng is more hands-on than ML
+    keyword_dense_junior: 0.70
+    remote_only_vs_hybrid_jd: 0.60
+    dilution: 0.50
+  retrieval:
+    bm25_jd_match: 0.40
+    dense_cosine_jd_match: 0.60
+  location:
+    location_match: 0.50
+    yoe_band_fit: 0.40
+    certifications_micro_boost: 0.10
+  category:
+    must_have: 1.0
+    substance: 0.6
+    retrieval: 0.2
+    location: 0.1
+  behavioural:
+    effectively_available: 0.40
+    notice_period_curve: 0.25
+    trust_modifier: 0.10
+    engagement_quality: 0.15
+    closability: 0.10
