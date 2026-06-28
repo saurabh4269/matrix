@@ -84,11 +84,26 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
   useEffect(() => {
     if (!cand) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        e.preventDefault()
+        onClose()
+      } else if (e.key === 'Enter') {
+        // Intercept Enter inside the modal so the deck's Enter handler
+        // doesn't fire underneath. Submit if a reason is picked.
+        if (e.target instanceof HTMLTextAreaElement) return
+        e.stopPropagation()
+        e.preventDefault()
+        if (selected || free.trim().length > 0) {
+          handleSubmit()
+        }
+      }
     }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [cand, onClose])
+    // capture-phase so we run BEFORE the deck's window-level handler
+    window.addEventListener('keydown', handler, true)
+    return () => window.removeEventListener('keydown', handler, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cand, selected, free, onClose])
 
   const reasons = kind === 'shortlist_override' ? SHORTLIST_REASONS : SKIP_REASONS
   const isOverride = kind === 'shortlist_override'
@@ -157,6 +172,10 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
                   ? `Interesting. What did we miss about ${cand.name}?`
                   : `Interesting. What stood out to you about ${cand.name} as a no?`}
               </h3>
+              <p className="mt-2 font-sans text-small text-ink-tertiary leading-relaxed">
+                Telling us why helps us tune the ranking for your eye, so the next time we surface
+                candidates we already know what you do and don't value.
+              </p>
 
               <ul className="mt-6 space-y-3">
                 {reasons.map(r => (

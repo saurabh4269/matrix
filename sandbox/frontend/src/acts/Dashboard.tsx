@@ -45,11 +45,48 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
     [candidates, selectedId]
   )
 
+  // Always render the header. Body falls back to a clear message if no data.
+  const renderHeader = () => (
+    <header className="flex items-center justify-between flex-wrap gap-y-3">
+      <div className="flex items-center gap-3">
+        <span className="font-serif text-title font-medium">matrix</span>
+        <span className="font-sans text-micro uppercase text-signal-verified bg-[#E8F0E0] px-2 py-0.5 rounded">
+          Live
+        </span>
+        <span className="font-sans text-small text-ink-tertiary">
+          {jd?.role ? `· ${jd.role}` : ''}
+        </span>
+        <span className="font-sans text-small text-ink-tertiary">
+          {jd?.location ? `· ${jd.location.split('.')[0]}` : ''}
+        </span>
+      </div>
+      <div className="flex items-center gap-5 font-sans text-small text-ink-tertiary">
+        <span>{(totalEvaluated || 0).toLocaleString()} candidates evaluated</span>
+        <button
+          onClick={onBackToDeck}
+          className="text-action hover:text-ink transition-colors underline decoration-1 underline-offset-4"
+        >
+          Back to deck
+        </button>
+      </div>
+    </header>
+  )
+
   if (!selected) {
     return (
-      <div className="p-12">
-        <p className="font-serif text-title text-ink-tertiary">No candidates loaded.</p>
-      </div>
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="min-h-screen w-full px-6 sm:px-10 py-6"
+      >
+        {renderHeader()}
+        <hr className="my-5 border-hairline" />
+        <p className="mt-12 font-serif text-title text-ink-tertiary">
+          No ranked candidates available yet. Press O or click Back to deck to return.
+        </p>
+      </motion.section>
     )
   }
 
@@ -77,29 +114,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
       className="min-h-screen w-full px-6 sm:px-10 py-6"
     >
       {/* Header */}
-      <header className="flex items-center justify-between flex-wrap gap-y-3">
-        <div className="flex items-center gap-3">
-          <span className="font-serif text-title font-medium">matrix</span>
-          <span className="font-sans text-micro uppercase text-signal-verified bg-[#E8F0E0] px-2 py-0.5 rounded">
-            Live
-          </span>
-          <span className="font-sans text-small text-ink-tertiary">
-            · {jd.role}
-          </span>
-          <span className="font-sans text-small text-ink-tertiary">
-            · {jd.location.split('.')[0]}
-          </span>
-        </div>
-        <div className="flex items-center gap-5 font-sans text-small text-ink-tertiary">
-          <span>{totalEvaluated.toLocaleString()} candidates evaluated</span>
-          <button
-            onClick={onBackToDeck}
-            className="text-action hover:text-ink transition-colors underline decoration-1 underline-offset-4"
-          >
-            Back to deck
-          </button>
-        </div>
-      </header>
+      {renderHeader()}
 
       <hr className="my-5 border-hairline" />
 
@@ -243,9 +258,9 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             </div>
             <div>
               <p className="font-sans text-micro uppercase text-ink-tertiary mb-3">
-                {selected.concerns.length > 0 ? 'Concerns' : 'Strengths'}
+                {(selected.concerns?.length ?? 0) > 0 ? 'Concerns' : 'Strengths'}
               </p>
-              {selected.concerns.length > 0 ? (
+              {(selected.concerns?.length ?? 0) > 0 ? (
                 <ul className="space-y-2.5">
                   {selected.concerns.map((c, i) => (
                     <li key={i} className="font-serif text-body text-signal-concern leading-snug">
@@ -255,7 +270,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
                 </ul>
               ) : (
                 <ul className="space-y-2.5">
-                  {selected.snr_high.slice(0, 4).map((h, i) => (
+                  {(selected.snr_high ?? []).slice(0, 4).map((h, i) => (
                     <li key={i} className="font-serif text-body text-ink-secondary leading-snug">
                       {h.evidence}
                     </li>

@@ -84,10 +84,16 @@ export default function App() {
   }
 
   // Client-side rerank: apply user weights to the backend's structured probes.
-  const candidates = useMemo(
-    () => (data ? rerank(data.ranked, weights) : []),
-    [data, weights],
-  )
+  // Wrapped in try-catch so a malformed payload can never blank the UI.
+  const candidates = useMemo(() => {
+    if (!data) return []
+    try {
+      return rerank(data.ranked, weights)
+    } catch (err) {
+      console.error('Rerank failed, falling back to backend order:', err)
+      return data.ranked
+    }
+  }, [data, weights])
   const current = candidates[deckIndex]
 
   // Detect "override" actions — user takes the opposite of the system's lean.
@@ -185,6 +191,7 @@ export default function App() {
             onBack={goBack}
             onOpenTuning={() => setTuningOpen(true)}
             onOpenDashboard={() => setPhase('dashboard')}
+            modalOpen={interrogation !== null || tuningOpen}
             shortlistCount={shortlist.length}
             position={deckIndex + 1}
             total={candidates.length}

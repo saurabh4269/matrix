@@ -15,6 +15,7 @@ interface Props {
   onBack: () => void
   onOpenTuning?: () => void
   onOpenDashboard?: () => void
+  modalOpen?: boolean
   shortlistCount: number
   position: number
   total: number
@@ -45,7 +46,9 @@ function noticeText(days: number): string {
 }
 
 export default function Act2Deck({
-  cand, onInterview, onNext, onBack, onOpenTuning, onOpenDashboard, shortlistCount, position, total,
+  cand, onInterview, onNext, onBack, onOpenTuning, onOpenDashboard,
+  modalOpen = false,
+  shortlistCount, position, total,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -57,7 +60,10 @@ export default function Act2Deck({
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // When the interrogation modal is open, let it handle its own keys.
+      if (modalOpen) return
       if (e.target instanceof HTMLInputElement) return
+      if (e.target instanceof HTMLTextAreaElement) return
       if (e.key === 'Enter' || e.key.toLowerCase() === 'i') {
         e.preventDefault()
         onInterview()
@@ -75,7 +81,7 @@ export default function Act2Deck({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [onInterview, onNext, onBack])
+  }, [onInterview, onNext, onBack, modalOpen])
 
   const b = cand.behavioural
   const days = daysSince(b.last_active)
