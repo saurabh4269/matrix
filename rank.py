@@ -31,6 +31,7 @@ from src.calibration import (
     percentile_from_z,
     z_scores,
 )
+from src.conformal import compute_rank_intervals
 from src.load import iter_candidates
 from src.pairwise import refine_top_n
 from src.reasoning import generate_reasoning
@@ -131,6 +132,10 @@ def main():
     print(f"Portfolio diversity pass on top 20…", file=sys.stderr)
     scored = diversify_top_n(scored, lambda cid: by_id[cid], n=20, diversity_weight=0.05)
 
+    # Conformal-style rank confidence intervals (95% CI under score perturbation)
+    print("Computing rank confidence intervals (conformal-style)…", file=sys.stderr)
+    rank_intervals = compute_rank_intervals(scored, n_perturbations=50)
+
     # Take top N
     top = scored[: args.top]
 
@@ -173,6 +178,8 @@ def main():
         # Bayesian + z-score calibration metadata
         bayes_bucket, bayes_posterior = bayesian_confidence(cs, pool_stats)
         z = z_scores(cs, pool_stats)
+        # Conformal rank interval (None if outside top 30)
+        ci_lo, ci_hi = rank_intervals.get(cs.candidate_id, (rank, rank))
         structured.append({
             "candidate_id": cs.candidate_id,
             "rank": rank,
@@ -188,6 +195,7 @@ def main():
                 "substance_percentile": percentile_from_z(z["substance_z"]),
                 "score_percentile": percentile_from_z(z["score_z"]),
                 "mahalanobis": round(mahalanobis_distance(cs, pool_stats), 3),
+                "rank_ci_95": [ci_lo, ci_hi],
             },
             "reasoning": reasoning,
             "must_have": [

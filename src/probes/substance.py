@@ -162,6 +162,57 @@ def shipper_vs_researcher_ratio(cand: Candidate) -> tuple[float, str]:
     return score, f"{ship} hands-on vs {research} research verbs (shipper ratio {ratio:.0%})"
 
 
+def skill_claim_entropy(cand: Candidate) -> tuple[float, str]:
+    """Information-theoretic substance check.
+
+    Real engineers have a messy skill distribution: a few deep skills with
+    long duration and many endorsements, and many shallow skills with low
+    counts. The Shannon entropy of (endorsements + duration) across their
+    skill list is high.
+
+    AI-tailored profiles tend to have suspiciously uniform endorsement and
+    duration patterns across all their skills (because the LLM generates
+    them as a single batch). Low entropy = looks generated.
+
+    This is a complement to description_specificity and verification_ratio:
+    they look at what's claimed and what's verified; this looks at the
+    *shape* of the claim distribution itself.
+    """
+    import math
+    skills = cand.skills
+    if len(skills) < 4:
+        # Too few skills for entropy to be meaningful
+        return 0.0, ""
+
+    # Compute weights: endorsements + duration_months
+    weights = [max(1.0, s.endorsements + s.duration_months / 4.0) for s in skills]
+    total = sum(weights)
+    if total <= 0:
+        return 0.0, ""
+    probs = [w / total for w in weights]
+    # Shannon entropy in bits
+    entropy = -sum(p * math.log2(p) for p in probs if p > 0)
+    # Normalise against maximum possible entropy log2(n)
+    n_skills = len(skills)
+    max_entropy = math.log2(n_skills)
+    if max_entropy <= 0:
+        return 0.0, ""
+    # Real engineers: entropy / max_entropy ~ 0.6-0.85 (uneven distribution)
+    # AI-generated: ~0.95+ (suspiciously uniform)
+    # Sparse claimers: < 0.4 (one dominant skill)
+    ratio = entropy / max_entropy
+    if 0.55 <= ratio <= 0.85:
+        # Healthy heterogeneous claim distribution
+        return saturating(1.0 - abs(ratio - 0.7) / 0.2, threshold=1.0) * 0.5, (
+            f"skill-claim entropy {ratio:.2f}/1.0 — natural heterogeneity"
+        )
+    if ratio > 0.95:
+        # Suspiciously uniform — could be AI-tailored
+        return 0.0, ""
+    # Sparse or very uneven — small partial signal
+    return 0.1, f"skill-claim entropy {ratio:.2f}/1.0"
+
+
 def named_employer_micro_boost(cand: Candidate) -> tuple[float, str]:
     """Small boost for known ML/IR-strong employers. +0.05 per, capped."""
     known = {
@@ -190,6 +241,7 @@ ALL_SUBSTANCE_PROBES = [
     ("company_stage_alignment", company_stage_alignment),
     ("shipper_vs_researcher_ratio", shipper_vs_researcher_ratio),
     ("named_employer_micro_boost", named_employer_micro_boost),
+    ("skill_claim_entropy", skill_claim_entropy),
 ]
 
 

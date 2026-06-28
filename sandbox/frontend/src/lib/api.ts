@@ -84,6 +84,7 @@ export interface ScoreBreakdown {
 export interface RankedCandidate {
   rank: number
   confidence: 'high' | 'medium' | 'low'
+  rank_ci_95?: [number, number]
   breakdown: ScoreBreakdown
   candidate_id: string
   name: string

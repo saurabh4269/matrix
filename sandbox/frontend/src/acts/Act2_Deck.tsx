@@ -100,9 +100,13 @@ export default function Act2Deck({
           {cand.current_title} <span className="text-ink-tertiary">at</span> {cand.current_company}
         </p>
 
-        {/* Confidence pill: the single most glanceable trust signal */}
+        {/* Confidence pill + rank CI: the single most glanceable trust signal */}
         <div className="mt-4">
-          <ConfidencePill confidence={cand.confidence} />
+          <ConfidencePill
+            confidence={cand.confidence}
+            currentRank={cand.rank}
+            rankCi95={cand.rank_ci_95}
+          />
         </div>
 
         {cand.whispered && <WhisperedHint />}

@@ -44,15 +44,16 @@ MUST_HAVE_WEIGHTS = {
 }
 
 SUBSTANCE_WEIGHTS = {
-    "description_specificity": 0.20,
+    "description_specificity": 0.18,
     "narrative_arc_density": 0.10,
     "production_emphasis": 0.15,
     "verification_ratio": 0.15,
     "acceleration": 0.05,
     "summary_thoughtfulness": 0.05,
     "company_stage_alignment": 0.10,
-    "shipper_vs_researcher_ratio": 0.10,
-    "named_employer_micro_boost": 0.10,
+    "shipper_vs_researcher_ratio": 0.08,
+    "named_employer_micro_boost": 0.09,
+    "skill_claim_entropy": 0.05,
 }
 
 LOCATION_WEIGHTS = {

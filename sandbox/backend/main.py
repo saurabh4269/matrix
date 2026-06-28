@@ -25,6 +25,7 @@ from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from src.conformal import compute_rank_intervals  # noqa: E402
 from src.reasoning import generate_reasoning  # noqa: E402
 from src.schema import Candidate  # noqa: E402
 from src.scoring import score_candidate  # noqa: E402
@@ -102,6 +103,9 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
     non_honeypot = [cs for cs in scored if not cs.is_honeypot]
     refined = refine_top_n(non_honeypot, n=min(20, len(non_honeypot)))
 
+    # Conformal-style rank confidence intervals — small N here, but still useful
+    rank_intervals = compute_rank_intervals(refined, n_perturbations=30)
+
     chosen = refined[:top]
     out_rows = []
     for rank, cs in enumerate(chosen, start=1):
@@ -124,9 +128,11 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
         )
         is_whispered = rank > 5 and spec_score > 0.5 and years_at_product > 0.4
 
+        ci_lo, ci_hi = rank_intervals.get(cs.candidate_id, (rank, rank))
         out_rows.append({
             "rank": rank,
             "confidence": cs.confidence,
+            "rank_ci_95": [ci_lo, ci_hi],
             "breakdown": cs.breakdown,
             "anti_snr_penalty": round(cs.anti_snr_penalty, 3),
             "candidate_id": cs.candidate_id,

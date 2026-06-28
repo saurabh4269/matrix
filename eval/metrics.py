@@ -73,6 +73,37 @@ def composite(
     )
 
 
+def expected_reciprocal_rank(
+    ranked_relevances: list[float],
+    k: int = 10,
+    max_grade: float = 5.0,
+) -> float:
+    """Expected Reciprocal Rank (Chapelle et al., CIKM 2009).
+
+    Models the user as scanning rank 1, 2, 3... and stopping with probability
+    R(grade) at each rank. Higher relevance grades make the user more likely
+    to stop and be satisfied. ERR rewards systems that put strong hits high.
+
+    For a recruiter who reads top-down and stops when they have enough
+    interviews scheduled, this is closer to their actual behaviour than NDCG.
+
+    R(grade) = (2^grade - 1) / (2^max_grade)
+    """
+    n = min(len(ranked_relevances), k)
+    if n == 0 or max_grade <= 0:
+        return 0.0
+    err = 0.0
+    p_not_stopped = 1.0
+    for i in range(n):
+        r = ranked_relevances[i]
+        # Stop probability at this rank, given relevance
+        R_i = (2 ** r - 1) / (2 ** max_grade)
+        R_i = max(0.0, min(1.0, R_i))
+        err += p_not_stopped * R_i / (i + 1)
+        p_not_stopped *= (1 - R_i)
+    return err
+
+
 def honeypot_rate_top_k(is_honeypot_ranked: list[bool], k: int = 100) -> float:
     """Fraction of top-k that are honeypots. >0.10 → Stage-3 DQ."""
     top = is_honeypot_ranked[:k]
@@ -109,6 +140,7 @@ def evaluate(
         "ndcg@50": ndcg_at_k(relevances, 50),
         "map": average_precision(relevances),
         "p@10": precision_at_k(relevances, 10),
+        "err@10": expected_reciprocal_rank(relevances, k=10),
         "composite": composite(relevances),
         "honeypot_rate_top_100": honeypot_rate_top_k(is_honeypot, 100),
         "honeypot_rate_top_10": honeypot_rate_top_k(is_honeypot, 10),
