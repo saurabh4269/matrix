@@ -2,8 +2,8 @@
 
 **Track:** 01, Intelligent Candidate Discovery & Ranking
 **Task:** Rank top 100 of 100,000 candidates against one specific JD (Senior AI Engineer @ Redrob, Pune/Noida).
-**Repo:** `C:\Users\shmishra\Documents\Matrix\redrob-ranker\` (public; declares lineage from `matrix-main` / KnowTruly.me for sandbox UI only).
-**Codename:** project name is just **redrob-ranker**, no marketing branding (no "AURA", no "Kinetic", no "Forensic"). Marketing language is a Stage-5 risk, not an asset.
+**Repo:** [`saurabh4269/matrix`](https://github.com/saurabh4269/matrix) (public).
+**Codename:** project name is just **matrix**, no marketing branding (no "AURA", no "Kinetic", no "Forensic"). Marketing language is a Stage-5 risk, not an asset.
 
 ---
 
@@ -927,7 +927,7 @@ Every distinct idea from vision.md mapped to status. Complete sweep.
 ## 18. Folder structure and deliverables
 
 ```
-redrob-ranker/
+matrix/
 ├── README.md                            # Lead: SNR thesis. Stripped of marketing.
 ├── final_plan.md                        # This document.
 ├── submission_metadata.yaml             # Filled-in metadata for portal upload.
@@ -1021,7 +1021,7 @@ redrob-ranker/
 
 **Submission deliverables:**
 1. `<team_id>.csv`, the ranked output.
-2. GitHub repo (public): `github.com/<user>/redrob-ranker`.
+2. GitHub repo (public): `github.com/saurabh4269/matrix`.
 3. Sandbox link: HuggingFace Space.
 4. Portal metadata + `submission_metadata.yaml` in repo root.
 

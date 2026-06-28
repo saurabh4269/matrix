@@ -54,7 +54,7 @@ I left placeholders. Otherwise these are personal/team details I don't have.
 ## 3. Push to GitHub (public repo) and deploy sandbox
 
 ```bash
-gh repo create redrob-ranker --public --source=. --remote=origin
+gh repo create matrix --public --source=. --remote=origin
 git push -u origin main
 ```
 

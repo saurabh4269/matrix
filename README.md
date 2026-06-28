@@ -1,4 +1,4 @@
-# redrob-ranker
+# matrix
 
 > *We treat the JD as the algorithm. Each requirement becomes a probe over the candidate schema. Every probe is tagged High-SNR, Medium-SNR, Low-SNR, or Anti-SNR, and we weight by class.*
 
@@ -18,7 +18,7 @@ Runtime: **~230 seconds** on CPU, ~2 GB peak RAM. Well inside the 5-min / 16 GB 
 ## What's in here
 
 ```
-redrob-ranker/
+matrix/
 ├── rank.py                       # single entry point
 ├── src/
 │   ├── schema.py                 # Pydantic models (lenient input, strict output)

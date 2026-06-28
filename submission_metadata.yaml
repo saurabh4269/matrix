@@ -14,7 +14,7 @@ team_members:
     role: "Team Lead / ML Engineer"
 
 github_repo: "https://github.com/saurabh4269/matrix"
-sandbox_link: "https://huggingface.co/spaces/TODO/redrob-ranker"
+sandbox_link: "https://huggingface.co/spaces/TODO/matrix"
 reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
 
 compute:

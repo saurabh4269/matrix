@@ -1,4 +1,4 @@
-# Common workflow commands for redrob-ranker
+# Common workflow commands for matrix
 #
 # Override CANDIDATES on the command line:
 #   make submission CANDIDATES="C:/path/to/candidates.jsonl"
@@ -10,7 +10,7 @@ TEAM_ID    ?= team_v2
 .PHONY: help install test sample precompute submission audit score validate compare clean
 
 help:
-	@echo "redrob-ranker, common commands:"
+	@echo "matrix, common commands:"
 	@echo ""
 	@echo "  make install              install Python + npm dependencies"
 	@echo "  make test                 run the 29 unit tests"
