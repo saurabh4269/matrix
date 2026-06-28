@@ -12,6 +12,7 @@ import Act2Deck from './acts/Act2_Deck'
 import Act4Pause from './acts/Act4_Pause'
 import Act5Shortlist from './acts/Act5_Shortlist'
 import Act6Reflection from './acts/Act6_Reflection'
+import Dashboard from './acts/Dashboard'
 import LoaderSequence from './components/LoaderSequence'
 import TuningPanel from './components/TuningPanel'
 import MicroInterrogation from './components/MicroInterrogation'
@@ -23,6 +24,7 @@ type Phase =
   | 'pause'
   | 'shortlist'
   | 'reflection'
+  | 'dashboard'
 
 type InterrogationKind = 'shortlist_override' | 'skip_override' | null
 
@@ -47,18 +49,22 @@ export default function App() {
   // Persist weights to localStorage whenever they change.
   useEffect(() => { saveStoredWeights(weights) }, [weights])
 
-  // Open the tuning panel with `T` key.
+  // Keyboard shortcuts.
+  // T: open tuning panel from the deck.
+  // O: toggle overview (dashboard) from anywhere with loaded data.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return
       if (e.target instanceof HTMLTextAreaElement) return
       if (e.key.toLowerCase() === 't' && phase === 'deck') {
         setTuningOpen(t => !t)
+      } else if (e.key.toLowerCase() === 'o' && data) {
+        setPhase(p => (p === 'dashboard' ? 'deck' : 'dashboard'))
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [phase])
+  }, [phase, data])
 
   // Lazy-fetch on first move
   const beginJourney = async () => {
@@ -178,6 +184,7 @@ export default function App() {
             onNext={handleNext}
             onBack={goBack}
             onOpenTuning={() => setTuningOpen(true)}
+            onOpenDashboard={() => setPhase('dashboard')}
             shortlistCount={shortlist.length}
             position={deckIndex + 1}
             total={candidates.length}
@@ -198,6 +205,15 @@ export default function App() {
             setShortlist={setShortlist}
             onBack={() => setPhase('deck')}
             onSend={() => setPhase('reflection')}
+          />
+        )}
+        {phase === 'dashboard' && data && (
+          <Dashboard
+            key="dashboard"
+            jd={data.jd_digest}
+            candidates={candidates}
+            totalEvaluated={data.total_evaluated}
+            onBackToDeck={() => setPhase('deck')}
           />
         )}
         {phase === 'reflection' && (

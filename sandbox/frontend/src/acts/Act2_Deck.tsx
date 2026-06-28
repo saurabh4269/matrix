@@ -14,6 +14,7 @@ interface Props {
   onNext: () => void
   onBack: () => void
   onOpenTuning?: () => void
+  onOpenDashboard?: () => void
   shortlistCount: number
   position: number
   total: number
@@ -44,7 +45,7 @@ function noticeText(days: number): string {
 }
 
 export default function Act2Deck({
-  cand, onInterview, onNext, onBack, onOpenTuning, shortlistCount, position, total,
+  cand, onInterview, onNext, onBack, onOpenTuning, onOpenDashboard, shortlistCount, position, total,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -171,6 +172,15 @@ export default function Act2Deck({
               title="Adjust how the system weights signals (T)"
             >
               Tune ranking <span className="font-mono text-[11px] ml-0.5">T</span>
+            </button>
+          )}
+          {onOpenDashboard && (
+            <button
+              onClick={onOpenDashboard}
+              className="hover:text-ink transition-colors duration-200"
+              title="See the whole ranking at a glance (O)"
+            >
+              Overview <span className="font-mono text-[11px] ml-0.5">O</span>
             </button>
           )}
         </div>
