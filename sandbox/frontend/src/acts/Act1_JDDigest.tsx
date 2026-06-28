@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { JDDigest } from '../lib/api'
+import { clearMemory, loadMemory, type MemoryEntry } from '../lib/memory'
 
 interface Props {
   jd: JDDigest | null
@@ -22,6 +23,9 @@ const FALLBACK: JDDigest = {
 
 export default function Act1JDDigest({ jd, onBegin, error }: Props) {
   const digest = jd ?? FALLBACK
+  const [memory, setMemory] = useState<MemoryEntry[]>([])
+
+  useEffect(() => { setMemory(loadMemory()) }, [])
 
   // Enter starts the journey
   useEffect(() => {
@@ -111,6 +115,33 @@ export default function Act1JDDigest({ jd, onBegin, error }: Props) {
 
         {error && (
           <p className="mt-5 font-sans text-small text-signal-concern">{error}</p>
+        )}
+
+        {memory.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.1, duration: 0.5 }}
+            className="mt-14 p-4 bg-card border border-hairline rounded-lg max-w-[58ch]"
+          >
+            <p className="font-sans text-micro uppercase text-ink-tertiary mb-2">
+              You mentioned, last time
+            </p>
+            <ul className="space-y-1.5">
+              {memory.slice(-3).reverse().map((m, i) => (
+                <li key={i} className="font-serif text-body text-ink-secondary leading-snug">
+                  <span className="italic">"{m.note}"</span>
+                  <span className="text-ink-tertiary"> — on {m.cand}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => { clearMemory(); setMemory([]) }}
+              className="mt-3 font-sans text-small text-ink-tertiary hover:text-ink transition-colors"
+            >
+              Clear memory
+            </button>
+          </motion.div>
         )}
       </div>
     </motion.section>

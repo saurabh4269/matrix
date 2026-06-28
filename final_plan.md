@@ -1102,7 +1102,40 @@ These are *features* for the interview, not bugs, they show we understand the li
 
 ---
 
-## 21. Stage-5 interview narrative (90-second version)
+## 21. Mathematical foundations and borrows
+
+The system is built on a structured-feature scorer that's been deliberately calibrated; on top of that, we layered six borrowed mathematical ideas, each filling a specific gap.
+
+### Shipped
+
+| Borrow | Source | What it does |
+|---|---|---|
+| **Z-score standardisation** | Quantitative finance | `compute_pool_stats` + `z_scores` in src/calibration.py. Per-candidate percentiles against the whole-pool mean+std. Surfaced as "97th percentile in substance" in the structured JSONL |
+| **Mahalanobis outlier distance** | Anomaly detection | Diagonal Mahalanobis distance from the pool centroid. Statistical complement to the deterministic honeypot rules; flags candidates whose probe vector is unusually far from the population |
+| **Bayesian posterior confidence** | Bayesian statistics | Naive-Bayes posterior `P(tier-5 \| evidence)`. Reframes the heuristic confidence buckets as a proper probability. Priors derived from the JD's "10 great matches in 100K" stinginess |
+| **Portfolio diversity (MMR)** | Portfolio theory | Maximal-Marginal-Relevance pass on the top 20 that spreads candidates across companies + locations. Visibly improved the top-10 composition |
+| **Expected Reciprocal Rank** | Information retrieval | Eval metric that models recruiter stop-after-first-satisfying-hit behaviour. Added to `eval/metrics.py` alongside NDCG/MAP/P@k |
+| **Shannon entropy** of skill claims | Information theory | Catches AI-tailored profiles whose skill claims are suspiciously uniform. Real engineers have heterogeneous claim distributions |
+| **Conformal-style rank intervals** | Conformal prediction | 50 Gaussian-noise perturbations of each candidate's probe scores → 95% rank CI. "Sarah is rank 1, stable in 1-3" instead of just "rank 1" |
+| **LightGBM-Rank weight learner** | Learning-to-rank | `eval/tune_weights.py`. Trains a pairwise-loss model with NDCG@10 eval metric against the labelled set. Produces YAML weights ready to drop into a JD config |
+| **Cross-encoder rerank** | Information retrieval | Optional `--cross-encoder` flag. Loads ms-marco-MiniLM-L-6-v2 (CPU-small) and blends its (JD, candidate) relevance score with our linear score on the top 50 |
+| **Multi-agent LLM debate** (offline) | Multi-agent reasoning | `eval/offline_debate_check.py`. Three LLM personas independently tier each labelled candidate. Flags rows where agents agree strongly but disagree with the user's label by 2+ tiers |
+
+### Deliberately not borrowed
+
+- **Survival analysis** for notice periods. The piecewise curve works; survival framing adds no real signal.
+- **Bradley-Terry-Luce** for pairwise. About the same as our hand-coded tiebreakers in practice.
+- **Network/PageRank** for company influence. Interesting product narrative; no ranking impact.
+- **Causal DAGs** for probe disentanglement. Academically nice, no ROI at this scale.
+- **Active learning** for label efficiency. Production HITL feature, not for hackathon.
+
+### What's blocked on labels
+
+The single highest-impact remaining math addition is **LightGBM-Rank actually fitted** against the labelled eval set. The scaffolding ships now; the fit waits for the user's 290 labels. Once those land, we replace the hand-tuned `weights.must_have`/`weights.substance` in the JD config with the learned weights and ship submission #2 with a measurable NDCG@10 lift.
+
+---
+
+## 22. Stage-5 interview narrative (90-second version)
 
 > *"We rejected the conventional architecture, embed everything, cosine similarity, cross-encoder rerank, because the dataset was explicitly designed to defeat it. The JD itself flagged keyword-stuffers, plain-language tier-5s, and behavioural twins.*
 >

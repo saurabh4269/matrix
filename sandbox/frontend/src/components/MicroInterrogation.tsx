@@ -94,12 +94,36 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
   const isOverride = kind === 'shortlist_override'
 
   const handleSubmit = () => {
-    if (!selected) {
+    if (!selected && !free) {
       onClose()
       return
     }
-    const reason = reasons.find(r => r.id === selected)
-    if (reason) onAdjust(reason.adjust(weights))
+    if (selected) {
+      const reason = reasons.find(r => r.id === selected)
+      if (reason) onAdjust(reason.adjust(weights))
+    }
+    // Persist a contextual memory buffer of user-stated reasons.
+    // vision.md's Track B: the system remembers qualitative feedback across
+    // sessions so it can surface it next time. We don't change probe weights
+    // from the free text; we just keep a log for the recruiter to see.
+    if (free.trim().length > 0 && cand) {
+      try {
+        const KEY = 'matrix.memoryBuffer'
+        const raw = window.localStorage.getItem(KEY) ?? '[]'
+        const buffer = JSON.parse(raw) as Array<{ at: string; cand: string; kind: string; note: string }>
+        buffer.push({
+          at: new Date().toISOString(),
+          cand: cand.name,
+          kind: kind ?? 'note',
+          note: free.trim(),
+        })
+        // Keep last 50 entries
+        const trimmed = buffer.slice(-50)
+        window.localStorage.setItem(KEY, JSON.stringify(trimmed))
+      } catch {
+        /* ignore — localStorage might be disabled */
+      }
+    }
     onClose()
   }
 
