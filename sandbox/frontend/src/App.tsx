@@ -193,7 +193,6 @@ export default function App() {
       {showTopBar && (
         <TopBar
           jdLabel={jdShortLabel || undefined}
-          tuned={tuned}
           onOpenTuning={() => setTuningOpen(true)}
           onOpenDashboard={data ? () => setPhase(p => p === 'dashboard' ? 'deck' : 'dashboard') : undefined}
         />

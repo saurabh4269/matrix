@@ -8,8 +8,37 @@ interface Props {
   onOpenDashboard?: () => void
   onOpenJdPicker?: () => void
   jdLabel?: string
-  tuned?: boolean
   extraRight?: React.ReactNode
+}
+
+// A pill-style ghost button. Native title attribute reveals the shortcut on
+// hover — recruiter learns it over time, like PowerPoint tooltips. No
+// inline kbd chip, no shouty affordance.
+function TopBarButton({
+  onClick,
+  label,
+  shortcut,
+  ariaLabel,
+}: {
+  onClick: () => void
+  label: string
+  shortcut?: string
+  ariaLabel?: string
+}) {
+  const title = shortcut ? `${ariaLabel ?? label} (${shortcut})` : (ariaLabel ?? label)
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className="font-sans text-small text-ink-secondary hover:text-ink
+                 border border-hairline hover:border-ink-secondary
+                 bg-canvas hover:bg-card
+                 rounded-full px-4 py-1.5 transition-colors"
+    >
+      {label}
+    </button>
+  )
 }
 
 export default function TopBar({
@@ -17,7 +46,6 @@ export default function TopBar({
   onOpenDashboard,
   onOpenJdPicker,
   jdLabel,
-  tuned,
   extraRight,
 }: Props) {
   return (
@@ -33,32 +61,25 @@ export default function TopBar({
             {jdLabel}
           </button>
         )}
-        {tuned && (
-          <span className="font-sans text-micro uppercase text-accent tracking-wider">
-            ranking tuned
-          </span>
-        )}
       </div>
 
-      <div className="flex items-center gap-5 font-sans text-small text-ink-tertiary">
+      <div className="flex items-center gap-3">
         {extraRight}
         {onOpenTuning && (
-          <button
+          <TopBarButton
             onClick={onOpenTuning}
-            className="hover:text-ink transition-colors"
-            title="Tune ranking (T)"
-          >
-            Tune <kbd className="font-mono text-[11px]">T</kbd>
-          </button>
+            label="Tune"
+            shortcut="T"
+            ariaLabel="Tune ranking"
+          />
         )}
         {onOpenDashboard && (
-          <button
+          <TopBarButton
             onClick={onOpenDashboard}
-            className="hover:text-ink transition-colors"
-            title="Overview (O)"
-          >
-            Overview <kbd className="font-mono text-[11px]">O</kbd>
-          </button>
+            label="Overview"
+            shortcut="O"
+            ariaLabel="Open overview"
+          />
         )}
       </div>
     </header>
