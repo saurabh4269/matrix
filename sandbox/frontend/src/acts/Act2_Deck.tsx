@@ -13,10 +13,8 @@ interface Props {
   onNext: () => void
   onBack: () => void
   modalOpen?: boolean
-  shortlistCount: number
   position: number
   total: number
-  tuned?: boolean
 }
 
 const REF_DATE = new Date('2026-06-01')
@@ -46,7 +44,7 @@ function noticeText(days: number): string {
 export default function Act2Deck({
   cand, onInterview, onNext, onBack,
   modalOpen = false,
-  shortlistCount, position, total, tuned,
+  position, total,
 }: Props) {
   const [showProfile, setShowProfile] = useState(false)
 
@@ -91,7 +89,7 @@ export default function Act2Deck({
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="min-h-screen flex flex-col px-6 sm:px-12 py-8"
     >
-      <ShortlistCounter count={shortlistCount} position={position} total={total} tuned={tuned} />
+      <ShortlistCounter position={position} total={total} />
 
       <div className="reading flex-1 flex flex-col justify-center mt-6">
         {/* Identity + inline read-profile action */}

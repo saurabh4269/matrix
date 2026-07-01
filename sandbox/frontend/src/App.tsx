@@ -56,6 +56,7 @@ export default function App() {
   // Keyboard shortcuts.
   // T: open tuning panel from the deck.
   // O: toggle overview (dashboard) from anywhere with loaded data.
+  // S: open shortlist review from anywhere (if there's a shortlist).
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return
@@ -64,11 +65,13 @@ export default function App() {
         setTuningOpen(t => !t)
       } else if (e.key.toLowerCase() === 'o' && data) {
         setPhase(p => (p === 'dashboard' ? 'deck' : 'dashboard'))
+      } else if (e.key.toLowerCase() === 's' && shortlist.length > 0 && phase !== 'shortlist') {
+        setPhase('shortlist')
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [phase, data])
+  }, [phase, data, shortlist.length])
 
   // Lazy-fetch on first move
   const beginJourney = async () => {
@@ -170,13 +173,6 @@ export default function App() {
     }
   }
 
-  // "Ranking tuned" indicator: any weight ≠ the JD defaults
-  const tuned = useMemo(
-    () => (Object.keys(DEFAULT_WEIGHTS) as (keyof UserWeights)[])
-      .some(k => Math.abs(weights[k] - DEFAULT_WEIGHTS[k]) > 1e-6),
-    [weights],
-  )
-
   const finishedSavings = useMemo(() => ({
     shortlisted: shortlist.length,
     fromTotal: data?.total_evaluated ?? 0,
@@ -193,6 +189,8 @@ export default function App() {
       {showTopBar && (
         <TopBar
           jdLabel={jdShortLabel || undefined}
+          shortlistCount={shortlist.length}
+          onOpenShortlist={shortlist.length > 0 ? () => setPhase('shortlist') : undefined}
           onOpenTuning={() => setTuningOpen(true)}
           onOpenDashboard={data ? () => setPhase(p => p === 'dashboard' ? 'deck' : 'dashboard') : undefined}
         />
@@ -229,10 +227,8 @@ export default function App() {
             onNext={handleNext}
             onBack={goBack}
             modalOpen={interrogation !== null || tuningOpen}
-            shortlistCount={shortlist.length}
             position={deckIndex + 1}
             total={candidates.length}
-            tuned={tuned}
           />
         )}
         {phase === 'pause' && (

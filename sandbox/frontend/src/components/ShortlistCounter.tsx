@@ -1,26 +1,14 @@
 interface Props {
-  count: number
   position: number
   total: number
-  tuned?: boolean
 }
 
-export default function ShortlistCounter({ count, position, total, tuned }: Props) {
+// Minimal per-candidate position indicator. Shortlist count now lives in
+// TopBar (persistent cart-style button); no need to duplicate here.
+export default function ShortlistCounter({ position, total }: Props) {
   return (
-    <div className="reading flex items-center justify-between text-xs font-mono text-ink-tertiary">
-      <span className="flex items-center gap-3">
-        <span>{position} of {total}</span>
-        {tuned && (
-          <span className="text-accent uppercase tracking-wider">
-            ranking tuned
-          </span>
-        )}
-      </span>
-      {count > 0 && (
-        <span>
-          Shortlist of {count}.
-        </span>
-      )}
+    <div className="reading text-xs font-mono text-ink-tertiary">
+      {position} of {total}
     </div>
   )
 }

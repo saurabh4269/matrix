@@ -7,13 +7,15 @@ interface Props {
   onOpenTuning?: () => void
   onOpenDashboard?: () => void
   onOpenJdPicker?: () => void
+  onOpenShortlist?: () => void
+  shortlistCount?: number
   jdLabel?: string
   extraRight?: React.ReactNode
 }
 
-// A pill-style ghost button. Native title attribute reveals the shortcut on
-// hover — recruiter learns it over time, like PowerPoint tooltips. No
-// inline kbd chip, no shouty affordance.
+// A pill-style ghost button. The shortcut key sits inside the button but is
+// invisible until hover — reveals instantly (no browser-tooltip delay), so a
+// recruiter learns it the first time they mouse near the button.
 function TopBarButton({
   onClick,
   label,
@@ -25,18 +27,27 @@ function TopBarButton({
   shortcut?: string
   ariaLabel?: string
 }) {
-  const title = shortcut ? `${ariaLabel ?? label} (${shortcut})` : (ariaLabel ?? label)
   return (
     <button
       onClick={onClick}
-      title={title}
-      aria-label={title}
-      className="font-sans text-small text-ink-secondary hover:text-ink
+      aria-label={ariaLabel ?? label}
+      className="group font-sans text-small text-ink-secondary hover:text-ink
                  border border-hairline hover:border-ink-secondary
                  bg-canvas hover:bg-card
-                 rounded-full px-4 py-1.5 transition-colors"
+                 rounded-full px-4 py-1.5 transition-colors
+                 inline-flex items-center gap-1.5"
     >
-      {label}
+      <span>{label}</span>
+      {shortcut && (
+        <kbd
+          className="font-mono text-[10px] text-ink-tertiary
+                     opacity-0 group-hover:opacity-100 focus-visible:opacity-100
+                     transition-opacity duration-75
+                     border border-hairline rounded px-1"
+        >
+          {shortcut}
+        </kbd>
+      )}
     </button>
   )
 }
@@ -45,9 +56,12 @@ export default function TopBar({
   onOpenTuning,
   onOpenDashboard,
   onOpenJdPicker,
+  onOpenShortlist,
+  shortlistCount,
   jdLabel,
   extraRight,
 }: Props) {
+  const showShortlist = onOpenShortlist && (shortlistCount ?? 0) > 0
   return (
     <header className="w-full px-6 sm:px-10 py-3 flex items-center justify-between border-b border-hairline bg-canvas/95 backdrop-blur-sm sticky top-0 z-30">
       <div className="flex items-baseline gap-3">
@@ -65,6 +79,24 @@ export default function TopBar({
 
       <div className="flex items-center gap-3">
         {extraRight}
+        {showShortlist && (
+          <button
+            onClick={onOpenShortlist}
+            title="Review shortlist (S)"
+            aria-label={`Review shortlist, ${shortlistCount} candidate${shortlistCount === 1 ? '' : 's'}`}
+            className="font-sans text-small text-ink hover:text-canvas
+                       bg-card hover:bg-action border border-action
+                       rounded-full pl-4 pr-3 py-1.5 transition-colors
+                       flex items-center gap-2"
+          >
+            Shortlist
+            <span className="inline-flex items-center justify-center min-w-[1.4rem] h-5 px-1.5
+                             bg-action text-canvas font-mono text-[11px] font-semibold
+                             rounded-full">
+              {shortlistCount}
+            </span>
+          </button>
+        )}
         {onOpenTuning && (
           <TopBarButton
             onClick={onOpenTuning}
