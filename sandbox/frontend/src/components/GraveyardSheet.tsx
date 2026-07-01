@@ -83,7 +83,7 @@ export default function GraveyardSheet({ open, onClose }: Props) {
                 Graveyard
               </h2>
               <p className="mt-2 font-sans text-small text-ink-tertiary">
-                Candidates we filtered out, with the rule that fired. Kept visible for transparency.
+                Candidates we filtered out and why.
               </p>
 
               {loading && (

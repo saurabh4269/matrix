@@ -45,30 +45,20 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
     [candidates, selectedId]
   )
 
-  // Always render the header. Body falls back to a clear message if no data.
+  // The persistent TopBar (in App.tsx) already carries the wordmark, JD
+  // label, and Tune/Overview shortcuts. The Dashboard's own header is just
+  // a compact caption + a Back-to-deck link.
   const renderHeader = () => (
     <header className="flex items-center justify-between flex-wrap gap-y-3">
-      <div className="flex items-center gap-3">
-        <span className="font-serif text-title font-medium">matrix</span>
-        <span className="font-sans text-micro uppercase text-signal-verified bg-[#E8F0E0] px-2 py-0.5 rounded">
-          Live
-        </span>
-        <span className="font-sans text-small text-ink-tertiary">
-          {jd?.role ? `· ${jd.role}` : ''}
-        </span>
-        <span className="font-sans text-small text-ink-tertiary">
-          {jd?.location ? `· ${jd.location.split('.')[0]}` : ''}
-        </span>
-      </div>
-      <div className="flex items-center gap-5 font-sans text-small text-ink-tertiary">
-        <span>{(totalEvaluated || 0).toLocaleString()} candidates evaluated</span>
-        <button
-          onClick={onBackToDeck}
-          className="text-action hover:text-ink transition-colors underline decoration-1 underline-offset-4"
-        >
-          Back to deck
-        </button>
-      </div>
+      <p className="font-sans text-micro uppercase text-ink-tertiary">
+        Overview · {(totalEvaluated || 0).toLocaleString()} evaluated
+      </p>
+      <button
+        onClick={onBackToDeck}
+        className="font-sans text-small text-action hover:text-ink transition-colors underline decoration-1 underline-offset-4"
+      >
+        Back to deck
+      </button>
     </header>
   )
 
@@ -243,26 +233,6 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             </div>
           )}
 
-          {/* HRMS routing chip — small production-readiness signal */}
-          {selected.hrms_routing_action && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 font-sans text-micro text-ink-tertiary">
-              <span className="uppercase">HRMS route</span>
-              <span className="text-hairline">·</span>
-              <code className="font-mono text-[11px] bg-card px-2 py-0.5 rounded border border-hairline">
-                {selected.hrms_routing_action.next_step}
-              </code>
-              {selected.hrms_routing_action.assessment_id && (
-                <>
-                  <span className="text-hairline">·</span>
-                  <code className="font-mono text-[11px]">
-                    {selected.hrms_routing_action.assessment_id}
-                  </code>
-                </>
-              )}
-              <span className="text-hairline">·</span>
-              <span>SLA {selected.hrms_routing_action.sla_hours}h</span>
-            </div>
-          )}
 
           {/* Score breakdown bar */}
           <ScoreBreakdownBar

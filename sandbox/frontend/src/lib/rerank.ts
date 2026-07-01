@@ -57,10 +57,21 @@ export function rerank(
   })
 
   composites.sort((a, b) => b.newScore - a.newScore)
+  // Reassign scores to a strictly decreasing sequence anchored to the top
+  // candidate's newScore so rank and score never contradict each other in
+  // the UI (rank.py does the same trick for the submission CSV).
+  const n = composites.length
+  const top = composites[0]?.newScore ?? 1.0
+  const bottom = composites[n - 1]?.newScore ?? 0.0
+  const spread = Math.max(top - bottom, 1e-9)
   return composites.map((entry, i) => ({
     ...entry.cand,
     rank: i + 1,
-    // Surface the user-recomputed score for debugging; keep original score for the canonical CSV.
+    // Interpolate between top and bottom so scores strictly decrease with rank.
+    // If everyone has the same newScore, fall back to a linear decay.
+    score: n <= 1
+      ? entry.newScore
+      : top - (i / (n - 1)) * spread,
   }))
 }
 

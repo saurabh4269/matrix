@@ -1,7 +1,6 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import type { RankedCandidate } from '../lib/api'
-import SNRSplit from '../components/SNRSplit'
 import ShortlistCounter from '../components/ShortlistCounter'
 import WhisperedHint from '../components/WhisperedHint'
 import ProfileSheet from '../components/ProfileSheet'
@@ -13,12 +12,11 @@ interface Props {
   onInterview: () => void
   onNext: () => void
   onBack: () => void
-  onOpenTuning?: () => void
-  onOpenDashboard?: () => void
   modalOpen?: boolean
   shortlistCount: number
   position: number
   total: number
+  tuned?: boolean
 }
 
 const REF_DATE = new Date('2026-06-01')
@@ -46,15 +44,13 @@ function noticeText(days: number): string {
 }
 
 export default function Act2Deck({
-  cand, onInterview, onNext, onBack, onOpenTuning, onOpenDashboard,
+  cand, onInterview, onNext, onBack,
   modalOpen = false,
-  shortlistCount, position, total,
+  shortlistCount, position, total, tuned,
 }: Props) {
-  const [showDetails, setShowDetails] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
 
   useEffect(() => {
-    setShowDetails(false)
     setShowProfile(false)
   }, [cand.candidate_id])
 
@@ -73,8 +69,6 @@ export default function Act2Deck({
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault()
         onBack()
-      } else if (e.key.toLowerCase() === 'd') {
-        setShowDetails(s => !s)
       } else if (e.key.toLowerCase() === 'p') {
         setShowProfile(p => !p)
       }
@@ -97,18 +91,28 @@ export default function Act2Deck({
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="min-h-screen flex flex-col px-6 sm:px-12 py-8"
     >
-      <ShortlistCounter count={shortlistCount} position={position} total={total} />
+      <ShortlistCounter count={shortlistCount} position={position} total={total} tuned={tuned} />
 
       <div className="reading flex-1 flex flex-col justify-center mt-6">
-        {/* Identity */}
-        <h2 className="font-serif text-display">
-          {cand.name}
-        </h2>
-        <p className="mt-2 font-serif text-title text-ink-secondary">
-          {cand.current_title} <span className="text-ink-tertiary">at</span> {cand.current_company}
-        </p>
+        {/* Identity + inline read-profile action */}
+        <div className="flex items-start justify-between flex-wrap gap-4">
+          <div>
+            <h2 className="font-serif text-display">
+              {cand.name}
+            </h2>
+            <p className="mt-2 font-serif text-title text-ink-secondary">
+              {cand.current_title} <span className="text-ink-tertiary">at</span> {cand.current_company}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowProfile(true)}
+            className="mt-2 font-sans text-small text-action hover:text-ink transition-colors underline decoration-1 underline-offset-4 decoration-action hover:decoration-ink whitespace-nowrap"
+          >
+            Read full profile →
+          </button>
+        </div>
 
-        {/* Confidence pill + rank CI: the single most glanceable trust signal */}
+        {/* Confidence pill: the single most glanceable trust signal */}
         <div className="mt-4">
           <ConfidencePill confidence={cand.confidence} />
         </div>
@@ -180,55 +184,6 @@ export default function Act2Deck({
           behaviouralModifier={cand.behavioural.behav_modifier_total}
         />
 
-        {/* Disclosure links */}
-        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 font-sans text-small text-ink-tertiary">
-          <button
-            onClick={() => setShowProfile(true)}
-            className="hover:text-ink transition-colors duration-200 underline decoration-1 underline-offset-4 decoration-hairline hover:decoration-ink"
-          >
-            Read full profile
-          </button>
-          <button
-            onClick={() => setShowDetails(s => !s)}
-            className="hover:text-ink transition-colors duration-200"
-          >
-            {showDetails ? 'Hide details' : 'Show how this ranks'}
-            <span className="ml-1">{showDetails ? '▴' : '▾'}</span>
-          </button>
-          {onOpenTuning && (
-            <button
-              onClick={onOpenTuning}
-              className="hover:text-ink transition-colors duration-200"
-              title="Adjust how the system weights signals (T)"
-            >
-              Tune ranking <span className="font-mono text-[11px] ml-0.5">T</span>
-            </button>
-          )}
-          {onOpenDashboard && (
-            <button
-              onClick={onOpenDashboard}
-              className="hover:text-ink transition-colors duration-200"
-              title="See the whole ranking at a glance (O)"
-            >
-              Overview <span className="font-mono text-[11px] ml-0.5">O</span>
-            </button>
-          )}
-        </div>
-
-        <AnimatePresence>
-          {showDetails && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="overflow-hidden"
-            >
-              <SNRSplit high={cand.snr_high} skills={cand.snr_low} />
-              <BehaviouralBreakdown b={b} />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <ProfileSheet cand={showProfile ? cand : null} onClose={() => setShowProfile(false)} />
@@ -249,13 +204,6 @@ export default function Act2Deck({
         >
           Next  →
         </button>
-        <div className="ml-auto font-sans text-small text-ink-tertiary hidden md:flex items-center gap-3">
-          <span><kbd>Enter</kbd> interview</span>
-          <span className="text-hairline">·</span>
-          <span><kbd>→</kbd> next</span>
-          <span className="text-hairline">·</span>
-          <span><kbd>P</kbd> profile</span>
-        </div>
       </div>
     </motion.section>
   )

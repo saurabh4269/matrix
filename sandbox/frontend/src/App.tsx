@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { fetchDemo, RankResponse, RankedCandidate } from './lib/api'
 import {
+  DEFAULT_WEIGHTS,
   loadStoredWeights,
   rerank,
   saveStoredWeights,
@@ -17,6 +18,7 @@ import LoaderSequence from './components/LoaderSequence'
 import TuningPanel from './components/TuningPanel'
 import MicroInterrogation from './components/MicroInterrogation'
 import ErrorBoundary from './components/ErrorBoundary'
+import TopBar from './components/TopBar'
 
 type Phase =
   | 'arrival'
@@ -168,14 +170,34 @@ export default function App() {
     }
   }
 
+  // "Ranking tuned" indicator: any weight ≠ the JD defaults
+  const tuned = useMemo(
+    () => (Object.keys(DEFAULT_WEIGHTS) as (keyof UserWeights)[])
+      .some(k => Math.abs(weights[k] - DEFAULT_WEIGHTS[k]) > 1e-6),
+    [weights],
+  )
+
   const finishedSavings = useMemo(() => ({
     shortlisted: shortlist.length,
     fromTotal: data?.total_evaluated ?? 0,
     hoursSaved: Math.max(1, Math.round((data?.total_evaluated ?? 0) / 150)),
   }), [shortlist.length, data?.total_evaluated])
 
+  const jdShortLabel = (data?.jd_digest.role ?? previewDigest?.role ?? '')
+    .replace(/\.$/, '')
+
+  const showTopBar = phase !== 'arrival' && phase !== 'loading'
+
   return (
     <main className="min-h-screen w-full bg-canvas text-ink overflow-x-hidden">
+      {showTopBar && (
+        <TopBar
+          jdLabel={jdShortLabel || undefined}
+          tuned={tuned}
+          onOpenTuning={() => setTuningOpen(true)}
+          onOpenDashboard={data ? () => setPhase(p => p === 'dashboard' ? 'deck' : 'dashboard') : undefined}
+        />
+      )}
       <AnimatePresence mode="wait">
         {phase === 'arrival' && data === null && (
           <Act1JDDigest
@@ -207,12 +229,11 @@ export default function App() {
             onInterview={handleInterview}
             onNext={handleNext}
             onBack={goBack}
-            onOpenTuning={() => setTuningOpen(true)}
-            onOpenDashboard={() => setPhase('dashboard')}
             modalOpen={interrogation !== null || tuningOpen}
             shortlistCount={shortlist.length}
             position={deckIndex + 1}
             total={candidates.length}
+            tuned={tuned}
           />
         )}
         {phase === 'pause' && (

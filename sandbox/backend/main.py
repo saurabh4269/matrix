@@ -115,6 +115,18 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
     rank_intervals = compute_rank_intervals(refined, n_perturbations=30)
 
     chosen = refined[:top]
+    # Reassign scores to a strictly-decreasing sequence so rank and score
+    # never contradict each other in the UI (rank.py does the same for
+    # the submission CSV).
+    if chosen:
+        top_score = max(chosen[0].score, 0.001)
+        bottom_score = max(min(cs.score for cs in chosen), 0.001)
+        spread = max(top_score - bottom_score, 1e-9)
+        n_chosen = len(chosen)
+        for i, cs in enumerate(chosen):
+            if n_chosen == 1:
+                continue
+            cs.score = float(round(top_score - (i / (n_chosen - 1)) * spread, 6))
     _jd_slug = get_config().name
     out_rows = []
     for rank, cs in enumerate(chosen, start=1):
