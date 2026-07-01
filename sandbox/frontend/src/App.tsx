@@ -122,7 +122,30 @@ export default function App() {
       return data.ranked
     }
   }, [data, weights])
+
+  // Ids the recruiter has already voted on. When we advance, we skip past
+  // these; when weights change, we jump to the first unvoted candidate at
+  // the top of the newly-ranked list.
+  const votedIds = useMemo(
+    () => new Set([...shortlist, ...skipped].map(c => c.candidate_id)),
+    [shortlist, skipped],
+  )
+
   const current = candidates[deckIndex]
+
+  // Weight change → jump to the first candidate we haven't voted on yet in
+  // the newly reordered deck. The tuning "lifts hidden gems" without ever
+  // resurfacing someone the recruiter already decided on.
+  const weightsRef = useRef(weights)
+  useEffect(() => {
+    if (weightsRef.current === weights) return
+    weightsRef.current = weights
+    const nextIdx = candidates.findIndex(c => !votedIds.has(c.candidate_id))
+    if (nextIdx >= 0 && nextIdx !== deckIndex) {
+      setDeckIndex(nextIdx)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weights])
 
   // Detect "override" actions — user takes the opposite of the system's lean.
   // System leans 'interview' if rank ≤ 8 (top of the deck). User skipping a
@@ -165,21 +188,30 @@ export default function App() {
   }
 
   const advance = () => {
-    const next = deckIndex + 1
+    // Walk forward past any already-voted candidates so tuning-driven
+    // reshuffles never resurface someone the recruiter already reviewed.
+    let next = deckIndex + 1
+    while (next < candidates.length && votedIds.has(candidates[next].candidate_id)) {
+      next++
+    }
     if (next >= candidates.length) {
       setPhase('reflection')
       return
     }
     setDeckIndex(next)
-    if ((next + 1) % 7 === 0 && shortlist.length >= 2) {
+    const decisionCount = shortlist.length + skipped.length
+    if (decisionCount > 0 && decisionCount % 7 === 0 && shortlist.length >= 2) {
       setPhase('pause')
     }
   }
 
   const goBack = () => {
-    if (deckIndex > 0) {
-      setDeckIndex(i => i - 1)
+    // Step back through candidates that haven't been voted on (if any).
+    let prev = deckIndex - 1
+    while (prev >= 0 && votedIds.has(candidates[prev].candidate_id)) {
+      prev--
     }
+    if (prev >= 0) setDeckIndex(prev)
   }
 
   const finishedSavings = useMemo(() => ({

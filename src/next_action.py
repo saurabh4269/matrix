@@ -109,64 +109,77 @@ def main_risk(cs: CandidateScore) -> str:
 # ---------------------------------------------------------------------------
 
 def why_not_higher(cs: CandidateScore) -> list[str]:
-    """Return up to 3 bullet points explaining what kept this candidate from
-    a higher rank. Deterministic, derived from probe values.
+    """Up to 3 plain-English reasons this candidate didn't rank higher.
 
-    vision.md's 'Why and Why Not' explainability — we already have the 'why'
-    (the reasoning string + snr_high highlights). This is the 'why not'.
+    Deterministic, derived from probe values. Never uses internal probe
+    names or math jargon in the strings we return — every sentence should
+    read naturally to a recruiter who has never opened our code.
 
     Returns [] if nothing's holding them back (truly strong pick).
     """
     bullets: list[str] = []
 
-    # 1. Anti-SNR is the loudest signal — surface the strongest finding even
-    #    if it's already in main_risk so the user sees it framed as a ceiling.
+    # 1. Anti-SNR — the strongest concern that fired.
     if cs.anti_snr:
         worst = max(cs.anti_snr, key=lambda t: t[1])
         if worst[1] > 0.3:
             labels = {
-                "consulting_only": "Consulting-only history reduces product-velocity confidence.",
-                "bigcorp_only": "Bigcorp-only history reduces zero-to-one confidence.",
-                "pure_research_career": "Research-heavy career reduces production-shipping confidence.",
+                "consulting_only": "Their history is all consulting-firm work, so it's hard to gauge product-shipping speed.",
+                "bigcorp_only": "Their history is all large-company work — untested at startup pace.",
+                "pure_research_career": "The career leans toward academic research, light on production shipping.",
                 "no_production_code_18mo": "No shipping work in the last 18 months.",
-                "framework_enthusiast": "Skill list reads framework-heavy without matching production depth.",
-                "title_chaser": "Short tenures across recent roles.",
-                "cv_speech_robo_only": "Adjacent subdomain, not the JD's NLP / IR focus.",
-                "manager_drift": "Recent roles trend manager-heavy, not hands-on.",
-                "keyword_dense_junior": "Keyword density is high for the stated years of experience.",
-                "remote_only_vs_hybrid_jd": "Remote-only against the JD's hybrid preference.",
-                "dilution": "Most tenure is in non-relevant titles.",
+                "framework_enthusiast": "The skill list leans on frameworks without the production depth to back them up.",
+                "title_chaser": "Short tenures across their recent roles.",
+                "cv_speech_robo_only": "They work in a related subfield, not the JD's core NLP / IR area.",
+                "manager_drift": "Recent roles have been more managerial than hands-on.",
+                "keyword_dense_junior": "Their skill list is unusually dense for the years of experience shown.",
+                "remote_only_vs_hybrid_jd": "They're remote-only, and this JD is hybrid.",
+                "dilution": "Most of the career tenure is in unrelated titles.",
             }
-            bullets.append(labels.get(worst[0], f"{worst[0]} signal: {worst[2]}"))
+            bullets.append(labels.get(worst[0], worst[2]))
 
-    # 2. Weakest must-have. If a high-weight must-have probe scored low, that
-    #    held the linear score down.
+    # 2. Weakest must-have — the strongest requirement they didn't clearly meet.
     if cs.must_have:
         weak_must = min(cs.must_have, key=lambda t: t[1])
         if weak_must[1] < 0.4:
             humanised = {
-                "yoe_band_fit": "Years of experience outside the JD's preferred band.",
-                "years_applied_ml_at_product_co": "Limited applied-ML tenure at a product company.",
-                "production_deployment_evidence": "Production deployment evidence is thin.",
-                "nlp_ir_focus": "NLP / IR focus is not central to their work history.",
-                "vector_search_depth": "Vector search depth is implied but not specifically demonstrated.",
-                "python_proficiency": "Python proficiency lower than expected for this role.",
+                "yoe_band_fit": "Their years of experience sit outside the JD's preferred band.",
+                "years_applied_ml_at_product_co": "Limited applied-ML time at a product company.",
+                "production_deployment_evidence": "Production-deployment evidence is thin.",
+                "nlp_ir_focus": "NLP / IR isn't the centre of their work history.",
+                "vector_search_depth": "Vector-search depth is implied but not clearly demonstrated.",
+                "python_proficiency": "Python looks weaker than the role expects.",
             }.get(weak_must[0])
             if humanised:
                 bullets.append(humanised)
 
-    # 3. Behavioural drag — explicit if the modifier is pulling them down.
+    # 3. Behavioural drag — surface the specific weak dimension, not the
+    #    aggregate multiplier. Recruiters care WHY availability is soft.
     if cs.behavioural_modifier < 0.7:
-        bullets.append(
-            f"Behavioural modifier × {cs.behavioural_modifier:.2f} (notice, responsiveness, "
-            "or activity is dampening the composite)."
-        )
+        behav_labels = {
+            "notice_period_curve":     "Long notice period — they won't start soon.",
+            "effectively_available":   "Not very active on the platform right now.",
+            "engagement_quality":      "Light engagement history — they may not be actively looking.",
+            "trust_modifier":          "Contact details aren't fully verified — harder to reach.",
+            "closability":             "Their offer-acceptance history is on the lower side.",
+        }
+        # Pick the single weakest behavioural dimension
+        weakest = None
+        for name, score, _ev in cs.behavioural:
+            if name in behav_labels and (weakest is None or score < weakest[1]):
+                weakest = (name, score)
+        if weakest and weakest[1] < 0.6:
+            bullets.append(behav_labels[weakest[0]])
+        else:
+            bullets.append(
+                "Availability is softer than typical — notice, responsiveness, or activity."
+            )
 
     # 4. Substance soft-spot
     if cs.substance:
         weak_sub = min(cs.substance, key=lambda t: t[1])
         if weak_sub[1] < 0.3 and weak_sub[0] == "description_specificity":
-            bullets.append("Career descriptions are thin on specifics — hard to verify claims.")
+            bullets.append("Their career descriptions are light on specifics — hard to verify claims.")
 
     return bullets[:3]
 
