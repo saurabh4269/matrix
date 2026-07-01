@@ -143,6 +143,22 @@ export default function Act2Deck({
           </div>
         )}
 
+        {/* Why-Not — honest ceiling notes. Shows even on top picks, because
+            vision.md's principle is "It's honest about its concerns even on
+            top picks." Suppressed only when there's truly nothing to flag. */}
+        {(cand.why_not_higher?.length ?? 0) > 0 && (
+          <div className="mt-3 p-4 bg-card border-l-2 border-hairline rounded-r">
+            <p className="font-sans text-micro uppercase text-ink-tertiary mb-1">
+              Why not ranked higher
+            </p>
+            <ul className="font-serif text-body text-ink-secondary leading-snug space-y-1">
+              {cand.why_not_higher!.map((line, i) => (
+                <li key={i} className="pl-3 border-l border-hairline">{line}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Status row, compact and structured */}
         <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-small text-ink-tertiary">
           {b.open_to_work && (

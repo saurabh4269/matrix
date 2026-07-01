@@ -242,6 +242,41 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             </div>
           )}
 
+          {/* Why not ranked higher — honest ceiling notes */}
+          {(selected.why_not_higher?.length ?? 0) > 0 && (
+            <div className="mt-3 p-4 bg-card border-l-2 border-hairline rounded-r">
+              <p className="font-sans text-micro uppercase text-ink-tertiary mb-1.5">
+                Why not ranked higher
+              </p>
+              <ul className="font-serif text-body text-ink-secondary leading-snug space-y-1">
+                {selected.why_not_higher!.map((line, i) => (
+                  <li key={i} className="pl-3 border-l border-hairline">{line}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* HRMS routing chip — small production-readiness signal */}
+          {selected.hrms_routing_action && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 font-sans text-micro text-ink-tertiary">
+              <span className="uppercase">HRMS route</span>
+              <span className="text-hairline">·</span>
+              <code className="font-mono text-[11px] bg-card px-2 py-0.5 rounded border border-hairline">
+                {selected.hrms_routing_action.next_step}
+              </code>
+              {selected.hrms_routing_action.assessment_id && (
+                <>
+                  <span className="text-hairline">·</span>
+                  <code className="font-mono text-[11px]">
+                    {selected.hrms_routing_action.assessment_id}
+                  </code>
+                </>
+              )}
+              <span className="text-hairline">·</span>
+              <span>SLA {selected.hrms_routing_action.sla_hours}h</span>
+            </div>
+          )}
+
           {/* Score breakdown bar */}
           <ScoreBreakdownBar
             breakdown={bd}

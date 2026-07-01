@@ -34,7 +34,7 @@ from src.calibration import (
 from src.conformal import compute_rank_intervals
 from src.cross_encoder_rerank import rerank_with_cross_encoder
 from src.load import iter_candidates
-from src.next_action import main_risk, next_action
+from src.next_action import hrms_routing_action, main_risk, next_action, why_not_higher
 from src.pairwise import refine_top_n
 from src.reasoning import generate_reasoning
 from src.schema import SubmissionRow
@@ -74,6 +74,18 @@ def main():
         "--cross-encoder",
         action="store_true",
         help="Blend a cross-encoder rerank into the top 50 (slower; ~30s extra on CPU).",
+    )
+    ap.add_argument(
+        "--debate-rerank",
+        action="store_true",
+        help="Run a 3-persona LLM debate reranker over the top 12 (vision.md §3). "
+             "Requires ANTHROPIC_API_KEY. Adds ~3 minutes + small API cost.",
+    )
+    ap.add_argument(
+        "--debate-top",
+        type=int,
+        default=12,
+        help="How many candidates to feed into the debate reranker (default 12).",
     )
     args = ap.parse_args()
 
@@ -150,6 +162,16 @@ def main():
         print("Cross-encoder rerank on top 50 (this adds ~30s on CPU)…", file=sys.stderr)
         scored = rerank_with_cross_encoder(scored, lambda cid: by_id[cid], n=50, alpha=0.4)
 
+    # Optional: 3-persona LLM debate rerank on the very top window
+    if args.debate_rerank:
+        print(
+            f"Debate rerank: 3 personas voting pairwise on top {args.debate_top}… "
+            "(requires ANTHROPIC_API_KEY)",
+            file=sys.stderr,
+        )
+        from src.debate_rerank import rerank_with_debate
+        scored = rerank_with_debate(scored, lambda cid: by_id[cid], n=args.debate_top, alpha=0.4)
+
     # Portfolio-diversity pass on top 20: nudges the order to spread across
     # companies / locations without bumping strong candidates out.
     print(f"Portfolio diversity pass on top 20…", file=sys.stderr)
@@ -185,6 +207,9 @@ def main():
 
     # Generate reasoning for each top candidate
     print(f"Generating reasoning for top {len(top)}…", file=sys.stderr)
+    # JD slug for HRMS routing payload
+    from src.jd_config import get_config as _get_cfg
+    _jd_slug = _get_cfg().name
     rows = []
     structured = []
     for rank, cs in enumerate(top, start=1):
@@ -215,6 +240,8 @@ def main():
             "breakdown": cs.breakdown,
             "next_action": next_action(cs, current_title=cand.profile.current_title),
             "main_risk": main_risk(cs),
+            "why_not_higher": why_not_higher(cs),
+            "hrms_routing_action": hrms_routing_action(cs, jd_slug=_jd_slug),
             "calibration": {
                 "must_have_percentile": percentile_from_z(z["must_have_z"]),
                 "substance_percentile": percentile_from_z(z["substance_z"]),

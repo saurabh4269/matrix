@@ -1,0 +1,101 @@
+candidate_id,rank,score,reasoning
+CAND_0039754,1,1.20429,"Senior Applied Scientist (16.2y) at Meta, 5 embedding/retrieval mention(s) in descriptions. Also 5 vector-DB mention(s) in descriptions."
+CAND_0081846,2,1.197072,"Strong fit: Lead AI Engineer (6.7y) at Razorpay. 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, plus 5 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0064326,3,1.189854,"Search Engineer (7.6y) at Sarvam AI, 3 embedding/retrieval mention(s) in descriptions. Also 3 vector-DB mention(s) in descriptions."
+CAND_0077337,4,1.182636,"Staff Machine Learning Engineer (7y) at Paytm; 4 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, 4 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0065195,5,1.175418,Search Engineer (5.1y) at CRED. 3 embedding/retrieval mention(s) in descriptions; 3 vector-DB mention(s) in descriptions.
+CAND_0036184,6,1.1682,Recommendation Systems Engineer (6y) at CRED. 2 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills; 2 vector-DB mention(s) in descriptions; 2 vector tool(s) in skills.
+CAND_0018499,7,1.160982,Senior Machine Learning Engineer (7.2y) at Zomato. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0041610,8,1.153764,Recommendation Systems Engineer (6.7y) at Zoho. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0046064,9,1.146546,Senior NLP Engineer (8.9y) at Salesforce. 4 embedding/retrieval mention(s) in descriptions; 4 vector-DB mention(s) in descriptions.
+CAND_0081852,10,1.139328,"Strong fit: Senior Data Scientist (5.9y) at Mad Street Den. 3 embedding/retrieval mention(s) in descriptions, plus 3 vector-DB mention(s) in descriptions."
+CAND_0079387,11,1.132111,AI Engineer (6.9y) at Microsoft. Notable: 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 5 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0017960,12,1.124893,Recommendation Systems Engineer (7.7y) at Nykaa; substance: 3 embedding/retrieval mention(s) in descriptions; 3 vector-DB mention(s) in descriptions.
+CAND_0071974,13,1.117675,Senior AI Engineer (7.8y) at Netflix. Notable: 3 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills; 3 vector-DB mention(s) in descriptions; 2 vector tool(s) in skills.
+CAND_0051004,14,1.110457,Senior Data Scientist (4.7y) at CRED. Notable: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0053591,15,1.103239,"AI Engineer (5.3y) at Ola, 3 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills, supported by 3 vector-DB mention(s) in descriptions; 2 vector tool(s) in skills."
+CAND_0042506,16,1.096021,"Search Engineer (4.2y) at Verloop.io; substance: 3 embedding/retrieval mention(s) in descriptions; 3 vector-DB mention(s) in descriptions. Logistics: remote-only, not willing to relocate."
+CAND_0002025,17,1.088803,"Senior AI Engineer (5.9y) at Apple, Python (expert, 54mo, 30e), not verified, supported by 5.9y experience (JD target 5–9y, peak 7y)."
+CAND_0098846,18,1.081585,"AI Engineer (7.6y) at upGrad, 3 embedding/retrieval mention(s) in descriptions, supported by 3 vector-DB mention(s) in descriptions."
+CAND_0077285,19,1.074367,"Solid match, Recommendation Systems Engineer (5.5y) at Nykaa. 3 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills. 3 vector-db mention(s) in descriptions; 2 vector tool(s) in skills."
+CAND_0086022,20,1.067149,"Senior Applied Scientist (5.3y) at Sarvam AI; 4 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills, and 4 vector-DB mention(s) in descriptions; 2 vector tool(s) in skills."
+CAND_0040887,21,1.059931,"Machine Learning Engineer (4.7y) at Netflix. 5 embedding/retrieval mention(s) in descriptions, plus 5 vector-DB mention(s) in descriptions. Logistics: remote-only, not willing to relocate, currently outside India."
+CAND_0044222,22,1.052714,"AI Engineer (7.7y) at PolicyBazaar; 2 embedding/retrieval mention(s) in descriptions, and 2 vector-DB mention(s) in descriptions."
+CAND_0068811,23,1.045496,"Applied ML Engineer (8y) at Freshworks; 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, and 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0055905,24,1.038278,"Senior Machine Learning Engineer (8.1y) at Flipkart. Notable: 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 5 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills. Logistics: remote-only, not willing to relocate, currently outside India."
+CAND_0093912,25,1.03106,Senior Data Scientist (5.3y) at Razorpay. Notable: 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 2 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0075574,26,1.023842,"Machine Learning Engineer (5.7y) at Haptik; 3 embedding/retrieval mention(s) in descriptions, and 3 vector-DB mention(s) in descriptions."
+CAND_0052328,27,1.016624,"Solid match, Recommendation Systems Engineer (6.5y) at Amazon. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. 3 vector-db mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0074225,28,1.009406,"Machine Learning Engineer (4.3y) at Unacademy. 3 embedding/retrieval mention(s) in descriptions, plus 3 vector-DB mention(s) in descriptions. Logistics: 120-day notice."
+CAND_0005260,29,1.002188,"Solid match, Senior NLP Engineer (5.2y) at Netflix. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. 3 vector-db mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0050454,30,0.99497,"AI Engineer (6.8y) at Rephrase.ai, 2 embedding/retrieval mention(s) in descriptions, supported by 2 vector-DB mention(s) in descriptions."
+CAND_0011687,31,0.987752,"Senior NLP Engineer (7.8y) at Niramai. 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, plus 2 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0049896,32,0.980534,"Search Engineer (7.3y) at Unacademy, 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, supported by 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills. Logistics: 90-day notice."
+CAND_0041669,33,0.973317,"Recommendation Systems Engineer (8y) at CRED. 3 embedding/retrieval mention(s) in descriptions, plus 3 vector-DB mention(s) in descriptions."
+CAND_0018722,34,0.966099,"Recommendation Systems Engineer (6.6y) at Saarthi.ai, 2 embedding/retrieval mention(s) in descriptions, supported by 2 vector-DB mention(s) in descriptions. Logistics: 90-day notice."
+CAND_0054123,35,0.958881,"Applied ML Engineer (4.7y) at Meta, 3 embedding/retrieval mention(s) in descriptions, supported by 3 vector-DB mention(s) in descriptions."
+CAND_0062247,36,0.951663,"Solid match, AI Engineer (7.3y) at Google. 2 embedding/retrieval mention(s) in descriptions. 2 vector-db mention(s) in descriptions."
+CAND_0076251,37,0.944445,Search Engineer (7.6y) at Haptik; substance: 2 embedding/retrieval mention(s) in descriptions; 2 vector-DB mention(s) in descriptions.
+CAND_0054394,38,0.937227,Recommendation Systems Engineer (4.1y) at PharmEasy. Notable: 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 2 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0008425,39,0.930009,"Senior NLP Engineer (7.8y) at Ola, 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, supported by 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills. Logistics: remote-only, not willing to relocate."
+CAND_0046525,40,0.922791,"Solid match, Senior Machine Learning Engineer (6.1y) at Genpact AI. 4 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. 4 vector-db mention(s) in descriptions; 1 vector tool(s) in skills. Note: entire career at 10001+ companies (2 roles)."
+CAND_0075249,41,0.915573,Applied ML Engineer (6.2y) at Zomato. Notable: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0069905,42,0.908355,Applied ML Engineer (6.6y) at Sarvam AI. Notable: 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 5 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills. Logistics: 90-day notice.
+CAND_0040117,43,0.901137,"Recommendation Systems Engineer (6.5y) at PhonePe. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, plus 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0052682,44,0.89392,"NLP Engineer (6.6y) at Aganitha; 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, and 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0051292,45,0.886702,Applied ML Engineer (5.2y) at Freshworks; substance: 5 embedding/retrieval mention(s) in descriptions; 5 vector-DB mention(s) in descriptions.
+CAND_0005649,46,0.879484,"Senior Data Scientist (7.4y) at Sarvam AI. 5 embedding/retrieval mention(s) in descriptions, plus 5 vector-DB mention(s) in descriptions. Logistics: 90-day notice."
+CAND_0030348,47,0.872266,Machine Learning Engineer (4.5y) at BYJU'S. Notable: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 3 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills.
+CAND_0043228,48,0.865048,"Solid match, Applied ML Engineer (6.8y) at Zoho. 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. 2 vector-db mention(s) in descriptions; 1 vector tool(s) in skills."
+CAND_0028793,49,0.85783,"Search Engineer (7.2y) at Google, 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, supported by 5 vector-DB mention(s) in descriptions; 1 vector tool(s) in skills. Logistics: 120-day notice."
+CAND_0088025,50,0.850612,"Staff Machine Learning Engineer (8.6y) at Yellow.ai, 2 embedding/retrieval mention(s) in descriptions, supported by 2 vector-DB mention(s) in descriptions. Logistics: 90-day notice."
+CAND_0010257,51,0.843394,"Senior Data Scientist (6.5y) at Google, adjacent rather than core: 5.2y of ML at product cos (2 role(s): 37mo at Google, 26mo at Google); 120-day notice."
+CAND_0007412,52,0.836176,Applied ML Engineer (7.4y) at Zoho. Strength: 3 embedding/retrieval mention(s) in descriptions. Why not higher: 120-day notice.
+CAND_0050876,53,0.828958,"Applied ML Engineer (6y) at Freshworks; some signal (6.0y experience (JD target 5–9y, peak 7y)) but 90-day notice."
+CAND_0081686,54,0.82174,Search Engineer (6y) at Netflix. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Ranked here because weaker overall signal for this specific role.
+CAND_0044855,55,0.814523,"Senior Data Scientist (6.6y) at Flipkart; 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, however weaker overall signal for this specific role."
+CAND_0011432,56,0.807305,Senior Data Scientist (7.6y) at Amazon; some signal (3 embedding/retrieval mention(s) in descriptions) but weaker overall signal for this specific role.
+CAND_0010770,57,0.800087,"Recommendation Systems Engineer (15.2y) at Aganitha. 2 embedding/retrieval mention(s) in descriptions, but weaker overall signal for this specific role."
+CAND_0037944,58,0.792869,Senior Data Scientist (4.9y) at Vedantu. 3 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills. Ranked here because weaker overall signal for this specific role.
+CAND_0007009,59,0.785651,"Recommendation Systems Engineer (7.9y) at Wysa. 5 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills, but weaker overall signal for this specific role."
+CAND_0080766,60,0.778433,Staff Machine Learning Engineer (8.8y) at Salesforce. 3 embedding/retrieval mention(s) in descriptions. Ranked here because weaker overall signal for this specific role.
+CAND_0027691,61,0.771215,"NLP Engineer (6.5y) at Haptik; 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, however weaker overall signal for this specific role."
+CAND_0036863,62,0.763997,Senior Data Scientist (4.3y) at upGrad. Strength: 3 embedding/retrieval mention(s) in descriptions. Why not higher: avg tenure of last 3 roles: 17mo.
+CAND_0032807,63,0.756779,"Machine Learning Engineer (4.2y) at CRED. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, but 90-day notice."
+CAND_0020708,64,0.749561,"Search Engineer (4.2y) at PolicyBazaar. 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, but remote-only, not willing to relocate."
+CAND_0084819,65,0.742343,"Search Engineer (4.5y) at Dream11; 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, however 120-day notice."
+CAND_0079064,66,0.735126,Senior Data Scientist (5.2y) at Niramai; some signal (5 embedding/retrieval mention(s) in descriptions) but 120-day notice.
+CAND_0074735,67,0.727908,"Applied ML Engineer (5.5y) at Rephrase.ai. 3 embedding/retrieval mention(s) in descriptions, but 90-day notice."
+CAND_0091534,68,0.72069,"AI Engineer (16.6y) at Flipkart. 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, but weaker overall signal for this specific role."
+CAND_0052335,69,0.713472,"Applied ML Engineer (6.4y) at Aganitha; 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills, however weaker overall signal for this specific role."
+CAND_0083307,70,0.706254,Search Engineer (7.8y) at CRED. Strength: 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: 120-day notice.
+CAND_0020877,71,0.699036,"Applied ML Engineer (5.1y) at CRED; 5 embedding/retrieval mention(s) in descriptions, however weaker overall signal for this specific role."
+CAND_0066376,72,0.691818,Applied ML Engineer (5.7y) at Dream11. 3 embedding/retrieval mention(s) in descriptions. Ranked here because 90-day notice.
+CAND_0030953,73,0.6846,Search Engineer (7.8y) at Nykaa; some signal (5 embedding/retrieval mention(s) in descriptions) but weaker overall signal for this specific role.
+CAND_0039383,74,0.677382,Applied ML Engineer (7.1y) at Meesho. Strength: 2 embedding/retrieval mention(s) in descriptions. Why not higher: 90-day notice.
+CAND_0027801,75,0.670164,NLP Engineer (7.4y) at InMobi; some signal (2 embedding/retrieval mention(s) in descriptions) but 120-day notice.
+CAND_0078002,76,0.662946,"Machine Learning Engineer (6.3y) at Meta, adjacent rather than core: 5 production-shipping verb(s) in recent roles; weaker overall signal for this specific role."
+CAND_0003977,77,0.655729,Recommendation Systems Engineer (4.6y) at Google; some signal (2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills) but weaker overall signal for this specific role.
+CAND_0029367,78,0.648511,"Senior Data Scientist (5.7y) at Rephrase.ai, adjacent rather than core: 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 90-day notice."
+CAND_0042029,79,0.641293,Senior Data Scientist (6.5y) at Flipkart. 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Ranked here because weaker overall signal for this specific role.
+CAND_0076904,80,0.634075,"Senior Data Scientist (4.2y) at Nykaa, adjacent rather than core: 2 embedding/retrieval mention(s) in descriptions; 90-day notice."
+CAND_0053695,81,0.626857,Recommendation Systems Engineer (5.8y) at Meesho. 2 embedding/retrieval mention(s) in descriptions; 2 embedding tool(s) in skills. Ranked here because weaker overall signal for this specific role.
+CAND_0070398,82,0.619639,Machine Learning Engineer (7.2y) at Genpact AI. Strength: 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: 120-day notice.
+CAND_0089552,83,0.612421,Machine Learning Engineer (6y) at Netflix. Strength: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: 120-day notice.
+CAND_0055992,84,0.605203,AI Engineer (16.9y) at CRED. 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Ranked here because weaker overall signal for this specific role.
+CAND_0096172,85,0.597985,NLP Engineer (5.2y) at Krutrim. Strength: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: weaker overall signal for this specific role.
+CAND_0001610,86,0.590767,Machine Learning Engineer (3y) at Dream11. Strength: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: 90-day notice.
+CAND_0013613,87,0.583549,Machine Learning Engineer (4.7y) at Adobe; some signal (3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills) but weaker overall signal for this specific role.
+CAND_0009024,88,0.576332,"Search Engineer (5.2y) at Google. Strength: located in preferred city: Chennai, Tamil Nadu. Why not higher: weaker overall signal for this specific role."
+CAND_0005538,89,0.569114,"Senior AI Engineer (5.9y) at Adobe. 5.9y experience (JD target 5–9y, peak 7y). Ranked here because 90-day notice."
+CAND_0058688,90,0.561896,"AI Engineer (6.7y) at Vedantu. 6.7y experience (jd target 5–9y, peak 7y), but weaker overall signal for this specific role."
+CAND_0094759,91,0.554678,"Lead AI Engineer (8.6y) at Meta; some signal (4 embedding/retrieval mention(s) in descriptions) but low recruiter response (0.11), not flagged open."
+CAND_0060054,92,0.54746,"AI Engineer (6.4y) at Mad Street Den; 3 embedding/retrieval mention(s) in descriptions, however weaker overall signal for this specific role."
+CAND_0064904,93,0.540242,"AI Engineer (4.9y) at LinkedIn. Python (expert, 52mo, 47e), not verified, but 90-day notice."
+CAND_0000031,94,0.533024,"Recommendation Systems Engineer (6y) at Swiggy. located in preferred city: Hyderabad, Telangana. Ranked here because weaker overall signal for this specific role."
+CAND_0016163,95,0.525806,"Applied ML Engineer (6.7y) at Dream11, adjacent rather than core: 2 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills; 120-day notice."
+CAND_0076163,96,0.518588,"NLP Engineer (6.9y) at Ola. 6.8y of ml at product cos (2 role(s): 46mo at ola, 36mo at zoho), but weaker overall signal for this specific role."
+CAND_0091909,97,0.51137,"Machine Learning Engineer (6.9y) at Rephrase.ai, adjacent rather than core: located in preferred city: Bangalore, Karnataka; weaker overall signal for this specific role."
+CAND_0041568,98,0.504152,Search Engineer (5.2y) at Haptik. Strength: 3 embedding/retrieval mention(s) in descriptions. Why not higher: 90-day notice.
+CAND_0026532,99,0.496935,Recommendation Systems Engineer (4.8y) at Zomato. Strength: 3 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: 90-day notice.
+CAND_0044883,100,0.489717,AI Engineer (6.3y) at Mad Street Den. Strength: 5 embedding/retrieval mention(s) in descriptions; 1 embedding tool(s) in skills. Why not higher: avg tenure of last 3 roles: 14mo.

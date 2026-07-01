@@ -1,0 +1,198 @@
+submission: team_v6_ce.csv
+label: ce-on
+created_at: '2026-07-01T17:29:07+00:00'
+git:
+  sha: 80252c724da3e099bd6092e288c82735fcc17c8c
+  dirty: true
+jd:
+  name: ai_engineer
+  display_name: Senior AI Engineer
+  yoe_peak: 7.0
+  yoe_sigma: 2.5
+weights_snapshot:
+  must_have:
+    production_embeddings_retrieval: 0.25
+    production_vector_db: 0.2
+    ranking_eval_framework: 0.15
+    python_proficiency: 0.1
+    years_applied_ml_at_product_co: 0.3
+  substance:
+    description_specificity: 0.18
+    narrative_arc_density: 0.1
+    production_emphasis: 0.15
+    verification_ratio: 0.15
+    acceleration: 0.05
+    summary_thoughtfulness: 0.05
+    company_stage_alignment: 0.1
+    shipper_vs_researcher_ratio: 0.08
+    named_employer_micro_boost: 0.09
+    skill_claim_entropy: 0.05
+  anti_snr:
+    consulting_only: 0.95
+    bigcorp_only: 0.4
+    pure_research_career: 0.95
+    no_production_code_18mo: 0.7
+    framework_enthusiast: 0.5
+    title_chaser: 0.3
+    cv_speech_robo_only: 0.7
+    manager_drift: 0.3
+    keyword_dense_junior: 0.7
+    remote_only_vs_hybrid_jd: 0.6
+    dilution: 0.5
+  retrieval:
+    bm25_jd_match: 0.4
+    dense_cosine_jd_match: 0.6
+  location:
+    location_match: 0.5
+    yoe_band_fit: 0.4
+    certifications_micro_boost: 0.1
+  category:
+    must_have: 1.0
+    substance: 0.6
+    retrieval: 0.2
+    location: 0.1
+  behavioural:
+    effectively_available: 0.4
+    notice_period_curve: 0.25
+    trust_modifier: 0.1
+    engagement_quality: 0.15
+    closability: 0.1
+extra:
+  cross_encoder_rerank: true
+  hrms: true
+stats:
+  n: 100
+  min_score: 0.489717
+  max_score: 1.20429
+  median_score: 0.850612
+  p90_score: 1.139328
+structured:
+  honeypot_count: 0
+  confidence_distribution:
+    high: 84
+    medium: 15
+    low: 1
+  rows_with_main_risk: 63
+  rows_with_next_action: 100
+top_20_ids:
+- CAND_0039754
+- CAND_0081846
+- CAND_0064326
+- CAND_0077337
+- CAND_0065195
+- CAND_0036184
+- CAND_0018499
+- CAND_0041610
+- CAND_0046064
+- CAND_0081852
+- CAND_0079387
+- CAND_0071974
+- CAND_0051004
+- CAND_0042506
+- CAND_0002025
+- CAND_0055905
+- CAND_0086022
+- CAND_0005260
+- CAND_0046525
+- CAND_0088025
+top_100_ids:
+- CAND_0039754
+- CAND_0081846
+- CAND_0064326
+- CAND_0077337
+- CAND_0065195
+- CAND_0036184
+- CAND_0018499
+- CAND_0041610
+- CAND_0046064
+- CAND_0081852
+- CAND_0079387
+- CAND_0071974
+- CAND_0051004
+- CAND_0042506
+- CAND_0002025
+- CAND_0055905
+- CAND_0086022
+- CAND_0005260
+- CAND_0046525
+- CAND_0088025
+- CAND_0098846
+- CAND_0068811
+- CAND_0044222
+- CAND_0017960
+- CAND_0011687
+- CAND_0093912
+- CAND_0040887
+- CAND_0050454
+- CAND_0053591
+- CAND_0052328
+- CAND_0008425
+- CAND_0076251
+- CAND_0075574
+- CAND_0062247
+- CAND_0077285
+- CAND_0041669
+- CAND_0049896
+- CAND_0075249
+- CAND_0018722
+- CAND_0043228
+- CAND_0028793
+- CAND_0054123
+- CAND_0069905
+- CAND_0030348
+- CAND_0074225
+- CAND_0005649
+- CAND_0052682
+- CAND_0051292
+- CAND_0054394
+- CAND_0040117
+- CAND_0010257
+- CAND_0007412
+- CAND_0050876
+- CAND_0081686
+- CAND_0044855
+- CAND_0011432
+- CAND_0010770
+- CAND_0037944
+- CAND_0007009
+- CAND_0080766
+- CAND_0027691
+- CAND_0036863
+- CAND_0032807
+- CAND_0020708
+- CAND_0084819
+- CAND_0079064
+- CAND_0074735
+- CAND_0091534
+- CAND_0052335
+- CAND_0083307
+- CAND_0020877
+- CAND_0066376
+- CAND_0030953
+- CAND_0039383
+- CAND_0027801
+- CAND_0078002
+- CAND_0003977
+- CAND_0029367
+- CAND_0042029
+- CAND_0076904
+- CAND_0053695
+- CAND_0070398
+- CAND_0089552
+- CAND_0055992
+- CAND_0096172
+- CAND_0001610
+- CAND_0013613
+- CAND_0009024
+- CAND_0005538
+- CAND_0058688
+- CAND_0094759
+- CAND_0060054
+- CAND_0064904
+- CAND_0000031
+- CAND_0016163
+- CAND_0076163
+- CAND_0091909
+- CAND_0041568
+- CAND_0026532
+- CAND_0044883

@@ -32,7 +32,7 @@ from src.jd_config import (  # noqa: E402
     load_jd,
     set_config,
 )
-from src.next_action import main_risk, next_action  # noqa: E402
+from src.next_action import hrms_routing_action, main_risk, next_action, why_not_higher  # noqa: E402
 from src.reasoning import generate_reasoning  # noqa: E402
 from src.schema import Candidate  # noqa: E402
 from src.scoring import score_candidate  # noqa: E402
@@ -114,6 +114,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
     rank_intervals = compute_rank_intervals(refined, n_perturbations=30)
 
     chosen = refined[:top]
+    _jd_slug = get_config().name
     out_rows = []
     for rank, cs in enumerate(chosen, start=1):
         cand = by_id[cs.candidate_id]
@@ -145,6 +146,8 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             "anti_snr_penalty": round(cs.anti_snr_penalty, 3),
             "next_action": next_action(cs, current_title=cand.profile.current_title),
             "main_risk": main_risk(cs),
+            "why_not_higher": why_not_higher(cs),
+            "hrms_routing_action": hrms_routing_action(cs, jd_slug=_jd_slug),
             "candidate_id": cs.candidate_id,
             "name": cand.profile.anonymized_name,
             "current_title": cand.profile.current_title,

@@ -183,6 +183,7 @@ export default function App() {
             jd={previewDigest}
             onBegin={beginJourney}
             onJdChanged={handleJdChanged}
+            onOpenTuning={() => setTuningOpen(true)}
             error={error}
           />
         )}
@@ -192,6 +193,7 @@ export default function App() {
             jd={data.jd_digest}
             onBegin={beginJourney}
             onJdChanged={handleJdChanged}
+            onOpenTuning={() => setTuningOpen(true)}
             error={null}
           />
         )}
@@ -264,6 +266,7 @@ export default function App() {
         onClose={() => setTuningOpen(false)}
         weights={weights}
         onChange={setWeights}
+        jdDisplayName={(data?.jd_digest.role ?? previewDigest?.role ?? '').replace(/\.$/, '')}
       />
 
       <MicroInterrogation

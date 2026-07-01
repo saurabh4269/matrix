@@ -20,9 +20,11 @@ interface Props {
   open: boolean
   onClose: () => void
   onJdChanged: (digest: JDDigest) => void
+  onOpenTuning?: () => void
+  activeJdDisplayName?: string
 }
 
-export default function JDPicker({ open, onClose, onJdChanged }: Props) {
+export default function JDPicker({ open, onClose, onJdChanged, onOpenTuning, activeJdDisplayName }: Props) {
   const [jds, setJds] = useState<JdListItem[]>([])
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState<string | null>(null)  // slug being switched/bootstrapped
@@ -125,6 +127,27 @@ export default function JDPicker({ open, onClose, onJdChanged }: Props) {
 
               {loading && (
                 <p className="mt-8 font-sans text-small text-ink-tertiary">Loading…</p>
+              )}
+
+              {onOpenTuning && (
+                <section className="mt-8 p-4 bg-card border border-hairline rounded-lg">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-sans text-micro uppercase text-ink-tertiary mb-1">
+                        Tuning for {activeJdDisplayName ?? 'the active JD'}
+                      </p>
+                      <p className="font-serif text-body text-ink leading-snug">
+                        Adjust what matters for this role — must-haves, evidence, availability.
+                      </p>
+                    </div>
+                    <button
+                      onClick={onOpenTuning}
+                      className="whitespace-nowrap font-sans text-small text-action hover:text-ink transition-colors underline decoration-1 underline-offset-4 decoration-action hover:decoration-ink"
+                    >
+                      Tune ranking →
+                    </button>
+                  </div>
+                </section>
               )}
 
               {!loading && jds.length > 0 && (

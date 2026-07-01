@@ -8,6 +8,7 @@ interface Props {
   jd: JDDigest | null
   onBegin: () => void
   onJdChanged?: (digest: JDDigest) => void
+  onOpenTuning?: () => void
   error: string | null
 }
 
@@ -23,7 +24,7 @@ const FALLBACK: JDDigest = {
   ],
 }
 
-export default function Act1JDDigest({ jd, onBegin, onJdChanged, error }: Props) {
+export default function Act1JDDigest({ jd, onBegin, onJdChanged, onOpenTuning, error }: Props) {
   const digest = jd ?? FALLBACK
   const [memory, setMemory] = useState<MemoryEntry[]>([])
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -162,6 +163,8 @@ export default function Act1JDDigest({ jd, onBegin, onJdChanged, error }: Props)
           open={pickerOpen}
           onClose={() => setPickerOpen(false)}
           onJdChanged={d => { onJdChanged(d); setPickerOpen(false) }}
+          onOpenTuning={onOpenTuning ? () => { setPickerOpen(false); onOpenTuning() } : undefined}
+          activeJdDisplayName={digest.role.replace(/\.$/, '')}
         />
       )}
     </motion.section>

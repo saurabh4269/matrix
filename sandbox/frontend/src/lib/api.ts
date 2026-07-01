@@ -81,6 +81,14 @@ export interface ScoreBreakdown {
   location: number
 }
 
+export interface HrmsRoutingAction {
+  next_step: string
+  assessment_id: string
+  priority: 'high' | 'medium' | 'low'
+  sla_hours: string
+  reason_code: string
+}
+
 export interface RankedCandidate {
   rank: number
   score: number
@@ -89,6 +97,8 @@ export interface RankedCandidate {
   breakdown: ScoreBreakdown
   next_action?: string
   main_risk?: string
+  why_not_higher?: string[]
+  hrms_routing_action?: HrmsRoutingAction
   candidate_id: string
   name: string
   current_title: string
