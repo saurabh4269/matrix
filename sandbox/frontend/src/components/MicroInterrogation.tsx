@@ -190,8 +190,7 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
                   : `Interesting. What stood out to you about ${cand.name} as a no?`}
               </h3>
               <p className="mt-1.5 font-sans text-small text-ink-tertiary leading-relaxed">
-                Telling us why helps us tune the ranking for your eye, so the next time we surface
-                candidates we already know what you do and don't value.
+                Telling us why helps tune the ranking for your eye.
               </p>
 
               <ul className="mt-4 space-y-2">
@@ -255,11 +254,6 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
                 </button>
               </div>
 
-              {submitting && (
-                <p className="mt-3 font-serif italic text-small text-accent leading-snug">
-                  Tuning the ranking for your eye…
-                </p>
-              )}
             </div>
           </motion.div>
         </>

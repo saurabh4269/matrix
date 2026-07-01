@@ -66,8 +66,33 @@ function highlight(
   return parts.length ? parts : text
 }
 
+const HIGHLIGHT_PREF_KEY = 'matrix.highlightMatched'
+
+function loadHighlightPref(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.localStorage.getItem(HIGHLIGHT_PREF_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+function saveHighlightPref(v: boolean): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(HIGHLIGHT_PREF_KEY, String(v))
+  } catch { /* ignore */ }
+}
+
 export default function ProfileSheet({ cand, onClose }: Props) {
-  const [highlightsOn, setHighlightsOn] = useState(true)
+  // Default off, and remembered per browser across candidates: if the
+  // recruiter turns it on for one profile, it stays on for the next.
+  const [highlightsOn, setHighlightsOnState] = useState<boolean>(() => loadHighlightPref())
+
+  const setHighlightsOn = (v: boolean) => {
+    setHighlightsOnState(v)
+    saveHighlightPref(v)
+  }
 
   useEffect(() => {
     if (!cand) return
@@ -157,53 +182,46 @@ export default function ProfileSheet({ cand, onClose }: Props) {
                 {cand.location} · {cand.years_of_experience.toFixed(1)} years
               </p>
 
-              {/* Model findings — Highlights + Concerns. Nothing here is
-                  invented: every string comes from a probe evidence field. */}
-              {((cand.snr_high?.length ?? 0) > 0 || (cand.concerns?.length ?? 0) > 0) && (
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Model findings — Highlights + Concerns. Hidden unless the
+                  user opts in via the header toggle. Nothing here is invented:
+                  every string comes from a probe evidence field. */}
+              {highlightsOn && ((cand.snr_high?.length ?? 0) > 0 || (cand.concerns?.length ?? 0) > 0) && (
+                <div className="mt-8 space-y-3">
                   {(cand.snr_high?.length ?? 0) > 0 && (
-                    <section className="p-4 bg-[#F1F6E5] border border-[#D6E1BF] rounded-lg">
-                      <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-[#3F4B2E] mb-2.5">
+                    <section className="px-6 py-5 bg-[#F1F6E5] border border-[#D6E1BF] rounded-lg">
+                      <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-[#3F4B2E] mb-4">
                         Highlights
                       </p>
                       <ul className="space-y-2">
                         {cand.snr_high!.slice(0, 5).map((h, i) => (
-                          <li key={i} className="font-serif text-small text-ink leading-snug">
+                          <li
+                            key={i}
+                            className="font-serif text-base text-ink leading-relaxed"
+                          >
                             {h.evidence}
-                            <span className="ml-1 font-mono text-[10px] text-ink-tertiary uppercase">
-                              {h.name}
-                            </span>
                           </li>
                         ))}
                       </ul>
                     </section>
                   )}
                   {(cand.concerns?.length ?? 0) > 0 && (
-                    <section className="p-4 bg-[#FAECDD] border border-[#EFD7BB] rounded-lg">
-                      <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-signal-concern mb-2.5">
+                    <section className="px-6 py-5 bg-[#FAECDD] border border-[#EFD7BB] rounded-lg">
+                      <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-signal-concern mb-4">
                         Concerns
                       </p>
                       <ul className="space-y-2">
                         {cand.concerns!.slice(0, 4).map((c, i) => (
-                          <li key={i} className="font-serif text-small text-ink leading-snug">
+                          <li
+                            key={i}
+                            className="font-serif text-base text-ink leading-relaxed"
+                          >
                             {c.evidence}
-                            <span className="ml-1 font-mono text-[10px] text-ink-tertiary uppercase">
-                              {c.name}
-                            </span>
                           </li>
                         ))}
                       </ul>
                     </section>
                   )}
                 </div>
-              )}
-
-              {highlightsOn && (posCount + conCount > 0) && (
-                <p className="mt-3 font-sans text-micro text-ink-tertiary italic">
-                  Green = terms from the JD vocabulary we found verbatim in this profile.
-                  Orange = flagged terms. Nothing highlighted is invented — toggle off to
-                  read the raw resume.
-                </p>
               )}
 
               {/* Headline (the candidate's own one-liner) */}

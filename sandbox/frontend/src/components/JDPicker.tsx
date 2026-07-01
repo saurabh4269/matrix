@@ -119,12 +119,6 @@ export default function JDPicker({ open, onClose, onJdChanged, onOpenTuning, act
                 </button>
               </div>
 
-              <p className="mt-2 font-sans text-small text-ink-tertiary max-w-[52ch] leading-relaxed">
-                The ranker is JD-agnostic. Every probe, weight, and vocabulary
-                lives in <span className="font-mono">jds/*.yaml</span>. Swap the
-                YAML, retarget the role.
-              </p>
-
               {loading && (
                 <p className="mt-8 font-sans text-small text-ink-tertiary">Loading…</p>
               )}
@@ -198,10 +192,6 @@ export default function JDPicker({ open, onClose, onJdChanged, onOpenTuning, act
               <section className="mt-10">
                 <p className="font-sans text-micro uppercase text-ink-tertiary mb-3">
                   Paste your own
-                </p>
-                <p className="font-sans text-small text-ink-tertiary mb-4 max-w-[52ch] leading-relaxed">
-                  We'll extract the role, location, must-haves, and anti-patterns
-                  via an LLM call and save a starter YAML. Takes about 15-30 seconds.
                 </p>
                 <label className="block">
                   <span className="font-sans text-small text-ink-tertiary">Role slug (optional)</span>

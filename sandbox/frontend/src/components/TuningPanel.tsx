@@ -175,10 +175,6 @@ export default function TuningPanel({ open, onClose, weights, onChange, jdDispla
               <h2 className="mt-1 font-serif text-display leading-[1.04]">
                 What matters here?
               </h2>
-              <p className="mt-2 font-sans text-small text-ink-tertiary leading-relaxed max-w-[38ch]">
-                Each choice reweights the ranking for this role. The deck reranks live,
-                and your settings stick per-JD.
-              </p>
 
               <div className="mt-10 space-y-10">
                 {SLIDERS.map(s => {
@@ -227,18 +223,6 @@ export default function TuningPanel({ open, onClose, weights, onChange, jdDispla
                 })}
               </div>
 
-              <div className="mt-14 p-4 bg-card border border-hairline rounded-lg">
-                <p className="font-sans text-micro uppercase text-ink-tertiary mb-2">
-                  How this works
-                </p>
-                <p className="font-serif text-small text-ink-secondary leading-relaxed">
-                  Each choice reweights one category of the composite score.
-                  We recompute every candidate's score in your browser and
-                  re-sort, then we surface the new ranking immediately. The
-                  submission CSV stays calibrated to the JD defaults; your
-                  exploration doesn't touch it.
-                </p>
-              </div>
             </div>
           </motion.aside>
         </>

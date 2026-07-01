@@ -128,24 +128,17 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
           <ol className="space-y-0.5">
             {candidates.slice(0, 20).map(c => {
               const isSel = c.candidate_id === selected.candidate_id
-              const conf = c.confidence
-              const dotColor = conf === 'high'
-                ? 'bg-signal-verified'
-                : conf === 'medium'
-                  ? 'bg-ink-secondary'
-                  : 'bg-ink-tertiary'
               return (
                 <li key={c.candidate_id}>
                   <button
                     onClick={() => setSelectedId(c.candidate_id)}
-                    className={`w-full text-left flex items-center gap-2.5 px-2 py-1.5 rounded transition-colors ${
+                    className={`w-full text-left flex items-center gap-3 px-2 py-1.5 rounded transition-colors ${
                       isSel ? 'bg-card border border-hairline' : 'hover:bg-card/60'
                     }`}
                   >
                     <span className="font-mono text-small text-ink-tertiary w-6 text-right">
                       {c.rank}
                     </span>
-                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${dotColor}`} />
                     <span className="font-serif text-body text-ink truncate flex-1">
                       {c.name}
                     </span>
@@ -178,11 +171,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
                 {selected.location} · {(selected.years_of_experience ?? 0).toFixed(1)}y total
               </p>
             </div>
-            <ConfidencePill
-              confidence={selected.confidence}
-              currentRank={selected.rank}
-              rankCi95={selected.rank_ci_95}
-            />
+            <ConfidencePill confidence={selected.confidence} />
           </div>
 
           {/* KPI cards row */}
@@ -190,13 +179,11 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             <KPICard
               label="Rank"
               value={`#${selected.rank}`}
-              sublabel={selected.rank_ci_95 ? `stable ${selected.rank_ci_95[0]}–${selected.rank_ci_95[1]}` : undefined}
               tone={selected.rank <= 5 ? 'accent' : 'default'}
             />
             <KPICard
               label="Match score"
               value={(selected.score ?? 0).toFixed(2)}
-              sublabel="0–1+ composite"
             />
             <KPICard
               label="Notice"
@@ -206,7 +193,7 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
             <KPICard
               label="Trust"
               value={verified ? 'verified' : 'partial'}
-              sublabel={selected.behavioural?.open_to_work ? 'open to work' : 'not flagged'}
+              sublabel={selected.behavioural?.open_to_work ? 'open to work' : undefined}
               tone={verified ? 'accent' : 'default'}
             />
           </div>
@@ -317,12 +304,8 @@ export default function Dashboard({ jd, candidates, totalEvaluated, onBackToDeck
 
           {/* Whitespace scatter */}
           <div className="mt-10">
-            <p className="font-sans text-micro uppercase text-ink-tertiary mb-2">
-              Top 20 in feature space
-            </p>
-            <p className="font-sans text-small text-ink-tertiary mb-4">
-              Where each candidate sits on must-have coverage (x) vs availability (y).
-              Click a dot to inspect.
+            <p className="font-sans text-micro uppercase text-ink-tertiary mb-3">
+              Top 20 · must-haves × availability
             </p>
             <WhitespaceScatter
               candidates={candidates}

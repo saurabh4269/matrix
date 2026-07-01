@@ -50,14 +50,17 @@ export default function SNRSplit({ high, skills }: Props) {
           </p>
         ) : (
           <ul className="space-y-2.5">
-            {high.map((h, i) => (
-              <li key={i} className="text-ink leading-snug">
-                <span className="font-sans text-small font-medium block">
-                  {NATURAL_SIGNAL[h.name] ?? h.name}
-                </span>
-                <span className="font-sans text-small text-ink-secondary">{h.evidence}</span>
-              </li>
-            ))}
+            {high.map((h, i) => {
+              const label = NATURAL_SIGNAL[h.name]
+              return (
+                <li key={i} className="text-ink leading-snug">
+                  {label && (
+                    <span className="font-sans text-small font-medium block">{label}</span>
+                  )}
+                  <span className="font-sans text-small text-ink-secondary">{h.evidence}</span>
+                </li>
+              )
+            })}
             {verifiedSkills.slice(0, 3).map((s, i) => (
               <li key={`vs-${i}`} className="text-ink leading-snug">
                 <span className="font-sans text-small font-medium block">{s.name}</span>
