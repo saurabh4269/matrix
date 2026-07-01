@@ -73,30 +73,17 @@ function clamp(v: number, lo: number, hi: number) {
 export default function MicroInterrogation({ cand, kind, onClose, weights, onAdjust }: Props) {
   const [selected, setSelected] = useState<string | null>(null)
   const [free, setFree] = useState('')
-  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (cand) {
       setSelected(null)
       setFree('')
-      setSubmitting(false)
     }
   }, [cand])
 
-  // Picking a reason IS the action. Auto-submit with a short visual beat so
-  // the user sees the radio register before the modal slides out. If they
-  // also typed free text, we wait for an explicit Submit so they don't lose
-  // unsent text.
-  const handleSelect = (id: string) => {
-    setSelected(id)
-    if (free.trim().length > 0) return  // wait for explicit Submit
-    setSubmitting(true)
-    window.setTimeout(() => {
-      const reason = (kind === 'shortlist_override' ? SHORTLIST_REASONS : SKIP_REASONS).find(r => r.id === id)
-      if (reason) onAdjust(reason.adjust(weights))
-      onClose()
-    }, 280)
-  }
+  // No auto-submit on radio click — the user might want to add free text
+  // in the 'Something else' box too, so we wait for an explicit Submit.
+  const handleSelect = (id: string) => setSelected(id)
 
   useEffect(() => {
     if (!cand) return
@@ -172,15 +159,18 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
             onClick={onClose}
           />
 
-          <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg px-4 max-h-[92vh]"
-            onClick={e => e.stopPropagation()}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
           >
-            <div className="bg-canvas border border-hairline rounded-2xl p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="w-full max-w-lg pointer-events-auto"
+              onClick={e => e.stopPropagation()}
+            >
+            <div className="bg-canvas border border-hairline rounded-2xl p-6 shadow-2xl max-h-[calc(100vh-2rem)] overflow-y-auto">
               <p className="font-sans text-micro uppercase text-ink-tertiary mb-2">
                 {isOverride ? 'Shortlisted against our rank' : 'Skipped a top pick'}
               </p>
@@ -209,7 +199,6 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
                           value={r.id}
                           checked={isSelected}
                           onChange={() => handleSelect(r.id)}
-                          disabled={submitting}
                           className="mt-1 accent-action"
                         />
                         <span className="font-sans text-body text-ink-secondary group-hover:text-ink transition-colors leading-snug">
@@ -234,28 +223,29 @@ export default function MicroInterrogation({ cand, kind, onClose, weights, onAdj
               </ul>
 
               <div className="mt-5 flex items-center gap-4">
-                {/* Submit button only shown when there's free-text — radio
-                    selection auto-submits, so a Submit button would be a
-                    second confirmation the user doesn't need. */}
-                {free.trim().length > 0 && (
-                  <button
-                    onClick={handleSubmit}
-                    className="font-sans text-body bg-action text-canvas px-6 py-2.5 rounded-full
-                               hover:bg-ink transition-all"
-                  >
-                    {selected ? 'Adjust ranking' : 'Submit note'}
-                  </button>
-                )}
+                <button
+                  onClick={handleSubmit}
+                  disabled={!selected && free.trim().length === 0}
+                  className="font-sans text-body bg-action text-canvas px-6 py-2.5 rounded-full
+                             hover:bg-ink disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  {selected && free.trim().length > 0
+                    ? 'Adjust ranking & save note'
+                    : selected
+                      ? 'Adjust ranking'
+                      : 'Save note'}
+                </button>
                 <button
                   onClick={onClose}
                   className="font-sans text-body text-ink-tertiary hover:text-ink transition-colors ml-auto"
                 >
-                  Skip and continue
+                  Skip
                 </button>
               </div>
 
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
