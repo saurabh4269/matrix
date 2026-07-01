@@ -32,6 +32,7 @@ from src.jd_config import (  # noqa: E402
     load_jd,
     set_config,
 )
+from src.evidence_tokens import extract_matched_tokens  # noqa: E402
 from src.next_action import hrms_routing_action, main_risk, next_action, why_not_higher  # noqa: E402
 from src.reasoning import generate_reasoning  # noqa: E402
 from src.schema import Candidate  # noqa: E402
@@ -148,6 +149,7 @@ def _rank_payload(candidates_raw: list[dict[str, Any]], top: int) -> dict[str, A
             "main_risk": main_risk(cs),
             "why_not_higher": why_not_higher(cs),
             "hrms_routing_action": hrms_routing_action(cs, jd_slug=_jd_slug),
+            "matched_tokens": extract_matched_tokens(cand, get_config()),
             "candidate_id": cs.candidate_id,
             "name": cand.profile.anonymized_name,
             "current_title": cand.profile.current_title,

@@ -34,6 +34,7 @@ from src.calibration import (
 from src.conformal import compute_rank_intervals
 from src.cross_encoder_rerank import rerank_with_cross_encoder
 from src.load import iter_candidates
+from src.evidence_tokens import extract_matched_tokens
 from src.next_action import hrms_routing_action, main_risk, next_action, why_not_higher
 from src.pairwise import refine_top_n
 from src.reasoning import generate_reasoning
@@ -242,6 +243,7 @@ def main():
             "main_risk": main_risk(cs),
             "why_not_higher": why_not_higher(cs),
             "hrms_routing_action": hrms_routing_action(cs, jd_slug=_jd_slug),
+            "matched_tokens": extract_matched_tokens(cand, _get_cfg()),
             "calibration": {
                 "must_have_percentile": percentile_from_z(z["must_have_z"]),
                 "substance_percentile": percentile_from_z(z["substance_z"]),

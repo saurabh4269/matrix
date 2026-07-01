@@ -99,6 +99,7 @@ export interface RankedCandidate {
   main_risk?: string
   why_not_higher?: string[]
   hrms_routing_action?: HrmsRoutingAction
+  matched_tokens?: { positive: string[]; concern: string[] }
   candidate_id: string
   name: string
   current_title: string

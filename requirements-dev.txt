@@ -1,0 +1,12 @@
+# Optional dependencies for pre-submission tools.
+# The main rank.py submission needs only requirements.txt (no network).
+# Install these for:
+#   - jds/bootstrap.py           (generate a new JD YAML from raw JD text)
+#   - src/debate_rerank.py       (3-persona LLM debate rerank on top window)
+#   - eval/judge.py              (LLM-judge tournament for proxy NDCG)
+#   - eval/offline_debate_check.py  (multi-agent label sanity check)
+-r requirements.txt
+
+anthropic>=0.30
+fastapi>=0.110
+uvicorn>=0.29
