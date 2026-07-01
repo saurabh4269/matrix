@@ -3,6 +3,8 @@
 // where to find them and each candidate card can stay focused on the
 // candidate.
 
+import { motion } from 'framer-motion'
+
 interface Props {
   onOpenTuning?: () => void
   onOpenDashboard?: () => void
@@ -11,44 +13,56 @@ interface Props {
   shortlistCount?: number
   jdLabel?: string
   extraRight?: React.ReactNode
+  // Increments whenever weights change. Triggers a subtle pulse on the Tune
+  // button so the recruiter sees a tuning tweak actually landed.
+  tunePulseKey?: number
 }
 
-// A pill-style ghost button. The shortcut key sits inside the button but is
-// invisible until hover — reveals instantly (no browser-tooltip delay), so a
-// recruiter learns it the first time they mouse near the button.
+// A pill-style ghost button. Shortcut appears in a fast custom tooltip
+// below the button on hover — 75ms fade instead of the ~500ms Windows
+// title-tooltip delay.
 function TopBarButton({
   onClick,
   label,
   shortcut,
   ariaLabel,
+  pulseKey,
 }: {
   onClick: () => void
   label: string
   shortcut?: string
   ariaLabel?: string
+  // When this key changes, briefly pulses the button. Skipped if undefined.
+  pulseKey?: number
 }) {
+  const tooltip = shortcut ? `${ariaLabel ?? label} (${shortcut})` : (ariaLabel ?? label)
   return (
-    <button
-      onClick={onClick}
-      aria-label={ariaLabel ?? label}
-      className="group font-sans text-small text-ink-secondary hover:text-ink
-                 border border-hairline hover:border-ink-secondary
-                 bg-canvas hover:bg-card
-                 rounded-full px-4 py-1.5 transition-colors
-                 inline-flex items-center gap-1.5"
-    >
-      <span>{label}</span>
-      {shortcut && (
-        <kbd
-          className="font-mono text-[10px] text-ink-tertiary
-                     opacity-0 group-hover:opacity-100 focus-visible:opacity-100
-                     transition-opacity duration-75
-                     border border-hairline rounded px-1"
-        >
-          {shortcut}
-        </kbd>
-      )}
-    </button>
+    <div className="relative group">
+      <motion.button
+        onClick={onClick}
+        aria-label={ariaLabel ?? label}
+        animate={pulseKey === undefined ? undefined : { scale: [1, 1.06, 1] }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        key={pulseKey !== undefined ? `pulse-${pulseKey}` : undefined}
+        className="font-sans text-small text-ink-secondary hover:text-ink
+                   border border-hairline hover:border-ink-secondary
+                   bg-canvas hover:bg-card
+                   rounded-full px-4 py-1.5 transition-colors"
+      >
+        {label}
+      </motion.button>
+      <div
+        role="tooltip"
+        className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2
+                   pointer-events-none
+                   opacity-0 group-hover:opacity-100 group-focus-within:opacity-100
+                   transition-opacity duration-75
+                   font-sans text-micro whitespace-nowrap
+                   bg-ink text-canvas rounded px-2 py-1 z-40 shadow-sm"
+      >
+        {tooltip}
+      </div>
+    </div>
   )
 }
 
@@ -60,6 +74,7 @@ export default function TopBar({
   shortlistCount,
   jdLabel,
   extraRight,
+  tunePulseKey,
 }: Props) {
   const showShortlist = onOpenShortlist && (shortlistCount ?? 0) > 0
   return (
@@ -103,6 +118,7 @@ export default function TopBar({
             label="Tune"
             shortcut="T"
             ariaLabel="Tune ranking"
+            pulseKey={tunePulseKey}
           />
         )}
         {onOpenDashboard && (

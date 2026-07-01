@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { fetchDemo, RankResponse, RankedCandidate } from './lib/api'
 import {
@@ -52,6 +52,15 @@ export default function App() {
 
   // Persist weights to localStorage whenever they change.
   useEffect(() => { saveStoredWeights(weights) }, [weights])
+
+  // Pulse the Tune button briefly whenever weights change (after first mount)
+  // so the recruiter sees the tuning actually landed on the TopBar.
+  const [tunePulseKey, setTunePulseKey] = useState(0)
+  const skipFirstPulse = useRef(true)
+  useEffect(() => {
+    if (skipFirstPulse.current) { skipFirstPulse.current = false; return }
+    setTunePulseKey(k => k + 1)
+  }, [weights])
 
   // Keyboard shortcuts.
   // T: open tuning panel from the deck.
@@ -193,6 +202,7 @@ export default function App() {
           onOpenShortlist={shortlist.length > 0 ? () => setPhase('shortlist') : undefined}
           onOpenTuning={() => setTuningOpen(true)}
           onOpenDashboard={data ? () => setPhase(p => p === 'dashboard' ? 'deck' : 'dashboard') : undefined}
+          tunePulseKey={tunePulseKey}
         />
       )}
       <AnimatePresence mode="wait">
