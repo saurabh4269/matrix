@@ -1,0 +1,113 @@
+Two answers, then the real question.
+
+Audit result
+
+- JD (data/jd_text.txt) — transcribed from Redrob's job_description.docx. Same content, just plain text so the ranker can grep it.
+- 100K candidates (candidates.jsonl) — untouched, read directly by rank.py. The submission CSV is 100% Redrob data.
+- Sandbox demo (sandbox/backend/sample_candidates.json, 20 profiles for the UI) — IDs match Redrob's candidates.jsonl. Career history, skills, education, redrob_signals — all byte-identical. The only field that differs is profile.summary — the ~2-line self-description got rewritten (probably during earlier demo curation to make summaries more compelling to read). Everything the ranker consumes (which excludes summary for scoring anyway) is the real data. The submission CSV is safe. The demo UI has slightly polished summaries.
+
+If that bothers you, I can restore the original summaries in 30 seconds — the demo would still work.
+
+Now the real question — winning on ranking quality
+
+The judges score us on NDCG@10 × 0.50 + NDCG@50 × 0.30 + MAP × 0.15 + P@10 × 0.05, against ground-truth labels we can never see. Our job is to produce a top-100 ranking that best agrees with their unknown truth.
+
+Here's what actually moves that needle — ranked by expected impact:
+
+Highest leverage (do these)
+
+1. Adversarial verify + debate rerank on the top 2 refute each top-10 ranking. If majority refute,they drop out of top-10; #11 gets promoted. Plus pairwise debate over top-20 to lock in ordering. Direct NDCG@10 impact. Needs ANTHROPIC_API_KEY, ~$3, ~5min. Not yet run for rea
+2. Ensemble across our own submissions. We have v5 (baseline), v6 (cross-encoder on top-50), v7 (debate). Take a Borda-count     consensus for the top-100. A candidate who's top-1than one that's top-10 in only one. This is trivial to compute and typically buys 1–3% NDCG@10 against any single method.                                                            3. Spot-check the top 10 manually. Read each of thofiles from candidates.jsonl. If one obviouslydoesn't fit ("hired 2 years ago", "current title is marketing manager"), that's a probe bug we can fix. 20 minutes of your time; could catch a critical error.
+4. Weight tuning against a labeled set. The one thing that would beat everything else — but needs labels. Two paths:
+  - You label 30–40 candidates from eval/sample_tohe rubric already written ineval/candidates_to_label.md). Then eval/tune_weights.py learns optimal weights via LightGBM-Rank.
+  - Or I run a 3-agent LLM labeling pass on 40 cansier, but > nothing.
+
+Sanity checks (before submitting)
+
+5. Confirm no honeypots in top-100. 222 quarantiness makes sure they stayed out. python -c "importjson; ..." — I can run this.
+6. Confirm no reasoning hallucinations. Every reasct from the profile. Automated check.
+7. Run Redrob's validate_submission.py. Their own validator — must pass or Stage-1 DQ.
+
+What NOT to spend time on
+
+- More UI polish. Ranking quality is the win, and the UI is already there.
+- More probes. Each new probe has diminishing retuur own hypotheses.
+- Fancier calibration math (Bayesian posteriors, etc). Already there, doesn't move NDCG.
+
+Concrete plan I'd propose
+
+If you export ANTHROPIC_API_KEY in a shell, I can (all in ~15 min):
+
+1. Run debate rerank on top-20 → team_v7_debate.csv
+2. Run LLM adversarial verify on top-10 → any thatmoted
+3. Ensemble v5 + v6 + v7 + verified into team_final.csv
+4. Optionally: LLM-label 40 candidates, run eval/t_tuned.csv — compare to see if it beats theensemble
+5. Manual spot-check of the top-10 (paste them her
+6. Run validate_submission.py
+7. Pick the winner (whichever has best judge-tau +
+
+Which do you want me to do first? Or: set the API o.
+7. Pick the winner (whichever has best judge-tau + passes validation)
+
+Which do you want me to do first? Or: set the API key and I'll do 1–5 in one go.
+
+================================================================
+Sanity check results (run 2026-07-01)
+================================================================
+
+All three sanity checks PASS on all four current submissions
+(team_v4.csv, team_v5.csv, team_v6_ce.csv, team_v7_debate.csv).
+
+1. Honeypot / anti-SNR leakage into top-100
+   - Top-100 rows:               100 / 100
+   - Honeypots quarantined:      222
+   - Heavy anti-SNR quarantined: 50
+   - Honeypot leak into top-100: 0   (must be 0) - PASS
+   - Heavy anti-SNR leak:        0   (should be 0) - PASS
+
+2. Reasoning hallucination audit
+   - Extracted every capitalised entity from each of the 100
+     reasoning strings and grep'd against the source profile
+     (summary + headline + title + company + career history
+     + skills + education) for that candidate_id.
+   - Result: 0 hallucinations across all 100 rows. The only
+     "unfound" tokens were regex false positives on sentence
+     starters like "Also". Every real company / title / tech
+     term is grounded in the candidate's actual profile.
+   - Structural check: the reasoning template is deterministic
+     ("N embedding/retrieval mention(s) in descriptions",
+     "M vector-DB mention(s) in descriptions", etc.) computed
+     from probe outputs. It cannot fabricate content by
+     construction.
+
+3. Redrob's official validate_submission.py
+   - team_v4.csv        - Submission is valid.
+   - team_v5.csv        - Submission is valid.
+   - team_v6_ce.csv     - Submission is valid.
+   - team_v7_debate.csv - Submission is valid.
+
+Bonus: v5 top-10 eyeball
+   Every top-10 candidate is in AI/ML/Search/NLP/Recommendation
+   roles at recognised product companies (Meta, Razorpay,
+   Sarvam AI, Paytm, CRED, Zomato, Zoho, Salesforce, Mad Street
+   Den). 9/10 open to work. 9/10 verified. Notice mostly 30-45d.
+   No obvious duds.
+
+   Two judgement calls to flag before locking in the submission:
+
+   (a) #1 Mira Banerjee has 16.2y - JD says "5-9 years". Our
+       yoe_band_fit probe uses a Gaussian with sigma=2.5, so
+       she pays a small YoE penalty but her Meta + Applied
+       Scientist + heavy embedding/vector-DB signals still
+       float her to #1. If we treat the JD's 5-9 as strict,
+       tighten sigma to ~1.5 and she'll drop. If it's a
+       preference range, keep as-is.
+
+   (b) #10 Krishna Subramanian is verified=False. Everyone
+       else in the top-10 is verified. Not a hard block
+       (verification is a trust modifier) but if we want a
+       fully-verified top-10 we could bump verification
+       weight and Krishna would drop.
+
+Nothing else looks off. Submission is judge-ready pending final
+call on Mira's YoE and Krishna's verification.
